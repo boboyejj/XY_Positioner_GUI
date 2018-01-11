@@ -59,7 +59,6 @@ def run_scan():
     print xpoints, ypoints, step_size, scan, reset
 
 
-
     if reset:
         motors = serial.Serial('COM3', timeout=1.5)
         motors.flush()
