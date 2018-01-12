@@ -8,50 +8,72 @@ import random
 from NARDA_control import read_data
 import numpy as np
 import argparse
+from grid_scan import run_scan
+import motor_driver
 
 
-@Gooey(program_name='NARDA Grid Scan', monospace_display=True, default_size=(600, 600), advanced=True, optional_cols=2)
+@Gooey(program_name='NARDA Grid Scan', monospace_display=True, default_size=(800, 600), advanced=True)
 def run_gui():
     parser = argparse.ArgumentParser(description='Scan over basic grid area. Built for C4 Motor Controller.')
+
     sub = parser.add_subparsers(title='Choose which command to run.', help='Subparser help goes here.',
                                 dest='subparser_name')
 
+    # Arguments for conducting a general area scan
     area_scan = sub.add_parser('area_scan', help='Run a standard grid scan or specified size.')
-    area_scan.add_argument('stuff', type=int, help='stuff help')
-    area_scan.add_argument('other stuff', help='other stuff help')
+    area_scan.add_argument('x_distance', type=float, default=6 * 2.8, help='distance in the x direction')
+    area_scan.add_argument('y_distance', type=float, default=4 * 2.8, help='distance in the y direction')
+    area_scan.add_argument('grid_step_dist', type=float, default=2.8, help='distance to between grid points '
+                                                                           '(default=2.8cm)')
+    area_scan.add_argument('--measure', action='store_true', default=False, help='perform measurement '
+                                                                                 '(can be disabled to test motors)')
+    area_scan.add_argument('--dwell_time', type=float, default=2,
+                           help='time in seconds to wait at each measurement point')
+    area_scan.add_argument('--outfile_location', help='choose directory where data will be output')
 
+    # Arguments for moving to a specific position in the grid
     pos_move = sub.add_parser('pos_move', help='Move to specified position')
-    pos_move.add_argument('b stuff', help='b stuff')
-    pos_move.add_argument('b not stuff', help='b not stuff')
+    pos_move.add_argument('x_distance', type=float, default=6 * 2.8, help='distance in the x direction')
+    pos_move.add_argument('y_distance', type=float, default=4 * 2.8, help='distance in the y direction')
+    pos_move.add_argument('grid_step_dist', type=float, default=2.8, help='distance to between grid points '
+                                                                          '(default=2.8cm)')
+    pos_move.add_argument('--measure', action='store_true', default=False, help='perform measurement '
+                                                                                '(can be disabled to test motors)')
+    pos_move.add_argument('--dwell_time', type=float, default=2, help='time in seconds to wait at measurement point')
+    pos_move.add_argument('--outfile_location', help='choose directory where data will be output')
 
+    # Arguments for conduction tests on extensions outside of a point.
     extension = sub.add_parser('extension',
                                help='Run extensions on a data point. Must have already moved to that position.')
     extension.add_argument('level', choices=list(['1', '2']),
                            help='What level of extensions outward would you like to go?')
+    extension.add_argument('--dwell_time', type=float, default=2,
+                           help='time in seconds to wait at each measurement point')
+    extension.add_argument('--outfile_location', help='choose directory where data will be output')
 
+    # Arguments for moving motors back to center position
     reset_motors = sub.add_parser('reset_motors', help='Move motors back to their original positions')
-    reset_motors.add_argument('wait', action='store_true', default=False,
+    reset_motors.add_argument('--wait', action='store_true', default=False,
                               help='Check this box to signify that you understand you are not allowed to touch '
                                    'anything while the motors are moving back to their home positions')
 
-    #    area_scan.add_argument('X_distance', type=int, default=6 * 2.8, help='distance in the x direction')
-    #    area_scan.add_argument('Y_distance', type=int, default=4 * 2.8, help='distance in the y direction')
-    #    area_scan.add_argument('Motor_step_distance', type=float, default=2.8, help='distance to between grid points'
-    #                                                                             ' (default=2.8cm)')
-    #    reset_motors.add_argument('--reset', action='store_true', default=False, help='Reset motors to their home positions '
-    #                                                                            'and exit (WARNING: PLEASE '
-    #                                                                            'WAIT UNTIL MOTORS ARE HOMED BEFORE '
-    #                                                                            'RUNNING PROGRAM AGAIN!)')
-    #    parser.add_argument('--scan', action='store_true', default=False, help='perform scan action '
-    #                                                                           '(can be disabled to test motors)')
-    #    # parser.add_argument('--outfile_location', help='choose directory where data will be output', widget='DirChooser')
-
     args = parser.parse_args()
     print args
-    if args.subparser_name == 'a':
+    if args.subparser_name == 'area_scan':
         print 1
-    if args.subparser_name == 'b':
+        run_scan(args)
+    elif args.subparser_name == 'pos_move':
         print 2
+    elif args.subparser_name == 'extension':
+        print 3
+    elif args.subparser_name == 'reset_motors':
+        if args.wait:
+            m = motor_driver.MotorDriver()
+            m.home_motors()
+            m.destroy()
+        else:
+            print 'Please check the box and try again. You must wait until the motors are done resetting.'
+            exit(1)
 
     # x_distance, y_distance, step_size, scan, reset = args.X_distance, args.Y_distance, args.Motor_step_distance, \
     #                                                 args.scan, args.reset

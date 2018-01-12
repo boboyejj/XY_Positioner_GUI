@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ec7ee67b-dab4-49e8-8d2e-33367546fbb8" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/overall_gui.py" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/grid_scan.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/c4motor_scan.py" afterPath="$PROJECT_DIR$/c4motor_scan.py" />
       <change beforePath="$PROJECT_DIR$/motor_driver.py" afterPath="$PROJECT_DIR$/motor_driver.py" />
+      <change beforePath="$PROJECT_DIR$/overall_gui.py" afterPath="$PROJECT_DIR$/overall_gui.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -19,8 +19,8 @@
       <file leaf-file-name="c4motor_scan.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/c4motor_scan.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="43" column="98" lean-forward="true" selection-start-line="43" selection-start-column="5" selection-end-line="43" selection-end-column="98" />
+            <state relative-caret-position="96">
+              <caret line="66" column="13" lean-forward="true" selection-start-line="66" selection-start-column="13" selection-end-line="66" selection-end-column="13" />
               <folding>
                 <element signature="e#103#139#0" expanded="true" />
               </folding>
@@ -28,11 +28,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="overall_gui.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="grid_scan.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/grid_scan.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="331">
+              <caret line="27" column="21" lean-forward="false" selection-start-line="27" selection-start-column="21" selection-end-line="27" selection-end-column="21" />
+              <folding>
+                <element signature="e#0#20#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="overall_gui.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/overall_gui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="128">
-              <caret line="20" column="66" lean-forward="true" selection-start-line="20" selection-start-column="66" selection-end-line="20" selection-end-column="66" />
+            <state relative-caret-position="171">
+              <caret line="23" column="62" lean-forward="false" selection-start-line="23" selection-start-column="62" selection-end-line="23" selection-end-column="62" />
               <folding>
                 <element signature="e#48#84#0" expanded="true" />
               </folding>
@@ -43,8 +55,8 @@
       <file leaf-file-name="motor_driver.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/motor_driver.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="288">
-              <caret line="63" column="24" lean-forward="false" selection-start-line="63" selection-start-column="24" selection-end-line="63" selection-end-column="24" />
+            <state relative-caret-position="331">
+              <caret line="68" column="37" lean-forward="true" selection-start-line="68" selection-start-column="37" selection-end-line="68" selection-end-column="37" />
               <folding>
                 <element signature="e#64#77#0" expanded="true" />
               </folding>
@@ -98,8 +110,12 @@
     </option>
   </component>
   <component name="FindInProjectRecents">
+    <findStrings>
+      <find>arguments</find>
+    </findStrings>
     <replaceStrings>
       <replace>open_port</replace>
+      <replace>args</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -112,10 +128,12 @@
         <option value="$PROJECT_DIR$/pySerial_testing.py" />
         <option value="$PROJECT_DIR$/motor_control.py" />
         <option value="$PROJECT_DIR$/NARDA_control.py" />
-        <option value="$PROJECT_DIR$/motor_driver.py" />
         <option value="$PROJECT_DIR$/c4motor_scan.py" />
         <option value="$PROJECT_DIR$/test.py" />
+        <option value="$PROJECT_DIR$/area_scan.py" />
+        <option value="$PROJECT_DIR$/motor_driver.py" />
         <option value="$PROJECT_DIR$/overall_gui.py" />
+        <option value="$PROJECT_DIR$/grid_scan.py" />
       </list>
     </option>
   </component>
@@ -313,8 +331,8 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2713816" sideWeight="0.5029762" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28125" sideWeight="0.49702382" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21052632" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16611843" sideWeight="0.49702382" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24671052" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -340,7 +358,7 @@
           <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="6" />
+      <option name="time" value="7" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -445,31 +463,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/motor_driver.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="63" column="24" lean-forward="false" selection-start-line="63" selection-start-column="24" selection-end-line="63" selection-end-column="24" />
-          <folding>
-            <element signature="e#64#77#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="164">
           <caret line="1071" column="0" lean-forward="false" selection-start-line="1071" selection-start-column="0" selection-end-line="1071" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/c4motor_scan.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="43" column="98" lean-forward="true" selection-start-line="43" selection-start-column="5" selection-end-line="43" selection-end-column="98" />
-          <folding>
-            <element signature="e#103#139#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -483,18 +481,48 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="11" column="14" lean-forward="true" selection-start-line="11" selection-start-column="14" selection-end-line="11" selection-end-column="14" />
+        <state relative-caret-position="224">
+          <caret line="17" column="57" lean-forward="true" selection-start-line="17" selection-start-column="57" selection-end-line="17" selection-end-column="57" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor_driver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="331">
+          <caret line="68" column="37" lean-forward="true" selection-start-line="68" selection-start-column="37" selection-end-line="68" selection-end-column="37" />
+          <folding>
+            <element signature="e#64#77#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/c4motor_scan.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="96">
+          <caret line="66" column="13" lean-forward="true" selection-start-line="66" selection-start-column="13" selection-end-line="66" selection-end-column="13" />
+          <folding>
+            <element signature="e#103#139#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/overall_gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="20" column="66" lean-forward="true" selection-start-line="20" selection-start-column="66" selection-end-line="20" selection-end-column="66" />
+        <state relative-caret-position="171">
+          <caret line="23" column="62" lean-forward="false" selection-start-line="23" selection-start-column="62" selection-end-line="23" selection-end-column="62" />
           <folding>
             <element signature="e#48#84#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grid_scan.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="331">
+          <caret line="27" column="21" lean-forward="false" selection-start-line="27" selection-start-column="21" selection-end-line="27" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
           </folding>
         </state>
       </provider>
