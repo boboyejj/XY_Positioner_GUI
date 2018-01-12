@@ -12,6 +12,7 @@ import turtle
 import random
 from NARDA_control import read_data
 import numpy as np
+import argparse
 
 
 # Home both motors to preset positions
@@ -40,10 +41,10 @@ def reset_motors(port):
 
 @Gooey(program_name='NARDA Grid Scan', monospace_display=True, default_size=(600, 600))
 def run_scan():
-    parser = GooeyParser(description='Scan over basic grid area. Built for C4 Motor Controller.')
-
-    parser.add_argument('X_Steps', type=int, default=6, help='number of grid points in the x direction')
-    parser.add_argument('Y_Steps', type=int, default=4, help='number of grid points in the y direction')
+    #parser = GooeyParser(description='Scan over basic grid area. Built for C4 Motor Controller.')
+    parser = argparse.ArgumentParser(description='Scan over basic grid area. Built for C4 Motor Controller.')
+    parser.add_argument('X_distance', type=int, default=6*2.8, help='distance in the x direction')
+    parser.add_argument('Y_distance', type=int, default=4*2.8, help='distance in the y direction')
     parser.add_argument('Motor_step_distance', type=float, default=2.8, help='distance to between grid points'
                                                                              ' (default=2.8cm)')
     parser.add_argument('--reset', action='store_true', default=False, help='Reset motors to their home positions '
@@ -52,10 +53,12 @@ def run_scan():
                                                                             'RUNNING PROGRAM AGAIN!)')
     parser.add_argument('--scan', action='store_true', default=False, help='perform scan action '
                                                                            '(can be disabled to test motors)')
-    parser.add_argument('--outfile_location', help='choose directory where data will be output', widget='DirChooser')
+    # parser.add_argument('--outfile_location', help='choose directory where data will be output', widget='DirChooser')
     args = parser.parse_args()
-    xpoints, ypoints, step_size, scan, reset = args.X_Steps, args.Y_Steps, args.Motor_step_distance, \
+    x_distance, y_distance, step_size, scan, reset = args.X_distance, args.Y_distance, args.Motor_step_distance, \
                                                    args.scan, args.reset
+    xpoints = int(x_distance / step_size) + 1
+    ypoints = int(y_distance / step_size) + 1
     print xpoints, ypoints, step_size, scan, reset
 
 

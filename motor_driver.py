@@ -70,3 +70,9 @@ class MotorDriver:
         self.port.flush()
 
         print 'Motors reset. Exit program and run again.'
+
+    def destroy(self):
+        self.port.flush()
+        self.port.flushInput()
+        self.port.flushOutput()
+        self.port.close()
