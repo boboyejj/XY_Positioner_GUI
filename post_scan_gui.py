@@ -1,9 +1,20 @@
+"""
+    Created by Ganesh Arvapalli on 1/15/18
+    ganesh.arvapalli@pctest.com
+"""
+
 import Tkinter as tk
 import ttk
 
+
 class PostScanGUI(tk.Tk):
-    """GUI to control options after initial scan has been run
+    """Tkinter GUI that allows user to select post scan options.
+
+    Attributes:
+        choiceVar = Option that is selected by the user
+        combobox = Tkinter widget allowing for selection of different options
     """
+
     def __init__(self, parent):
         tk.Tk.__init__(self, parent)
         self.parent = parent

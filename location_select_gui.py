@@ -1,8 +1,19 @@
+"""
+    Created by Ganesh Arvapalli on 1/15/18
+    ganesh.arvapalli@pctest.com
+"""
+
 import Tkinter as tk
-import ttk
-import numpy as np
+
 
 class LocationSelectGUI(tk.Tk):
+    """Tkinter GUI that allows user to select specific location along scan path.
+
+    Attributes:
+        grid = Grid of buttons showing arrangement of scan path
+        choiceVar = Desired location within grid
+    """
+
     def __init__(self, parent, grid):
         tk.Tk.__init__(self, parent)
         self.parent = parent
@@ -16,7 +27,7 @@ class LocationSelectGUI(tk.Tk):
         for i in range(len(self.grid)):
             for j in range(len(self.grid[0])):
                 btn = tk.Button(self, text=str(int(self.grid[i][j])),
-                                command=lambda row=i, col=j: self.selected(row, col))
+                                command=lambda row=i, col=j: self.selected(row, col), padx=10, pady=10)
                 btn.grid(row=i, column=j, sticky="nsew")
 
         self.grid_rowconfigure(len(self.grid), weight=1)

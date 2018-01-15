@@ -1,5 +1,3 @@
-import Tkinter as tk
-import math
 import serial
 import time
 import sys
@@ -89,32 +87,36 @@ def run_scan(args):
             break
         print np.argwhere(grid == count)[0], count
 
-    post_gui = PostScanGUI(None)
-    post_gui.title('Post Scan Options')
-    post_gui.mainloop()
+    while True:
+        post_gui = PostScanGUI(None)
+        post_gui.title('Post Scan Options')
+        post_gui.mainloop()
 
-    choice = post_gui.get_gui_value()
-    print choice
-    if choice == 'Exit':
-        print 'Exiting program...'
-        exit(0)
-    elif choice == 'Zoom Scan':
-        print 'Please select location.'
-        loc_gui = LocationSelectGUI(None, grid)
-        loc_gui.title('Location Selection')
-        loc_gui.mainloop()
-        location = loc_gui.get_gui_value()
-        print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
-        print 'Please enter required parameters'
-    elif choice == 'Correct Previous Value':
-        print 'Please select location.'
-        loc_gui = LocationSelectGUI(None, grid)
-        loc_gui.title('Location Selection')
-        loc_gui.mainloop()
-        location = loc_gui.get_gui_value()
-        print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
-    else:
-        print 'Invalid choice'
-        exit(1)
-
-    m.destroy()
+        choice = post_gui.get_gui_value()
+        print choice
+        if choice == 'Exit':
+            print 'Exiting program...'
+            m.destroy()
+            exit(0)
+        elif choice == 'Zoom Scan':
+            print 'Please select location.'
+            loc_gui = LocationSelectGUI(None, grid)
+            loc_gui.title('Location Selection')
+            loc_gui.mainloop()
+            location = loc_gui.get_gui_value()
+            print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
+            print 'Please enter required parameters'
+            count = location
+        elif choice == 'Correct Previous Value':
+            print 'Please select location.'
+            loc_gui = LocationSelectGUI(None, grid)
+            loc_gui.title('Location Selection')
+            loc_gui.mainloop()
+            location = loc_gui.get_gui_value()
+            print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
+            print 'Need to Move', np.argwhere(grid == count) - np.argwhere(grid == location)
+            count = location
+        else:
+            print 'Invalid choice'
+            m.destroy()
+            exit(1)

@@ -1,9 +1,9 @@
 """
-Created by Ganesh Arvapalli on 1/12/18
+    Created by Ganesh Arvapalli on 1/12/18
+    ganesh.arvapalli@pctest.com
 """
 
-from gooey import Gooey, GooeyParser
-import Tkinter as tk
+from gooey import Gooey
 import random
 from NARDA_control import read_data
 import numpy as np
@@ -11,7 +11,6 @@ import argparse
 from grid_scan import run_scan, generate_grid
 import motor_driver
 from location_select_gui import LocationSelectGUI
-from post_scan_gui import PostScanGUI
 
 
 @Gooey(program_name='NARDA Grid Scan', monospace_display=True, default_size=(800, 600), advanced=True)
@@ -29,6 +28,8 @@ def run_gui():
                                                                            '(default=2.8cm)')
     area_scan.add_argument('--measure', action='store_true', default=False, help='perform measurement '
                                                                                  '(can be disabled to test motors)')
+    area_scan.add_argument('--auto_zoom_scan', action='store_true', default=False,
+                           help='perform zoom scan automatically (can be disabled to conduct multiple area scans')
     area_scan.add_argument('--dwell_time', type=float, default=2,
                            help='time in seconds to wait at each measurement point')
     area_scan.add_argument('--outfile_location', help='choose directory where data will be output')
@@ -65,16 +66,27 @@ def run_gui():
         print 1
         run_scan(args)
     elif args.subparser_name == 'pos_move':
+        # Generate grid following scan path
         x_points = int(np.ceil(np.around(args.x_distance / args.grid_step_dist, decimals=3)))
         y_points = int(np.ceil(np.around(args.y_distance / args.grid_step_dist, decimals=3)))
         grid = generate_grid(y_points, x_points)
+
+        # Show GUI with selectable buttons for where you want to go
         loc_gui = LocationSelectGUI(None, grid)
         loc_gui.title('Location Selection')
         loc_gui.mainloop()
         location = loc_gui.get_gui_value()
-        print location
+        grid_loc = np.argwhere(grid == location)[0]
+
+        m = motor_driver.MotorDriver()
+        num_steps = args.grid_step_dist / m.step_unit
+
+        m.forward_motor_one(num_steps * grid_loc[1])
+        m.forward_motor_two(num_steps * grid_loc[0])
+        exit(0)
     elif args.subparser_name == 'extension':
         print 'Extensions not implemented as of yet.'
+        exit(0)
     elif args.subparser_name == 'reset_motors':
         if args.wait:
             m = motor_driver.MotorDriver()

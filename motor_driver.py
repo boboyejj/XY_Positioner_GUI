@@ -1,11 +1,14 @@
-# Class for controlling motors using serial port communication
+"""
+    Created by Ganesh Arvapalli on 1/12/18
+    ganesh.arvapalli@pctest.com
+"""
 
 import serial
 import time
 
 
 class MotorDriver:
-    """ Attempts to open port to control two MD2 stepper motors.
+    """Attempts to open serial port to control two MD2 stepper motors.
 
         Automatically flushes input and output
 
