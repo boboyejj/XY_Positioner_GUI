@@ -2,10 +2,14 @@ import Tkinter as tk
 import ttk
 
 class PostScanGUI(tk.Tk):
+    """GUI to control options after initial scan has been run
+    """
     def __init__(self, parent):
         tk.Tk.__init__(self, parent)
         self.parent = parent
+        self.setup()
 
+    def setup(self):
         self.choiceVar = tk.StringVar()
         self.choices = ('Correct Previous Value', 'Zoom Scan', 'Exit')
         self.choiceVar.set(self.choices[0])
@@ -22,8 +26,8 @@ class PostScanGUI(tk.Tk):
 
     def selected(self, event):
         self.choiceVar = self.combobox.get()
-        w = tk.Tk()
-        w.withdraw()
+        #w = tk.Tk()
+        #w.withdraw()
         self.quit()
 
     def get_gui_value(self):

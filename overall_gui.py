@@ -8,8 +8,10 @@ import random
 from NARDA_control import read_data
 import numpy as np
 import argparse
-from grid_scan import run_scan
+from grid_scan import run_scan, generate_grid
 import motor_driver
+from location_select_gui import LocationSelectGUI
+from post_scan_gui import PostScanGUI
 
 
 @Gooey(program_name='NARDA Grid Scan', monospace_display=True, default_size=(800, 600), advanced=True)
@@ -63,9 +65,16 @@ def run_gui():
         print 1
         run_scan(args)
     elif args.subparser_name == 'pos_move':
-        print 2
+        x_points = int(np.ceil(np.around(args.x_distance / args.grid_step_dist, decimals=3)))
+        y_points = int(np.ceil(np.around(args.y_distance / args.grid_step_dist, decimals=3)))
+        grid = generate_grid(y_points, x_points)
+        loc_gui = LocationSelectGUI(None, grid)
+        loc_gui.title('Location Selection')
+        loc_gui.mainloop()
+        location = loc_gui.get_gui_value()
+        print location
     elif args.subparser_name == 'extension':
-        print 3
+        print 'Extensions not implemented as of yet.'
     elif args.subparser_name == 'reset_motors':
         if args.wait:
             m = motor_driver.MotorDriver()

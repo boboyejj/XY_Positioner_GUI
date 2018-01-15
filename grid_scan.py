@@ -9,6 +9,7 @@ from NARDA_control import read_data
 import numpy as np
 import motor_driver
 from post_scan_gui import PostScanGUI
+from location_select_gui import LocationSelectGUI
 
 
 def move_to_pos_one(moto, num_steps, x, y):
@@ -84,25 +85,36 @@ def run_scan(args):
         count += 1
         if count > x_points * y_points:
             # TODO: MEASURE HERE
+            count -= 1  # Reset count to end of grid
             break
         print np.argwhere(grid == count)[0], count
 
-    p = PostScanGUI(None)
-    p.title('Post Scan Options')
-    p.mainloop()
+    post_gui = PostScanGUI(None)
+    post_gui.title('Post Scan Options')
+    post_gui.mainloop()
 
-    choice = p.get_gui_value()
+    choice = post_gui.get_gui_value()
     print choice
     if choice == 'Exit':
         print 'Exiting program...'
         exit(0)
     elif choice == 'Zoom Scan':
-        print 'Please select location'
+        print 'Please select location.'
+        loc_gui = LocationSelectGUI(None, grid)
+        loc_gui.title('Location Selection')
+        loc_gui.mainloop()
+        location = loc_gui.get_gui_value()
+        print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
         print 'Please enter required parameters'
     elif choice == 'Correct Previous Value':
-        print 'Please select location'
+        print 'Please select location.'
+        loc_gui = LocationSelectGUI(None, grid)
+        loc_gui.title('Location Selection')
+        loc_gui.mainloop()
+        location = loc_gui.get_gui_value()
+        print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
     else:
         print 'Invalid choice'
         exit(1)
-    
+
     m.destroy()
