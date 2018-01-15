@@ -21,13 +21,14 @@ class MotorDriver:
         """Init MotorDriver with step_unit and port = COM3"""
         try:
             self.port = serial.Serial('COM3', timeout=1.5)
+            self.port.flushOutput()
+            self.port.flushInput()
+            self.port.flush()
+            self.step_unit = step_unit_
         except serial.SerialException:
             print 'Error opening port'
-            exit(0)
-        self.port.flushOutput()
-        self.port.flushInput()
-        self.port.flush()
-        self.step_unit = step_unit_
+            exit(1)
+
 
     def forward_motor_one(self, steps):
         """Move motor 1 forward the specified number of steps."""
