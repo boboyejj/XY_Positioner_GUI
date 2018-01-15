@@ -5,7 +5,17 @@ import time
 
 
 class MotorDriver:
+    """ Attempts to open port to control two MD2 stepper motors.
+
+        Automatically flushes input and output
+
+        Attributes:
+            port: Serial port through which motors are controlled
+            step_unit: Size of individual motor step (consult manual)
+    """
+
     def __init__(self, step_unit_=0.00508):
+        """Init MotorDriver with step_unit and port = COM3"""
         try:
             self.port = serial.Serial('COM3', timeout=1.5)
         except serial.SerialException:
@@ -17,6 +27,7 @@ class MotorDriver:
         self.step_unit = step_unit_
 
     def forward_motor_one(self, steps):
+        """Move motor 1 forward the specified number of steps."""
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
@@ -26,6 +37,7 @@ class MotorDriver:
         return out
 
     def reverse_motor_one(self, steps):
+        """Move motor 1 backward the specified number of steps."""
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
@@ -35,6 +47,7 @@ class MotorDriver:
         return out
 
     def forward_motor_two(self, steps):
+        """Move motor 2 forward the specified number of steps."""
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
@@ -44,6 +57,7 @@ class MotorDriver:
         return out
 
     def reverse_motor_two(self, steps):
+        """Move motor 2 backward the specified number of steps."""
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
@@ -54,6 +68,7 @@ class MotorDriver:
 
     # Home both motors to preset positions
     def home_motors(self):
+        """Reset motors back to center of grid."""
         # Set home of motor 1 to be 6000 steps away, home of motor 2 to be 13000 steps away
         self.port.write(str.encode('!1wh1,r,5000\r'))
         self.port.readline()
@@ -76,6 +91,7 @@ class MotorDriver:
         print 'Motors reset. Exit program and run again.'
 
     def destroy(self):
+        """Flush remaining data and close port."""
         self.port.flush()
         self.port.flushInput()
         self.port.flushOutput()
