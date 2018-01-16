@@ -25,7 +25,7 @@ class NARDAcontroller():
             self.output = {k: [] for k in self.modes}
             self.totals = {k: [] for k in ['Electrical', 'Magnetic']}
         except serial.SerialException:
-            print 'Error opening port'
+            print 'Error opening NARDA port'
             exit(1)
 
     def read_one_mode(self, mode, start=None, stop=None, step=None):
@@ -61,6 +61,8 @@ class NARDAcontroller():
         while self.port.in_waiting:
             output += self.port.read(num_bytes)
         # print output
+        time.sleep(1)
+
         print output.encode('hex')
         output = output[11:]
         print output.encode('hex')
@@ -122,6 +124,9 @@ class NARDAcontroller():
         self.get_totals()
 
     def destroy(self):
+        self.port.flush()
+        self.port.flushOutput()
+        self.port.flushInput()
         self.port.close()
 
     def get_totals(self):
@@ -148,3 +153,4 @@ if __name__ == '__main__':
     n.read_data()
     print n.get_wide_band()
     print n.get_highest_peak()
+    n.destroy()

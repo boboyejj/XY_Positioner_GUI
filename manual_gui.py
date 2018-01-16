@@ -43,10 +43,13 @@ class ManualGUI(tk.Tk):
         my_font = Font(family='Sans Serif', size=15)
 
         controlFrame = tk.Frame(background='lightblue', padx=10, pady=30)
-        btnUp = tk.Button(controlFrame, text='Up', command=self.selectedUp, padx=15, pady=20, bg='blue', font=my_font)
-        btnDown = tk.Button(controlFrame, text='Down', command=self.selectedDown, padx=15, pady=20, bg='blue', font=my_font)
-        btnLeft = tk.Button(controlFrame, text='Left', command=self.selectedLeft, padx=20, pady=20, bg='blue', font=my_font)
-        btnRight = tk.Button(controlFrame, text='Right', command=self.selectedRight, padx=20, pady=20, bg='blue', font=my_font)
+        btnUp = tk.Button(controlFrame, text='Up', command=self.selectedUp, padx=15, pady=20, bg='cyan', font=my_font)
+        btnDown = tk.Button(controlFrame, text='Down', command=self.selectedDown, padx=15, pady=20, bg='cyan',
+                            font=my_font)
+        btnLeft = tk.Button(controlFrame, text='Left', command=self.selectedLeft, padx=20, pady=20, bg='cyan',
+                            font=my_font)
+        btnRight = tk.Button(controlFrame, text='Right', command=self.selectedRight, padx=20, pady=20, bg='cyan',
+                             font=my_font)
         btnUp.grid(row=0, column=1, sticky="nsew")
         btnDown.grid(row=2, column=1, sticky="nsew")
         btnLeft.grid(row=1, column=0, sticky="nsew")
@@ -56,7 +59,8 @@ class ManualGUI(tk.Tk):
         controlFrame.grid_columnconfigure(3, weight=1)
         controlFrame.grid(row=0, column=0)
 
-        self.loc = tk.Label(self, text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc), font=my_font, padx=20, pady=20)
+        self.loc = tk.Label(self, text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc), font=my_font,
+                            padx=20, pady=20)
         self.loc.grid(row=1, column=0, sticky='sew')
         self.grid_rowconfigure(2, weight=1)
         self.grid_columnconfigure(1, weight=1)
