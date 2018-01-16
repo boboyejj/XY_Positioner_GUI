@@ -8,9 +8,10 @@ import random
 from NARDA_control import NARDAcontroller
 import numpy as np
 import argparse
-from grid_scan import run_scan, generate_grid
-import motor_driver
+from grid_scan import run_scan, generate_grid, move_to_pos_one
+from motor_driver import MotorDriver
 from location_select_gui import LocationSelectGUI
+from manual_gui import ManualGUI
 
 
 @Gooey(program_name='NARDA Grid Scan', monospace_display=True, default_size=(800, 600), advanced=True)
@@ -60,8 +61,13 @@ def run_gui():
                               help='Check this box to signify that you understand you are not allowed to touch '
                                    'anything while the motors are moving back to their home positions')
 
+    # Arguments for moving motors manually
+    manual_move = sub.add_parser('manual', help='Move motors manually according to a specified distance')
+    manual_move.add_argument('x_dist', default=2.8, help='How far an x step will move left or right (in cm)')
+    manual_move.add_argument('y_dist', default=2.8, help='How far a y step will move up or down (in cm)')
+
     args = parser.parse_args()
-    print args
+    # print args
     if args.subparser_name == 'area_scan':
         print 1
         run_scan(args)
@@ -72,15 +78,21 @@ def run_gui():
         grid = generate_grid(y_points, x_points)
 
         # Show GUI with selectable buttons for where you want to go
+        location = 0
         loc_gui = LocationSelectGUI(None, grid)
         loc_gui.title('Location Selection')
         loc_gui.mainloop()
         location = loc_gui.get_gui_value()
+        if location == None or location == 0:
+            print 'Please select an appropriate value'
+            exit(1)
         grid_loc = np.argwhere(grid == location)[0]
 
-        m = motor_driver.MotorDriver()
+        m = MotorDriver()
         num_steps = args.grid_step_dist / m.step_unit
 
+        # Move to first position in grid, then move to correct grid location
+        move_to_pos_one(m, num_steps, x_points, y_points)
         m.forward_motor_one(num_steps * grid_loc[1])
         m.forward_motor_two(num_steps * grid_loc[0])
         exit(0)
@@ -89,12 +101,18 @@ def run_gui():
         exit(0)
     elif args.subparser_name == 'reset_motors':
         if args.wait:
-            m = motor_driver.MotorDriver()
+            m = MotorDriver()
             m.home_motors()
             m.destroy()
+            exit(0)
         else:
             print 'Please check the box and try again. You must wait until the motors are done resetting.'
             exit(1)
+    elif args.subparser_name == 'manual':
+        man = ManualGUI(None, float(args.x_dist), float(args.y_dist))
+        man.title('Manual movement control')
+        man.mainloop()
+        exit(0)
 
     # x_distance, y_distance, step_size, scan, reset = args.X_distance, args.Y_distance, args.Motor_step_distance, \
     #                                                 args.scan, args.reset

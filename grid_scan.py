@@ -1,11 +1,6 @@
-import serial
-import time
-import sys
-import turtle
-import random
 from NARDA_control import NARDAcontroller
 import numpy as np
-import motor_driver
+from motor_driver import MotorDriver
 from post_scan_gui import PostScanGUI
 from location_select_gui import LocationSelectGUI
 
@@ -48,7 +43,7 @@ def run_scan(args):
     x_points = int(np.ceil(np.around(args.x_distance / args.grid_step_dist, decimals=3)))
     y_points = int(np.ceil(np.around(args.y_distance / args.grid_step_dist, decimals=3)))
     grid = generate_grid(y_points, x_points)
-    m = motor_driver.MotorDriver()
+    m = MotorDriver()
 
     num_steps = args.grid_step_dist / m.step_unit
     move_to_pos_one(m, num_steps, x_points, y_points)
