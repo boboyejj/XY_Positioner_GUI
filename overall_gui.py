@@ -5,7 +5,7 @@
 
 from gooey import Gooey
 import random
-from NARDA_control import read_data
+from NARDA_control import NARDAcontroller
 import numpy as np
 import argparse
 from grid_scan import run_scan, generate_grid

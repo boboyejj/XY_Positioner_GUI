@@ -3,7 +3,7 @@ import time
 import sys
 import turtle
 import random
-from NARDA_control import read_data
+from NARDA_control import NARDAcontroller
 import numpy as np
 import motor_driver
 from post_scan_gui import PostScanGUI
@@ -11,8 +11,7 @@ from location_select_gui import LocationSelectGUI
 
 
 def move_to_pos_one(moto, num_steps, x, y):
-    """
-    Move motor to first position in grid.
+    """Move motor to first position in grid.
 
     :param moto: MotorDriver to control motion
     :param num_steps: Number of motor steps between grid points
