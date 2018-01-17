@@ -3,6 +3,7 @@ import numpy as np
 from motor_driver import MotorDriver
 from post_scan_gui import PostScanGUI
 from location_select_gui import LocationSelectGUI
+import turtle
 
 
 def move_to_pos_one(moto, num_steps, x, y):
@@ -46,12 +47,13 @@ def run_scan(args):
     m = MotorDriver()
 
     num_steps = args.grid_step_dist / m.step_unit
-    move_to_pos_one(m, num_steps, x_points, y_points)
+    move_to_pos_one(m, int(num_steps), x_points, y_points)
     # TODO: MEASURE HERE
     count = 1
     print np.argwhere(grid == count)[0], count
 
     frac_step = num_steps - int(num_steps)
+    num_steps = int(num_steps)
     x_error, y_error = 0, 0
 
     going_forward = True
@@ -60,25 +62,31 @@ def run_scan(args):
             if going_forward:
                 x_error += frac_step
                 m.forward_motor_one(num_steps + int(x_error))
+                turtle.forward(20)
                 # TODO: MEASURE HERE
                 x_error = x_error - int(x_error)
             else:
                 x_error -= frac_step
                 m.reverse_motor_one(num_steps + int(x_error))   # Should be |x_error|?
+                turtle.backward(20)
                 # TODO: MEASURE HERE
                 x_error = x_error - int(x_error)
             count += 1
             print np.argwhere(grid == count)[0], count
-        y_error += frac_step
-        m.forward_motor_two(num_steps + int(y_error))
-        # TODO: MEASURE HERE
-        y_error = y_error - int(y_error)
-        going_forward = not going_forward
         count += 1
         if count > x_points * y_points:
             # TODO: MEASURE HERE
             count -= 1  # Reset count to end of grid
             break
+
+        y_error += frac_step
+        m.forward_motor_two(num_steps + int(y_error))
+        turtle.right(90)
+        turtle.forward(20)
+        turtle.left(90)
+        # TODO: MEASURE HERE
+        y_error = y_error - int(y_error)
+        going_forward = not going_forward
         print np.argwhere(grid == count)[0], count
 
     while True:
@@ -107,8 +115,11 @@ def run_scan(args):
             loc_gui.title('Location Selection')
             loc_gui.mainloop()
             location = loc_gui.get_gui_value()
+            grid_loc = np.argwhere(grid == location)[0]
             print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
             print 'Need to Move', np.argwhere(grid == count) - np.argwhere(grid == location)
+            m.forward_motor_one(num_steps * grid_loc[1])
+            m.forward_motor_two(num_steps * grid_loc[0])
             count = location
         else:
             print 'Invalid choice'
