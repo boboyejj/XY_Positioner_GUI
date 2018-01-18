@@ -21,6 +21,10 @@ class LocationSelectGUI(tk.Tk):
         self.setup()
 
     def setup(self):
+        """Set up GUI and instantiate relevant variables
+
+        :return:
+        """
         self.title('Please select a location on the grid')
         self.choiceVar = tk.IntVar()
         self.choiceVar = 0
@@ -47,9 +51,18 @@ class LocationSelectGUI(tk.Tk):
         self.config(background='lightgreen')
 
     def selected(self, row, col):
-        # Set selected value to be value of grid where button was pressed
+        """Set selected value to be value of grid where button was pressed
+
+        :param row: button row position
+        :param col: button col position
+        :return:
+        """
         self.choiceVar = self.grid[row][col]
         self.quit()
 
     def get_gui_value(self):
+        """Make selected value available outside of GUI by storing at as part of GUI
+
+        :return: Grid value where button was pressed
+        """
         return self.choiceVar

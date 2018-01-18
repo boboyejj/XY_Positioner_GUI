@@ -30,9 +30,14 @@ def run_gui():
                                                                                  '(can be disabled to test motors)')
     area_scan.add_argument('--auto_zoom_scan', action='store_true', default=False,
                            help='perform zoom scan automatically (can be disabled to conduct multiple area scans')
-    area_scan.add_argument('--dwell_time', type=float, default=2,
+    area_scan.add_argument('--dwell_time', type=float, default=240,
                            help='time in seconds to wait at each measurement point')
     area_scan.add_argument('--outfile_location', help='choose directory where data will be output')
+    area_scan.add_argument('--start_freq', help='lowest frequency (in Hz) of data sweep', default=13000)
+    area_scan.add_argument('--step_freq', help='step frequency (in Hz) of data sweep', default=1000)
+    area_scan.add_argument('--stop_freq', help='highest frequency (in Hz) of data sweep', default=15000)
+    area_scan.add_argument('--scan_mode', choices=list(['Electrical', 'Magnetic A', 'Magnetic B']),
+                           help='What mode would you like to scan?')
 
     # Arguments for moving to a specific position in the grid
     pos_move = sub.add_parser('pos_move', help='Move to specified position')
@@ -41,8 +46,13 @@ def run_gui():
     pos_move.add_argument('grid_step_dist', type=float, default=2.8, help='distance to between grid points (in cm)')
     pos_move.add_argument('--measure', action='store_true', default=False, help='perform measurement '
                                                                                 '(can be disabled to test motors)')
-    pos_move.add_argument('--dwell_time', type=float, default=2, help='time in seconds to wait at measurement point')
+    pos_move.add_argument('--dwell_time', type=float, default=240, help='time in seconds to wait at measurement point')
     pos_move.add_argument('--outfile_location', help='choose directory where data will be output')
+    pos_move.add_argument('--start_freq', help='lowest frequency (in Hz) of data sweep', default=13000)
+    pos_move.add_argument('--step_freq', help='step frequency (in Hz) of data sweep', default=1000)
+    pos_move.add_argument('--stop_freq', help='highest frequency (in Hz) of data sweep', default=15000)
+    pos_move.add_argument('--scan_mode', choices=list(['Electrical', 'Magnetic A', 'Magnetic B']),
+                          help='What mode would you like to scan?')
 
     # Arguments for conduction tests on extensions outside of a point.
     extension = sub.add_parser('extension',
@@ -63,6 +73,7 @@ def run_gui():
     manual_move = sub.add_parser('manual', help='Move motors manually according to a specified distance')
     manual_move.add_argument('x_dist', default=2.8, help='How far an x step will move left or right (in cm)')
     manual_move.add_argument('y_dist', default=2.8, help='How far a y step will move up or down (in cm)')
+    manual_move.add_argument('dwell_time', default=240, help='Dwell time at single measurement point (in s)')
 
     args = parser.parse_args()
     # print args
@@ -108,7 +119,7 @@ def run_gui():
             print 'Please check the box and try again. You must wait until the motors are done resetting.'
             exit(1)
     elif args.subparser_name == 'manual':
-        man = ManualGUI(None, float(args.x_dist), float(args.y_dist))
+        man = ManualGUI(None, float(args.x_dist), float(args.y_dist), int(args.dwell_time))
         man.title('Manual movement control')
         man.mainloop()
         exit(0)

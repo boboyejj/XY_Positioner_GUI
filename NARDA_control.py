@@ -152,6 +152,7 @@ class NARDAcontroller():
         self.output = {k: [] for k in self.modes}
         self.totals = {k: [] for k in ['Electrical', 'Magnetic']}
 
+
 if __name__ == '__main__':
     n = NARDAcontroller()
     n.read_data()

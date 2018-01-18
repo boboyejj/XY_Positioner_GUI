@@ -24,12 +24,12 @@ class ManualGUI(tk.Tk):
         y_error = accumulated error from leaving out y_frac
     """
 
-    def __init__(self, parent, x_dist_=2.8, y_dist_=2.8):
+    def __init__(self, parent, x_dist_=2.8, y_dist_=2.8, dwell_=2):
         tk.Tk.__init__(self, parent)
         self.parent = parent
         self.motor = MotorDriver()
-        self.narda = NARDAcontroller()
-        self.x_dist, self.y_dist = x_dist_, y_dist_
+        # self.narda = NARDAcontroller()
+        self.x_dist, self.y_dist, self.dwell = x_dist_, y_dist_, int(dwell_)
         self.x_steps = int(self.x_dist / self.motor.step_unit)
         self.y_steps = int(self.y_dist / self.motor.step_unit)
         self.x_frac = self.x_dist / self.motor.step_unit - self.x_steps
@@ -39,16 +39,18 @@ class ManualGUI(tk.Tk):
         self.setup()
 
     def update_variables(self):
-        if float(self.x_entry.get()) < 0 or float(self.y_entry.get()) < 0:
+        if float(self.x_entry.get()) < 0 or float(self.y_entry.get()) < 0 or int(self.dwell_entry.get()) < 0:
             print 'Please enter a valid distance.'
             return
         self.x_dist = float(self.x_entry.get())
         self.y_dist = float(self.y_entry.get())
+        self.dwell = int(self.dwell_entry.get())
         self.x_steps = int(self.x_dist / self.motor.step_unit)
         self.y_steps = int(self.y_dist / self.motor.step_unit)
         self.x_frac = self.x_dist / self.motor.step_unit - self.x_steps
         self.y_frac = self.y_dist / self.motor.step_unit - self.y_steps
         print 'Distances changed: X =', self.x_dist, 'Y =', self.y_dist
+        print 'New dwell time:', self.dwell
 
     def setup(self):
         self.title('Please select a location on the grid')
@@ -89,17 +91,22 @@ class ManualGUI(tk.Tk):
         modifyFrame = tk.Frame(bg='lightblue')
         self.x_entry = tk.Entry(modifyFrame, font=my_font)
         self.y_entry = tk.Entry(modifyFrame, font=my_font)
+        self.dwell_entry = tk.Entry(modifyFrame, font=my_font)
         self.x_entry.insert(0, str(self.x_dist))
         self.y_entry.insert(0, str(self.y_dist))
+        self.dwell_entry.insert(0, str(self.dwell))
         self.x_entry.grid(row=1, column=0, sticky='NSEW', padx=10, pady=10)
-        self.y_entry.grid(row=1, column=2, sticky='NSEW', padx=10, pady=10)
+        self.y_entry.grid(row=1, column=1, sticky='NSEW', padx=10, pady=10)
+        self.dwell_entry.grid(row=1, column=2, stick='NSEW', padx=10, pady=10)
 
         x_entry_label = tk.Label(modifyFrame, text='X Distance', font=my_font, bg='cyan', padx=10, pady=10)
         y_entry_label = tk.Label(modifyFrame, text='Y Distance', font=my_font, bg='cyan', padx=10, pady=10)
+        dwell_entry_label = tk.Label(modifyFrame, text='Dwell Time (in s)', font=my_font, bg='cyan', padx=10, pady=10)
         x_entry_label.grid(row=0, column=0, sticky='NSEW')
-        y_entry_label.grid(row=0, column=2, sticky='NSEW')
+        y_entry_label.grid(row=0, column=1, sticky='NSEW')
+        dwell_entry_label.grid(row=0, column=2, sticky='NSEW')
 
-        submitBtn = tk.Button(modifyFrame, text='Change distances', command=self.update_variables, padx=10, pady=10,
+        submitBtn = tk.Button(modifyFrame, text='Change settings', command=self.update_variables, padx=10, pady=10,
                               font=my_font)
         submitBtn.grid(row=2, column=1)
         modifyFrame.grid_rowconfigure(3, weight=1)

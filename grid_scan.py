@@ -56,7 +56,7 @@ def run_scan(args):
     m = MotorDriver()
     narda = None
     if args.measure:
-        narda = NARDAcontroller()
+        narda = NARDAcontroller(args.start_freq, args.step_freq, args.stop_freq)
 
     # Visualization of robot progress will be done using python Turtle (temporary)
     franklin = turtle.Turtle()
