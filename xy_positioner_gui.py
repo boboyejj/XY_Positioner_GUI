@@ -66,8 +66,9 @@ def run_gui():
 
     args = parser.parse_args()
     # print args
+
+    # Main cases
     if args.subparser_name == 'area_scan':
-        print 1
         run_scan(args)
     elif args.subparser_name == 'pos_move':
         # Generate grid following scan path
@@ -111,12 +112,6 @@ def run_gui():
         man.title('Manual movement control')
         man.mainloop()
         exit(0)
-
-    # x_distance, y_distance, step_size, scan, reset = args.X_distance, args.Y_distance, args.Motor_step_distance, \
-    #                                                 args.scan, args.reset
-    # xpoints = int(x_distance / step_size) + 1
-    # ypoints = int(y_distance / step_size) + 1
-    # print xpoints, ypoints, step_size, scan, reset
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ import struct
 
 
 class NARDAcontroller():
-    def __init__(self, start_freq=13000, step_freq=1000, stop_freq=20000):
+    def __init__(self, start_freq=13000, step_freq=1000, stop_freq=15000):
         try:
             self.port = serial.Serial('COM4', baudrate=38400, timeout=2)
             self.port.flushInput()

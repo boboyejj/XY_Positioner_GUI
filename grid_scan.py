@@ -3,6 +3,7 @@ import numpy as np
 from motor_driver import MotorDriver
 from post_scan_gui import PostScanGUI
 from location_select_gui import LocationSelectGUI
+from matplotlib import pyplot as plt
 import turtle
 
 
@@ -41,43 +42,55 @@ def run_scan(args):
     :param args: Arguments passed in from GUI (see GUI driver file for details)
     :return: None
     """
+    # Calculate dimensions of grid and generate it
     x_points = int(np.ceil(np.around(args.x_distance / args.grid_step_dist, decimals=3)))
     y_points = int(np.ceil(np.around(args.y_distance / args.grid_step_dist, decimals=3)))
     grid = generate_grid(y_points, x_points)
+
+    # For showing progress through grid
     progress = np.matrix(grid)
+    # For storing values of highest peak/wide-band
     values = [[tuple() for i in range(y_points)] for j in range(x_points)]
-    print values
+
+    # Check ports and instantiate relevant objects
     m = MotorDriver()
     narda = None
     if args.measure:
         narda = NARDAcontroller()
 
+    # Visualization of robot progress will be done using python Turtle (temporary)
     franklin = turtle.Turtle()
     franklin.penup()
     franklin.setposition(-100, 100)
     franklin.pendown()
+
+    # Calculate number of motor steps necessary to move one grid space
     num_steps = args.grid_step_dist / m.step_unit
+    # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
     # TODO: MEASURE HERE
     if args.measure:
         narda.reset()
         narda.read_data()
         values[0][0] = tuple((narda.get_wide_band(), narda.get_highest_peak()))
-    count = 1
+    count = 1   # Tracks our current progress through the grid
     progress[progress == count] = 0
     print values
     # print np.argwhere(grid == count)[0], count
 
+    # Create an accumulator for the fraction of a step lost each time a grid space is moved
     frac_step = num_steps - int(num_steps)
     num_steps = int(num_steps)
-    x_error, y_error = 0, 0
-    going_forward = True
+    x_error, y_error = 0, 0     # Accumulator for x and y directions
+
+    # Main loop
+    going_forward = True    # Start by moving forward
     j = 0
     for i in range(y_points):
         while j < x_points - 1:
             if going_forward:
-                x_error += frac_step
-                m.forward_motor_one(num_steps + int(x_error))
+                x_error += frac_step    # Add to error
+                m.forward_motor_one(num_steps + int(x_error))   # Increase distance moved by adding error
                 franklin.circle(2)
                 franklin.forward(20)
                 # TODO: MEASURE HERE
@@ -85,7 +98,8 @@ def run_scan(args):
                     narda.reset()
                     narda.read_data()
                     values[i][j] = tuple((narda.get_wide_band(), narda.get_highest_peak()))
-                x_error = x_error - int(x_error)
+                x_error = x_error - int(x_error)    # Subtract integer number of steps that were moved
+            # Do the same for when the robot is moving backwards as well
             else:
                 x_error -= frac_step
                 m.reverse_motor_one(num_steps + int(x_error))   # Should be |x_error|?
@@ -97,12 +111,13 @@ def run_scan(args):
                     narda.read_data()
                     values[i][j] = tuple((narda.get_wide_band(), narda.get_highest_peak()))
                 x_error = x_error - int(x_error)
+            # Increment our progress counter and print out current set of values
             count += 1
             j += 1
             progress[progress == count] = 0
             print values
-            # print np.argwhere(grid == count)[0], count
-        count += 1
+        count += 1      # Increment our progress counter
+        # If counter is outside accepted bounds, measure once and exit
         if count > x_points * y_points:
             franklin.circle(2)
             # TODO: MEASURE HERE
@@ -114,6 +129,7 @@ def run_scan(args):
             progress[progress == count] = 0
             print values
             break
+        # Else update counter, measure, and move down. Reverse direction
         progress[progress == count] = 0
         y_error += frac_step
         m.forward_motor_two(num_steps + int(y_error))
@@ -130,11 +146,27 @@ def run_scan(args):
         y_error = y_error - int(y_error)
         going_forward = not going_forward
         j = 0
-        # print np.argwhere(grid == count)[0], count
 
-    print values
-    # Post area scan loop (unless auto zoom has been implemented
+    # Post area scan loop (unless auto zoom has been implemented)
     while True:
+        # Plot results
+        if args.measure:
+            highest_peak = np.zeros(grid.shape)
+            wide_band = np.zeros(grid.shape)
+            for i in range(len(values)):
+                for j in range(len(values[0])):
+                    wide_band[i][j] = values[i][j][0]
+                    highest_peak[i][j] = values[i][j][1][0]
+            plt.figure(1)
+            wide = plt.subplot(211)
+            wide.set_title('Wide Band Measurement')
+            plt.contourf(wide_band)
+
+            high = plt.subplot(212)
+            high.set_title('Highest Peak Measurement')
+            plt.contourf(highest_peak)
+            plt.show(block=False)
+
         post_gui = PostScanGUI(None)
         post_gui.title('Post Scan Options')
         post_gui.mainloop()
@@ -144,6 +176,8 @@ def run_scan(args):
         if choice == 'Exit':
             print 'Exiting program...'
             m.destroy()
+            if narda is not None:
+                narda.destroy()
             exit(0)
         elif choice == 'Zoom Scan':
             print 'Please select location.'
@@ -197,7 +231,8 @@ def run_scan(args):
         else:
             print 'Invalid choice'
             m.destroy()
-            narda.destory()
+            if narda is not None:
+                narda.destroy()
             exit(1)
 
     # TODO: Auto-zoom-scan mode
