@@ -44,51 +44,96 @@ def run_scan(args):
     x_points = int(np.ceil(np.around(args.x_distance / args.grid_step_dist, decimals=3)))
     y_points = int(np.ceil(np.around(args.y_distance / args.grid_step_dist, decimals=3)))
     grid = generate_grid(y_points, x_points)
+    progress = np.matrix(grid)
+    values = [[tuple() for i in range(y_points)] for j in range(x_points)]
+    print values
     m = MotorDriver()
+    narda = None
+    if args.measure:
+        narda = NARDAcontroller()
 
+    franklin = turtle.Turtle()
+    franklin.penup()
+    franklin.setposition(-100, 100)
+    franklin.pendown()
     num_steps = args.grid_step_dist / m.step_unit
     move_to_pos_one(m, int(num_steps), x_points, y_points)
     # TODO: MEASURE HERE
+    if args.measure:
+        narda.reset()
+        narda.read_data()
+        values[0][0] = tuple((narda.get_wide_band(), narda.get_highest_peak()))
     count = 1
-    print np.argwhere(grid == count)[0], count
+    progress[progress == count] = 0
+    print values
+    # print np.argwhere(grid == count)[0], count
 
     frac_step = num_steps - int(num_steps)
     num_steps = int(num_steps)
     x_error, y_error = 0, 0
-
     going_forward = True
+    j = 0
     for i in range(y_points):
-        for j in range(x_points - 1):
+        while j < x_points - 1:
             if going_forward:
                 x_error += frac_step
                 m.forward_motor_one(num_steps + int(x_error))
-                turtle.forward(20)
+                franklin.circle(2)
+                franklin.forward(20)
                 # TODO: MEASURE HERE
+                if args.measure:
+                    narda.reset()
+                    narda.read_data()
+                    values[i][j] = tuple((narda.get_wide_band(), narda.get_highest_peak()))
                 x_error = x_error - int(x_error)
             else:
                 x_error -= frac_step
                 m.reverse_motor_one(num_steps + int(x_error))   # Should be |x_error|?
-                turtle.backward(20)
+                franklin.circle(2)
+                franklin.backward(20)
                 # TODO: MEASURE HERE
+                if args.measure:
+                    narda.reset()
+                    narda.read_data()
+                    values[i][j] = tuple((narda.get_wide_band(), narda.get_highest_peak()))
                 x_error = x_error - int(x_error)
             count += 1
-            print np.argwhere(grid == count)[0], count
+            j += 1
+            progress[progress == count] = 0
+            print values
+            # print np.argwhere(grid == count)[0], count
         count += 1
         if count > x_points * y_points:
+            franklin.circle(2)
             # TODO: MEASURE HERE
+            if args.measure:
+                narda.reset()
+                narda.read_data()
+                values[i][j] = tuple((narda.get_wide_band(), narda.get_highest_peak()))
             count -= 1  # Reset count to end of grid
+            progress[progress == count] = 0
+            print values
             break
-
+        progress[progress == count] = 0
         y_error += frac_step
         m.forward_motor_two(num_steps + int(y_error))
-        turtle.right(90)
-        turtle.forward(20)
-        turtle.left(90)
+        franklin.circle(2)
+        franklin.right(90)
+        franklin.forward(20)
+        franklin.left(90)
+        print values
         # TODO: MEASURE HERE
+        if args.measure:
+            narda.reset()
+            narda.read_data()
+            values[i][j] = tuple((narda.get_wide_band(), narda.get_highest_peak()))
         y_error = y_error - int(y_error)
         going_forward = not going_forward
-        print np.argwhere(grid == count)[0], count
+        j = 0
+        # print np.argwhere(grid == count)[0], count
 
+    print values
+    # Post area scan loop (unless auto zoom has been implemented
     while True:
         post_gui = PostScanGUI(None)
         post_gui.title('Post Scan Options')
@@ -107,7 +152,22 @@ def run_scan(args):
             loc_gui.mainloop()
             location = loc_gui.get_gui_value()
             print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
+            grid_move = (np.argwhere(grid == location) - np.argwhere(grid == count))[0]
+            print 'Need to move', grid_move
+            if grid_move[1] > 0:
+                m.forward_motor_one(num_steps * grid_move[1])
+            else:
+                m.reverse_motor_one(num_steps * grid_move[1])
+            if grid_move[0] > 0:
+                m.forward_motor_two(num_steps * grid_move[0])
+            else:
+                m.reverse_motor_two(num_steps * grid_move[0])
+            count = location
+            grid_loc = np.argwhere(grid == count)[0]
             print 'Please enter required parameters'
+
+            # TODO: Implement zoom scan GUI
+
             count = location
         elif choice == 'Correct Previous Value':
             print 'Please select location.'
@@ -115,13 +175,29 @@ def run_scan(args):
             loc_gui.title('Location Selection')
             loc_gui.mainloop()
             location = loc_gui.get_gui_value()
-            grid_loc = np.argwhere(grid == location)[0]
             print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
-            print 'Need to Move', np.argwhere(grid == count) - np.argwhere(grid == location)
-            m.forward_motor_one(num_steps * grid_loc[1])
-            m.forward_motor_two(num_steps * grid_loc[0])
+            grid_move = (np.argwhere(grid == location) - np.argwhere(grid == count))[0]
+            print 'Need to move', grid_move
+            if grid_move[1] > 0:
+                m.forward_motor_one(num_steps * grid_move[1])
+            else:
+                m.reverse_motor_one(num_steps * grid_move[1])
+            if grid_move[0] > 0:
+                m.forward_motor_two(num_steps * grid_move[0])
+            else:
+                m.reverse_motor_two(num_steps * grid_move[0])
             count = location
+            grid_loc = np.argwhere(grid == count)[0]
+            print grid_loc
+            # TODO: MEASURE HERE
+            if args.measure:
+                narda.reset()
+                narda.read_data()
+                values[grid_loc[0]][grid_loc[1]] = tuple((narda.get_wide_band(), narda.get_highest_peak()))
         else:
             print 'Invalid choice'
             m.destroy()
+            narda.destory()
             exit(1)
+
+    # TODO: Auto-zoom-scan mode

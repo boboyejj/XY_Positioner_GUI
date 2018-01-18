@@ -23,10 +23,9 @@ def run_gui():
 
     # Arguments for conducting a general area scan
     area_scan = sub.add_parser('area_scan', help='Run a standard grid scan or specified size.')
-    area_scan.add_argument('x_distance', type=float, default=6 * 2.8, help='distance in the x direction')
-    area_scan.add_argument('y_distance', type=float, default=4 * 2.8, help='distance in the y direction')
-    area_scan.add_argument('grid_step_dist', type=float, default=2.8, help='distance to between grid points '
-                                                                           '(default=2.8cm)')
+    area_scan.add_argument('x_distance', type=float, default=6 * 2.8, help='distance in the x direction (in cm)')
+    area_scan.add_argument('y_distance', type=float, default=4 * 2.8, help='distance in the y direction (in cm)')
+    area_scan.add_argument('grid_step_dist', type=float, default=2.8, help='distance to between grid points (in cm)')
     area_scan.add_argument('--measure', action='store_true', default=False, help='perform measurement '
                                                                                  '(can be disabled to test motors)')
     area_scan.add_argument('--auto_zoom_scan', action='store_true', default=False,
@@ -37,10 +36,9 @@ def run_gui():
 
     # Arguments for moving to a specific position in the grid
     pos_move = sub.add_parser('pos_move', help='Move to specified position')
-    pos_move.add_argument('x_distance', type=float, default=6 * 2.8, help='distance in the x direction')
-    pos_move.add_argument('y_distance', type=float, default=4 * 2.8, help='distance in the y direction')
-    pos_move.add_argument('grid_step_dist', type=float, default=2.8, help='distance to between grid points '
-                                                                          '(default=2.8cm)')
+    pos_move.add_argument('x_distance', type=float, default=6 * 2.8, help='distance in the x direction (in cm)')
+    pos_move.add_argument('y_distance', type=float, default=4 * 2.8, help='distance in the y direction (in cm)')
+    pos_move.add_argument('grid_step_dist', type=float, default=2.8, help='distance to between grid points (in cm)')
     pos_move.add_argument('--measure', action='store_true', default=False, help='perform measurement '
                                                                                 '(can be disabled to test motors)')
     pos_move.add_argument('--dwell_time', type=float, default=2, help='time in seconds to wait at measurement point')

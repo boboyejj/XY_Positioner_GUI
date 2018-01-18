@@ -6,6 +6,7 @@
 import Tkinter as tk
 from tkFont import Font
 from motor_driver import MotorDriver
+from NARDA_control import NARDAcontroller
 from PIL import ImageTk, Image
 
 class ManualGUI(tk.Tk):
@@ -27,6 +28,7 @@ class ManualGUI(tk.Tk):
         tk.Tk.__init__(self, parent)
         self.parent = parent
         self.motor = MotorDriver()
+        self.narda = NARDAcontroller()
         self.x_dist, self.y_dist = x_dist_, y_dist_
         self.x_steps = int(self.x_dist / self.motor.step_unit)
         self.y_steps = int(self.y_dist / self.motor.step_unit)
@@ -55,24 +57,24 @@ class ManualGUI(tk.Tk):
 
         # Button control grid
         controlFrame = tk.Frame(background='lightblue', padx=10, pady=30)
-        btnUp = tk.Button(controlFrame, text='Up', command=self.selectedUp, padx=15, pady=20, bg='cyan', font=my_font)
-        btnDown = tk.Button(controlFrame, text='Down', command=self.selectedDown, padx=15, pady=20, bg='cyan',
+        btnUp = tk.Button(controlFrame, text='Up', command=self.button_up, padx=15, pady=20, bg='cyan', font=my_font)
+        btnDown = tk.Button(controlFrame, text='Down', command=self.button_down, padx=15, pady=20, bg='cyan',
                             font=my_font)
-        btnLeft = tk.Button(controlFrame, text='Left', command=self.selectedLeft, padx=20, pady=20, bg='cyan',
+        btnLeft = tk.Button(controlFrame, text='Left', command=self.button_left, padx=20, pady=20, bg='cyan',
                             font=my_font)
-        btnRight = tk.Button(controlFrame, text='Right', command=self.selectedRight, padx=20, pady=20, bg='cyan',
+        btnRight = tk.Button(controlFrame, text='Right', command=self.button_right, padx=20, pady=20, bg='cyan',
                              font=my_font)
 
         img = Image.open('images/EHP-200A-500x500.gif').rotate(180)
         img.thumbnail((50, 50), Image.ANTIALIAS)
         photo = ImageTk.PhotoImage(img)
-        lab = tk.Label(controlFrame, image=photo)
-        lab.image = photo
+        btn_center = tk.Button(controlFrame, image=photo, command=self.measure)
+        btn_center.image = photo
         btnUp.grid(row=0, column=1, sticky='NSEW')
         btnDown.grid(row=2, column=1, sticky='NSEW')
         btnLeft.grid(row=1, column=0, sticky='NSEW')
         btnRight.grid(row=1, column=2, sticky='NSEW')
-        lab.grid(row=1, column=1)
+        btn_center.grid(row=1, column=1)
 
         controlFrame.grid_rowconfigure(3, weight=1)
         controlFrame.grid_columnconfigure(3, weight=1)
@@ -108,33 +110,66 @@ class ManualGUI(tk.Tk):
         self.grid_columnconfigure(1, weight=1)
 
         # Keyboard controls
-        self.bind('<Control-Up>', self.selectedUp)
-        self.bind('<Control-Down>', self.selectedDown)
-        self.bind('<Control-Left>', self.selectedLeft)
-        self.bind('<Control-Right>', self.selectedRight)
+        self.bind('<Up>', self.key_up)
+        self.bind('<Down>', self.key_down)
+        self.bind('<Left>', self.key_left)
+        self.bind('<Right>', self.key_right)
 
-    def selectedUp(self, event):
+    def measure(self):
+        self.narda.reset()
+        self.narda.read_data()
+        print self.narda.get_wide_band(), self.narda.get_highest_peak()
+
+    def button_up(self):
         self.y_loc -= self.y_dist
         self.y_error -= self.y_frac
         self.motor.reverse_motor_two(self.y_steps + int(self.y_error))
         self.y_error -= int(self.y_error)
         self.loc.config(text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc))
 
-    def selectedDown(self, event):
+    def button_down(self):
         self.y_loc += self.y_dist
         self.y_error += self.y_frac
         self.motor.forward_motor_two(self.y_steps + int(self.y_error))
         self.y_error -= int(self.y_error)
         self.loc.config(text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc))
 
-    def selectedLeft(self, event):
+    def button_left(self):
         self.x_loc -= self.x_dist
         self.x_error -= self.x_frac
         self.motor.reverse_motor_one(self.x_steps + int(self.x_error))
         self.x_error -= int(self.x_error)
         self.loc.config(text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc))
 
-    def selectedRight(self, event):
+    def button_right(self):
+        self.x_loc += self.x_dist
+        self.x_error += self.x_frac
+        self.motor.forward_motor_one(self.x_steps + int(self.x_error))
+        self.x_error -= int(self.x_error)
+        self.loc.config(text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc))
+
+    def key_up(self, event):
+        self.y_loc -= self.y_dist
+        self.y_error -= self.y_frac
+        self.motor.reverse_motor_two(self.y_steps + int(self.y_error))
+        self.y_error -= int(self.y_error)
+        self.loc.config(text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc))
+
+    def key_down(self, event):
+        self.y_loc += self.y_dist
+        self.y_error += self.y_frac
+        self.motor.forward_motor_two(self.y_steps + int(self.y_error))
+        self.y_error -= int(self.y_error)
+        self.loc.config(text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc))
+
+    def key_left(self, event):
+        self.x_loc -= self.x_dist
+        self.x_error -= self.x_frac
+        self.motor.reverse_motor_one(self.x_steps + int(self.x_error))
+        self.x_error -= int(self.x_error)
+        self.loc.config(text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc))
+
+    def key_right(self, event):
         self.x_loc += self.x_dist
         self.x_error += self.x_frac
         self.motor.forward_motor_one(self.x_steps + int(self.x_error))

@@ -44,7 +44,7 @@ class NARDAcontroller():
         else:
             self.port.write(str.encode('#00' + chr(126) + 'C' + chr(mode + 1) + chr(80) + '*\r'))
         out = self.port.readline()
-        print 'Select ' + self.modes[mode] + ': ', out
+        # print 'Select ' + self.modes[mode] + ': ', out
 
         if mode < 3:
             kf = 0.125
@@ -63,7 +63,7 @@ class NARDAcontroller():
         # print output
         time.sleep(1)
 
-        print output.encode('hex')
+        # print output.encode('hex')
         output = output[11:]
         print output.encode('hex')
 
@@ -82,7 +82,7 @@ class NARDAcontroller():
             # print 'Sync ', sync, 'Exp', exp, 'Mantissa', mantissa, '\nField', fld
             # print 'Field at step ' + str(sync) + ': ', fld
             self.output[self.modes[mode]].append(fld)
-            print self.modes[mode] + ' Field at ' + str(start + i * step) + ' Hz: ', fld
+            # print self.modes[mode] + ' Field at ' + str(start + i * step) + ' Hz: ', fld
 
     def read_data(self, start=None, step=None, stop=None):
         # If reading custom, allow for changes
@@ -93,25 +93,25 @@ class NARDAcontroller():
 
         self.port.write(str.encode('#00v*\r'))
         out = self.port.readline()
-        print 'Setting to request mode: ', out
+        # print 'Setting to request mode: ', out
         self.port.flush()
 
         # Lowest frequency of scan in Hz
         self.port.write(str.encode('#00(i' + str(start) + '*\r'))
         out = self.port.readline()
-        print 'Set start freq to ' + str(start) + ' Hz: Done'  # , out
+        # print 'Set start freq to ' + str(start) + ' Hz: Done'  # , out
         self.port.flush()
 
         # Steps to climb from lowest to highest frequency in Hz
         self.port.write(str.encode('#00(s' + str(step) + '*\r'))
         out = self.port.readline()
-        print 'Set freq step to ' + str(step) + ' Hz: Done'  # , out
+        # print 'Set freq step to ' + str(step) + ' Hz: Done'  # , out
         self.port.flush()
 
         # Highest frequency of scan in Hz
         self.port.write(str.encode('#00(f' + str(stop) + '*\r'))
         out = self.port.readline()
-        print 'Set stop freq to ' + str(stop - step) + ' Hz: Done'  # , out
+        # print 'Set stop freq to ' + str(stop - step) + ' Hz: Done'  # , out
         self.port.flush()
 
         # 6 modes, all electrical axes + mode A magnetics
@@ -144,9 +144,13 @@ class NARDAcontroller():
         return np.trapz([k for k in self.totals[mode]], dx=self.step / 1000.0)
 
     def get_highest_peak(self, mode='Electrical'):
+        print self.totals
         highest = np.amax(self.totals[mode])
-        return highest, int(np.argwhere(self.totals[mode] == highest)) * self.step + self.start
+        return highest, int(np.argwhere(self.totals[mode] == highest)[0]) * self.step + self.start
 
+    def reset(self):
+        self.output = {k: [] for k in self.modes}
+        self.totals = {k: [] for k in ['Electrical', 'Magnetic']}
 
 if __name__ == '__main__':
     n = NARDAcontroller()

@@ -26,7 +26,7 @@ class MotorDriver:
             self.port.flush()
             self.step_unit = step_unit_
         except serial.SerialException:
-            print 'Error opening port'
+            print 'Error opening port. Check which port is connected to what.'
             exit(1)
 
 
