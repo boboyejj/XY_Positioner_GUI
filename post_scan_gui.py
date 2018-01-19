@@ -22,7 +22,7 @@ class PostScanGUI(tk.Tk):
 
     def setup(self):
         self.choiceVar = tk.StringVar()
-        self.choices = ('Correct Previous Value', 'Zoom Scan', 'Exit')
+        self.choices = ('Correct Previous Value', 'Zoom Scan', 'Save Data', 'Exit')
         self.choiceVar.set(self.choices[0])
 
         label = tk.Label(self, text='What would you like to do next?')

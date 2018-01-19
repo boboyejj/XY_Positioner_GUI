@@ -185,6 +185,19 @@ def run_scan(args):
             if narda is not None:
                 narda.destroy()
             exit(0)
+        elif choice == 'Save Data':
+            # TODO: Save file method that creates place for files
+            if args.measure:
+                file = open(args.outfile_location + './results/wide_band.txt', 'w+')
+                for line in values[:][:][0]:
+                    np.savetxt(file, line)
+                file = open(args.outfile_location + './results/highest_peak.txt', 'w+')
+                for line in values[:][:][1][0]:
+                    np.savetxt(file, line)
+                for line in values[:][:][1][1]:
+                    np.savetxt(file, line)
+            else:
+                print 'No data to save.'
         elif choice == 'Zoom Scan':
             print 'Please select location.'
             loc_gui = LocationSelectGUI(None, grid)

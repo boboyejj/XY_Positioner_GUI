@@ -32,12 +32,10 @@ def run_gui():
                            help='perform zoom scan automatically (can be disabled to conduct multiple area scans')
     area_scan.add_argument('--dwell_time', type=float, default=240,
                            help='time in seconds to wait at each measurement point')
-    area_scan.add_argument('--outfile_location', help='choose directory where data will be output')
+    area_scan.add_argument('--outfile_location', default='', help='choose directory where data will be output')
     area_scan.add_argument('--start_freq', help='lowest frequency (in Hz) of data sweep', default=13000)
     area_scan.add_argument('--step_freq', help='step frequency (in Hz) of data sweep', default=1000)
     area_scan.add_argument('--stop_freq', help='highest frequency (in Hz) of data sweep', default=15000)
-    area_scan.add_argument('--scan_mode', choices=list(['Electrical', 'Magnetic A', 'Magnetic B']),
-                           help='What mode would you like to scan?')
     area_mode = area_scan.add_mutually_exclusive_group()
     area_mode.add_argument('--electrical', action='store_true', default=True, help='run electrical mode (default)')
     area_mode.add_argument('--magnetic_a', action='store_true', default=False, help='run magnetic mode A')
@@ -51,12 +49,10 @@ def run_gui():
     pos_move.add_argument('--measure', action='store_true', default=False, help='perform measurement '
                                                                                 '(can be disabled to test motors)')
     pos_move.add_argument('--dwell_time', type=float, default=240, help='time in seconds to wait at measurement point')
-    pos_move.add_argument('--outfile_location', help='choose directory where data will be output')
+    pos_move.add_argument('--outfile_location', default='', help='choose directory where data will be output')
     pos_move.add_argument('--start_freq', help='lowest frequency (in Hz) of data sweep', default=13000)
     pos_move.add_argument('--step_freq', help='step frequency (in Hz) of data sweep', default=1000)
     pos_move.add_argument('--stop_freq', help='highest frequency (in Hz) of data sweep', default=15000)
-    pos_move.add_argument('--scan_mode', choices=list(['Electrical', 'Magnetic A', 'Magnetic B']),
-                          help='What mode would you like to scan?')
     move_mode = pos_move.add_mutually_exclusive_group()
     move_mode.add_argument('--electrical', action='store_true', default=True, help='run electrical mode (default)')
     move_mode.add_argument('--magnetic_a', action='store_true', default=False, help='run magnetic mode A')
@@ -69,7 +65,7 @@ def run_gui():
                            help='What level of extensions outward would you like to go?')
     extension.add_argument('--dwell_time', type=float, default=2,
                            help='time in seconds to wait at each measurement point')
-    extension.add_argument('--outfile_location', help='choose directory where data will be output')
+    extension.add_argument('--outfile_location', default='', help='choose directory where data will be output')
 
     # Arguments for moving motors back to center position
     reset_motors = sub.add_parser('reset_motors', help='Move motors back to their original positions')

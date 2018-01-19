@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ec7ee67b-dab4-49e8-8d2e-33367546fbb8" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/NARDA_control.py" afterPath="$PROJECT_DIR$/NARDA_control.py" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/grid_scan.py" afterPath="$PROJECT_DIR$/grid_scan.py" />
-      <change beforePath="$PROJECT_DIR$/manual_gui.py" afterPath="$PROJECT_DIR$/manual_gui.py" />
+      <change beforePath="$PROJECT_DIR$/post_scan_gui.py" afterPath="$PROJECT_DIR$/post_scan_gui.py" />
       <change beforePath="$PROJECT_DIR$/xy_positioner_gui.py" afterPath="$PROJECT_DIR$/xy_positioner_gui.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,11 +17,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="grid_scan.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="grid_scan.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/grid_scan.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-3382">
-              <caret line="14" column="36" lean-forward="true" selection-start-line="14" selection-start-column="36" selection-end-line="14" selection-end-column="36" />
+            <state relative-caret-position="176">
+              <caret line="188" column="65" lean-forward="false" selection-start-line="188" selection-start-column="65" selection-end-line="188" selection-end-column="65" />
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
               </folding>
@@ -28,11 +29,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="xy_positioner_gui.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="xy_positioner_gui.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/xy_positioner_gui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="74">
-              <caret line="84" column="55" lean-forward="false" selection-start-line="84" selection-start-column="55" selection-end-line="84" selection-end-column="55" />
+            <state relative-caret-position="-102">
+              <caret line="72" column="50" lean-forward="true" selection-start-line="72" selection-start-column="50" selection-end-line="72" selection-end-column="50" />
               <folding>
                 <element signature="e#84#107#0" expanded="true" />
               </folding>
@@ -65,7 +66,7 @@
       <file leaf-file-name="NARDA_control.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NARDA_control.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
+            <state relative-caret-position="-1776">
               <caret line="21" column="45" lean-forward="true" selection-start-line="21" selection-start-column="45" selection-end-line="21" selection-end-column="45" />
               <folding>
                 <element signature="e#83#96#0" expanded="true" />
@@ -109,7 +110,6 @@
         <option value="$PROJECT_DIR$/c4motor_scan.py" />
         <option value="$PROJECT_DIR$/test.py" />
         <option value="$PROJECT_DIR$/area_scan.py" />
-        <option value="$PROJECT_DIR$/post_scan_gui.py" />
         <option value="$PROJECT_DIR$/overall_gui.py" />
         <option value="$PROJECT_DIR$/asdfasdasaf.py" />
         <option value="$PROJECT_DIR$/motor_driver.py" />
@@ -117,8 +117,9 @@
         <option value="$PROJECT_DIR$/location_select_gui.py" />
         <option value="$PROJECT_DIR$/NARDA_control.py" />
         <option value="$PROJECT_DIR$/manual_gui.py" />
-        <option value="$PROJECT_DIR$/grid_scan.py" />
+        <option value="$PROJECT_DIR$/post_scan_gui.py" />
         <option value="$PROJECT_DIR$/xy_positioner_gui.py" />
+        <option value="$PROJECT_DIR$/grid_scan.py" />
       </list>
     </option>
   </component>
@@ -465,16 +466,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test.py" />
-    <entry file="file://$PROJECT_DIR$/post_scan_gui.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="160">
-          <caret line="10" column="4" lean-forward="false" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="4" />
-          <folding>
-            <element signature="e#84#104#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/motor_control.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2192">
@@ -553,16 +544,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NARDA_control.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="21" column="45" lean-forward="true" selection-start-line="21" selection-start-column="45" selection-end-line="21" selection-end-column="45" />
-          <folding>
-            <element signature="e#83#96#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/manual_gui.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2230">
@@ -573,22 +554,56 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grid_scan.py">
+    <entry file="file://$PROJECT_DIR$/NARDA_control.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3382">
-          <caret line="14" column="36" lean-forward="true" selection-start-line="14" selection-start-column="36" selection-end-line="14" selection-end-column="36" />
+        <state relative-caret-position="-1776">
+          <caret line="21" column="45" lean-forward="true" selection-start-line="21" selection-start-column="45" selection-end-line="21" selection-end-column="45" />
           <folding>
-            <element signature="e#0#41#0" expanded="true" />
+            <element signature="e#83#96#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/post_scan_gui.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="416">
+          <caret line="27" column="70" lean-forward="true" selection-start-line="27" selection-start-column="70" selection-end-line="27" selection-end-column="70" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/xy_positioner_gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="74">
-          <caret line="84" column="55" lean-forward="false" selection-start-line="84" selection-start-column="55" selection-end-line="84" selection-end-column="55" />
+        <state relative-caret-position="-102">
+          <caret line="72" column="50" lean-forward="true" selection-start-line="72" selection-start-column="50" selection-end-line="72" selection-end-column="50" />
           <folding>
             <element signature="e#84#107#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/results/wide_band.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/results/highest_peak.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grid_scan.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="188" column="65" lean-forward="false" selection-start-line="188" selection-start-column="65" selection-end-line="188" selection-end-column="65" />
+          <folding>
+            <element signature="e#0#41#0" expanded="true" />
           </folding>
         </state>
       </provider>
