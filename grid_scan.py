@@ -16,8 +16,8 @@ def move_to_pos_one(moto, num_steps, x, y):
     :param y: Number of grid rows
     :return: None
     """
-    moto.reverse_motor_one(int(num_steps * x / 2))
-    moto.reverse_motor_two(int(num_steps * y / 2))
+    moto.reverse_motor_one(int(num_steps * x / 2.0))
+    moto.reverse_motor_two(int(num_steps * y / 2.0))
 
 def generate_grid(rows, columns):
     """Create grid traversal visual in format of numpy matrix.

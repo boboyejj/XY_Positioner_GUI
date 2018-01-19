@@ -4,7 +4,6 @@
     <list default="true" id="ec7ee67b-dab4-49e8-8d2e-33367546fbb8" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/NARDA_control.py" afterPath="$PROJECT_DIR$/NARDA_control.py" />
       <change beforePath="$PROJECT_DIR$/grid_scan.py" afterPath="$PROJECT_DIR$/grid_scan.py" />
-      <change beforePath="$PROJECT_DIR$/location_select_gui.py" afterPath="$PROJECT_DIR$/location_select_gui.py" />
       <change beforePath="$PROJECT_DIR$/manual_gui.py" afterPath="$PROJECT_DIR$/manual_gui.py" />
       <change beforePath="$PROJECT_DIR$/xy_positioner_gui.py" afterPath="$PROJECT_DIR$/xy_positioner_gui.py" />
     </list>
@@ -17,21 +16,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="c4motor_scan.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/c4motor_scan.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2640">
-              <caret line="12" column="35" lean-forward="false" selection-start-line="12" selection-start-column="35" selection-end-line="12" selection-end-column="35" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="grid_scan.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grid_scan.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="15" column="33" lean-forward="true" selection-start-line="15" selection-start-column="33" selection-end-line="15" selection-end-column="33" />
+            <state relative-caret-position="192">
+              <caret line="12" column="46" lean-forward="true" selection-start-line="12" selection-start-column="46" selection-end-line="12" selection-end-column="46" />
               <folding>
                 <element signature="e#0#41#0" expanded="true" />
               </folding>
@@ -39,11 +28,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="xy_positioner_gui.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="xy_positioner_gui.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/xy_positioner_gui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-795">
-              <caret line="54" column="67" lean-forward="true" selection-start-line="54" selection-start-column="67" selection-end-line="54" selection-end-column="67" />
+            <state relative-caret-position="-22">
+              <caret line="112" column="15" lean-forward="true" selection-start-line="112" selection-start-column="15" selection-end-line="112" selection-end-column="15" />
               <folding>
                 <element signature="e#84#107#0" expanded="true" />
               </folding>
@@ -54,18 +43,18 @@
       <file leaf-file-name="location_select_gui.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/location_select_gui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="277">
+            <state relative-caret-position="389">
               <caret line="59" column="44" lean-forward="true" selection-start-line="59" selection-start-column="44" selection-end-line="59" selection-end-column="44" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="manual_gui.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="manual_gui.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/manual_gui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="496">
-              <caret line="76" column="52" lean-forward="true" selection-start-line="76" selection-start-column="52" selection-end-line="76" selection-end-column="52" />
+            <state relative-caret-position="208">
+              <caret line="31" column="21" lean-forward="true" selection-start-line="31" selection-start-column="21" selection-end-line="31" selection-end-column="21" />
               <folding>
                 <element signature="e#84#104#0" expanded="true" />
               </folding>
@@ -76,8 +65,8 @@
       <file leaf-file-name="NARDA_control.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NARDA_control.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2368">
-              <caret line="154" column="0" lean-forward="true" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
+            <state relative-caret-position="256">
+              <caret line="25" column="32" lean-forward="true" selection-start-line="25" selection-start-column="32" selection-end-line="25" selection-end-column="32" />
               <folding>
                 <element signature="e#83#96#0" expanded="true" />
               </folding>
@@ -97,10 +86,15 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>arguments</find>
+      <find>modesToDo</find>
+      <find>totals</find>
+      <find>self.out</find>
+      <find>narda</find>
     </findStrings>
     <replaceStrings>
       <replace>open_port</replace>
       <replace>args</replace>
+      <replace>modes_to_do</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -120,11 +114,11 @@
         <option value="$PROJECT_DIR$/asdfasdasaf.py" />
         <option value="$PROJECT_DIR$/motor_driver.py" />
         <option value="$PROJECT_DIR$/extended_scan.py" />
+        <option value="$PROJECT_DIR$/location_select_gui.py" />
         <option value="$PROJECT_DIR$/grid_scan.py" />
-        <option value="$PROJECT_DIR$/manual_gui.py" />
         <option value="$PROJECT_DIR$/NARDA_control.py" />
         <option value="$PROJECT_DIR$/xy_positioner_gui.py" />
-        <option value="$PROJECT_DIR$/location_select_gui.py" />
+        <option value="$PROJECT_DIR$/manual_gui.py" />
       </list>
     </option>
   </component>
@@ -325,7 +319,7 @@
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5871711" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.097039476" sideWeight="0.49702382" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27302632" sideWeight="0.49702382" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24671052" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -535,14 +529,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/c4motor_scan.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2640">
-          <caret line="12" column="35" lean-forward="false" selection-start-line="12" selection-start-column="35" selection-end-line="12" selection-end-column="35" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/extended_scan.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -551,50 +537,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/manual_gui.py">
+    <entry file="file://$PROJECT_DIR$/c4motor_scan.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="496">
-          <caret line="76" column="52" lean-forward="true" selection-start-line="76" selection-start-column="52" selection-end-line="76" selection-end-column="52" />
-          <folding>
-            <element signature="e#84#104#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="-1451">
+          <caret line="12" column="35" lean-forward="false" selection-start-line="12" selection-start-column="35" selection-end-line="12" selection-end-column="35" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NARDA_control.py">
+    <entry file="file://$PROJECT_DIR$/location_select_gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2368">
-          <caret line="154" column="0" lean-forward="true" selection-start-line="154" selection-start-column="0" selection-end-line="154" selection-end-column="0" />
-          <folding>
-            <element signature="e#83#96#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="389">
+          <caret line="59" column="44" lean-forward="true" selection-start-line="59" selection-start-column="44" selection-end-line="59" selection-end-column="44" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/grid_scan.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="15" column="33" lean-forward="true" selection-start-line="15" selection-start-column="33" selection-end-line="15" selection-end-column="33" />
+        <state relative-caret-position="192">
+          <caret line="12" column="46" lean-forward="true" selection-start-line="12" selection-start-column="46" selection-end-line="12" selection-end-column="46" />
           <folding>
             <element signature="e#0#41#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/location_select_gui.py">
+    <entry file="file://$PROJECT_DIR$/NARDA_control.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="277">
-          <caret line="59" column="44" lean-forward="true" selection-start-line="59" selection-start-column="44" selection-end-line="59" selection-end-column="44" />
-          <folding />
+        <state relative-caret-position="256">
+          <caret line="25" column="32" lean-forward="true" selection-start-line="25" selection-start-column="32" selection-end-line="25" selection-end-column="32" />
+          <folding>
+            <element signature="e#83#96#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/xy_positioner_gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-795">
-          <caret line="54" column="67" lean-forward="true" selection-start-line="54" selection-start-column="67" selection-end-line="54" selection-end-column="67" />
+        <state relative-caret-position="-22">
+          <caret line="112" column="15" lean-forward="true" selection-start-line="112" selection-start-column="15" selection-end-line="112" selection-end-column="15" />
           <folding>
             <element signature="e#84#107#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/manual_gui.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="31" column="21" lean-forward="true" selection-start-line="31" selection-start-column="21" selection-end-line="31" selection-end-column="21" />
+          <folding>
+            <element signature="e#84#104#0" expanded="true" />
           </folding>
         </state>
       </provider>

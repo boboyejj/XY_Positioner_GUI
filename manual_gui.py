@@ -24,12 +24,14 @@ class ManualGUI(tk.Tk):
         y_error = accumulated error from leaving out y_frac
     """
 
-    def __init__(self, parent, x_dist_=2.8, y_dist_=2.8, dwell_=2):
+    def __init__(self, parent, x_dist_=2.8, y_dist_=2.8, dwell=2, scan=False):
         tk.Tk.__init__(self, parent)
         self.parent = parent
         self.motor = MotorDriver()
-        # self.narda = NARDAcontroller()
-        self.x_dist, self.y_dist, self.dwell = x_dist_, y_dist_, int(dwell_)
+        self.scan = scan
+        if self.scan:
+            self.narda = NARDAcontroller(dwell=dwell)
+        self.x_dist, self.y_dist, self.dwell = x_dist_, y_dist_, int(dwell)
         self.x_steps = int(self.x_dist / self.motor.step_unit)
         self.y_steps = int(self.y_dist / self.motor.step_unit)
         self.x_frac = self.x_dist / self.motor.step_unit - self.x_steps
@@ -51,6 +53,8 @@ class ManualGUI(tk.Tk):
         self.y_frac = self.y_dist / self.motor.step_unit - self.y_steps
         print 'Distances changed: X =', self.x_dist, 'Y =', self.y_dist
         print 'New dwell time:', self.dwell
+        if self.scan:
+            self.narda.set_dwell(self.dwell)
 
     def setup(self):
         self.title('Please select a location on the grid')
@@ -123,9 +127,12 @@ class ManualGUI(tk.Tk):
         self.bind('<Right>', self.key_right)
 
     def measure(self):
-        self.narda.reset()
-        self.narda.read_data()
-        print self.narda.get_wide_band(), self.narda.get_highest_peak()
+        if self.scan:
+            self.narda.reset()
+            self.narda.read_data()
+            print self.narda.get_wide_band(), self.narda.get_highest_peak()
+        else:
+            print 'Measurement disabled. Please open NARDA software.'
 
     def button_up(self):
         self.y_loc -= self.y_dist

@@ -74,6 +74,8 @@ def run_gui():
     manual_move.add_argument('x_dist', default=2.8, help='How far an x step will move left or right (in cm)')
     manual_move.add_argument('y_dist', default=2.8, help='How far a y step will move up or down (in cm)')
     manual_move.add_argument('dwell_time', default=240, help='Dwell time at single measurement point (in s)')
+    manual_move.add_argument('--measure', action='store_true', default=False, help='perform measurement '
+                                                                                   '(can be disabled to test motors)')
 
     args = parser.parse_args()
     # print args
@@ -110,6 +112,7 @@ def run_gui():
         print 'Extensions not implemented as of yet.'
         exit(0)
     elif args.subparser_name == 'reset_motors':
+        # Ensure that user waits until motors are completely done homing before continuing on
         if args.wait:
             m = MotorDriver()
             m.home_motors()
@@ -119,8 +122,8 @@ def run_gui():
             print 'Please check the box and try again. You must wait until the motors are done resetting.'
             exit(1)
     elif args.subparser_name == 'manual':
-        man = ManualGUI(None, float(args.x_dist), float(args.y_dist), int(args.dwell_time))
-        man.title('Manual movement control')
+        man = ManualGUI(None, float(args.x_dist), float(args.y_dist), int(args.dwell_time), scan=bool(args.measure))
+        man.title('Manual Control')
         man.mainloop()
         exit(0)
 

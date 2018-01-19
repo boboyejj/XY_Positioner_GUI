@@ -11,7 +11,7 @@ import struct
 
 
 class NARDAcontroller():
-    def __init__(self, start_freq=13000, step_freq=1000, stop_freq=15000):
+    def __init__(self, start_freq=13000, step_freq=1000, stop_freq=15000, type='E', dwell=1):
         try:
             self.port = serial.Serial('COM4', baudrate=38400, timeout=2)
             self.port.flushInput()
@@ -22,8 +22,11 @@ class NARDAcontroller():
             self.stop = stop_freq + self.step
             self.modes = ['Ex', 'Ey', 'Ez', 'Hxh (Mode A)', 'Hyh (Mode A)', 'Hzh (Mode A)',
                           'Hx (Mode B)', 'Hy (Mode B)', 'Hz (Mode B)']
-            self.output = {k: [] for k in self.modes}
-            self.totals = {k: [] for k in ['Electrical', 'Magnetic']}
+            self.type = type
+            self.electrical = []
+            self.magnetic_a = []
+            self.magnetic_b = []
+            self.dwell = dwell
         except serial.SerialException:
             print 'Error opening NARDA port'
             exit(1)
@@ -43,7 +46,7 @@ class NARDAcontroller():
             self.port.write(str.encode('#00' + chr(126) + 'C' + chr(mode + 1) + chr(0) + '*\r'))
         else:
             self.port.write(str.encode('#00' + chr(126) + 'C' + chr(mode + 1) + chr(80) + '*\r'))
-        out = self.port.readline()
+        self.port.readline()
         # print 'Select ' + self.modes[mode] + ': ', out
 
         if mode < 3:
@@ -53,7 +56,7 @@ class NARDAcontroller():
         else:
             kf = 0.0075
 
-        time.sleep(1)
+        time.sleep(self.dwell)
         n = (stop - start) / step
         num_bytes = 5 * n
         self.port.write(str.encode('#00(g*\r'))
@@ -67,9 +70,9 @@ class NARDAcontroller():
         output = output[11:]
         print output.encode('hex')
 
+        fields = []
         for i in range(len(output) / 5):
             # print output[5*i].encode('hex'),'^',output[5*i+1].encode('hex'),'^',output[5*i+2].encode('hex'),'^',output[5*i+3].encode('hex'),'^',output[5*i+4].encode('hex')
-            # print output[5*i:5*i+5]
             # sync = ((int(output[5*i].encode('hex'), 16)) / (step/1000.0)) % 256 + 1
             # print 'Sync', output[5*i].encode('hex')
             # EXP is either 5*i+2 or 5*i+3 still not sure
@@ -81,8 +84,9 @@ class NARDAcontroller():
             fld = kf * mantissa / 8.0 * math.sqrt(math.pow(2.0, exp))  # ** 2
             # print 'Sync ', sync, 'Exp', exp, 'Mantissa', mantissa, '\nField', fld
             # print 'Field at step ' + str(sync) + ': ', fld
-            self.output[self.modes[mode]].append(fld)
+            fields.append(fld)
             # print self.modes[mode] + ' Field at ' + str(start + i * step) + ' Hz: ', fld
+        return fields
 
     def read_data(self, start=None, step=None, stop=None):
         # If reading custom, allow for changes
@@ -92,65 +96,96 @@ class NARDAcontroller():
             stop = self.stop
 
         self.port.write(str.encode('#00v*\r'))
-        out = self.port.readline()
+        self.port.readline()
         # print 'Setting to request mode: ', out
         self.port.flush()
 
         # Lowest frequency of scan in Hz
         self.port.write(str.encode('#00(i' + str(start) + '*\r'))
-        out = self.port.readline()
+        self.port.readline()
         # print 'Set start freq to ' + str(start) + ' Hz: Done'  # , out
         self.port.flush()
 
         # Steps to climb from lowest to highest frequency in Hz
         self.port.write(str.encode('#00(s' + str(step) + '*\r'))
-        out = self.port.readline()
+        self.port.readline()
         # print 'Set freq step to ' + str(step) + ' Hz: Done'  # , out
         self.port.flush()
 
         # Highest frequency of scan in Hz
         self.port.write(str.encode('#00(f' + str(stop) + '*\r'))
-        out = self.port.readline()
+        self.port.readline()
         # print 'Set stop freq to ' + str(stop - step) + ' Hz: Done'  # , out
         self.port.flush()
 
-        # 6 modes, all electrical axes + mode A magnetics
-        for i in range(len(self.modes)):
-            self.read_one_mode(i, start, stop + step, step)
+        modes_to_do = []
+        if 'E' in self.type:
+            modes_to_do.append(1)
+        if 'Ha' in self.type:
+            modes_to_do.append(3)
+        if 'Hb' in self.type:
+            modes_to_do.append(5)
+
+        for i in modes_to_do:
+            out1 = self.read_one_mode(i, start, stop + step, step)
             self.port.flush()
             self.port.flushOutput()
             self.port.flushInput()
+            out2 = self.read_one_mode(i + 1, start, stop + step, step)
+            self.port.flush()
+            self.port.flushOutput()
+            self.port.flushInput()
+            out3 = self.read_one_mode(i + 2, start, stop + step, step)
+            self.port.flush()
+            self.port.flushOutput()
+            self.port.flushInput()
+            for j in range(len(out1)):
+                mag = self.get_magnitude(out1[j], out2[j], out3[j])
+                if i == 1:
+                    self.electrical.append(mag)
+                elif i == 3:
+                    self.magnetic_a.append(mag)
+                elif i == 5:
+                    self.magnetic_b.append(mag)
 
-        self.get_totals()
+    def get_magnitude(self, x, y, z):
+        return x ** 2.0 + y ** 2.0 + z ** 2.0
+
+    def get_wide_band(self, mode='E'):
+        # Integral of squared values to calculate Wide Band
+        # return np.trapz([k ** 2 for k in self.totals[mode]], dx=self.step / 1000.0)
+        if 'E' in mode:
+            return np.trapz([k for k in self.electrical], dx=self.step / 1000.0)
+        elif 'Ha' in mode:
+            return np.trapz([k for k in self.magnetic_a], dx=self.step / 1000.0)
+        elif 'Hb' in mode:
+            return np.trapz([k for k in self.magnetic_b], dx=self.step / 1000.0)
+        return
+
+    def get_highest_peak(self, mode='E'):
+        if 'E' in mode:
+            highest = np.amax(self.electrical)
+            return highest, int(np.argwhere(self.electrical == highest)[0]) * self.step + self.start
+        elif 'Ha' in mode:
+            highest = np.amax(self.magnetic_a)
+            return highest, int(np.argwhere(self.magnetic_a == highest)[0]) * self.step + self.start
+        elif 'Hb' in mode:
+            highest = np.amax(self.magnetic_b)
+            return highest, int(np.argwhere(self.magnetic_b == highest)[0]) * self.step + self.start
+
+    def reset(self):
+        self.electrical = []
+        self.magnetic_a = []
+        self.magnetic_b = []
+
+    def set_dwell(self, x):
+        self.dwell = x
 
     def destroy(self):
         self.port.flush()
         self.port.flushOutput()
         self.port.flushInput()
         self.port.close()
-
-    def get_totals(self):
-        for i in range(len(self.output[self.modes[0]])):
-            self.totals['Electrical'].append(math.sqrt(
-                self.output[self.modes[0]][i] ** 2.0 + self.output[self.modes[1]][i] ** 2.0 +
-                self.output[self.modes[2]][i] ** 2.0))
-            self.totals['Magnetic'].append(math.sqrt(
-                self.output[self.modes[3]][i] ** 2.0 + self.output[self.modes[4]][i] ** 2.0 +
-                self.output[self.modes[5]][i] ** 2.0))
-
-    def get_wide_band(self, mode='Electrical'):
-        # Integral of squared values to calculate Wide Band
-        # return np.trapz([k ** 2 for k in self.totals[mode]], dx=self.step / 1000.0)
-        return np.trapz([k for k in self.totals[mode]], dx=self.step / 1000.0)
-
-    def get_highest_peak(self, mode='Electrical'):
-        print self.totals
-        highest = np.amax(self.totals[mode])
-        return highest, int(np.argwhere(self.totals[mode] == highest)[0]) * self.step + self.start
-
-    def reset(self):
-        self.output = {k: [] for k in self.modes}
-        self.totals = {k: [] for k in ['Electrical', 'Magnetic']}
 
 
 if __name__ == '__main__':
