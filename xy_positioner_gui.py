@@ -38,6 +38,10 @@ def run_gui():
     area_scan.add_argument('--stop_freq', help='highest frequency (in Hz) of data sweep', default=15000)
     area_scan.add_argument('--scan_mode', choices=list(['Electrical', 'Magnetic A', 'Magnetic B']),
                            help='What mode would you like to scan?')
+    area_mode = area_scan.add_mutually_exclusive_group()
+    area_mode.add_argument('--electrical', action='store_true', default=True, help='run electrical mode (default)')
+    area_mode.add_argument('--magnetic_a', action='store_true', default=False, help='run magnetic mode A')
+    area_mode.add_argument('--magnetic_b', action='store_true', default=False, help='run magnetic mode B')
 
     # Arguments for moving to a specific position in the grid
     pos_move = sub.add_parser('pos_move', help='Move to specified position')
@@ -53,6 +57,10 @@ def run_gui():
     pos_move.add_argument('--stop_freq', help='highest frequency (in Hz) of data sweep', default=15000)
     pos_move.add_argument('--scan_mode', choices=list(['Electrical', 'Magnetic A', 'Magnetic B']),
                           help='What mode would you like to scan?')
+    move_mode = pos_move.add_mutually_exclusive_group()
+    move_mode.add_argument('--electrical', action='store_true', default=True, help='run electrical mode (default)')
+    move_mode.add_argument('--magnetic_a', action='store_true', default=False, help='run magnetic mode A')
+    move_mode.add_argument('--magnetic_b', action='store_true', default=False, help='run magnetic mode B')
 
     # Arguments for conduction tests on extensions outside of a point.
     extension = sub.add_parser('extension',
@@ -76,6 +84,10 @@ def run_gui():
     manual_move.add_argument('dwell_time', default=240, help='Dwell time at single measurement point (in s)')
     manual_move.add_argument('--measure', action='store_true', default=False, help='perform measurement '
                                                                                    '(can be disabled to test motors)')
+    manual_mode = manual_move.add_mutually_exclusive_group()
+    manual_mode.add_argument('--electrical', action='store_true', default=True, help='run electrical mode (default')
+    manual_mode.add_argument('--magnetic_a', action='store_true', default=False, help='run magnetic mode A')
+    manual_mode.add_argument('--magnetic_b', action='store_true', default=False, help='run magnetic mode B')
 
     args = parser.parse_args()
     # print args
@@ -122,7 +134,12 @@ def run_gui():
             print 'Please check the box and try again. You must wait until the motors are done resetting.'
             exit(1)
     elif args.subparser_name == 'manual':
-        man = ManualGUI(None, float(args.x_dist), float(args.y_dist), int(args.dwell_time), scan=bool(args.measure))
+        mode = 'E'
+        if args.magnetic_a:
+            mode = 'Ha'
+        elif args.magnetic_b:
+            mode = 'Hb'
+        man = ManualGUI(None, float(args.x_dist), float(args.y_dist), int(args.dwell_time), bool(args.measure), mode)
         man.title('Manual Control')
         man.mainloop()
         exit(0)

@@ -9,6 +9,7 @@ from motor_driver import MotorDriver
 from NARDA_control import NARDAcontroller
 from PIL import ImageTk, Image
 
+
 class ManualGUI(tk.Tk):
     """Tkinter GUI that allows user to move motors manually set distances.
 
@@ -24,13 +25,13 @@ class ManualGUI(tk.Tk):
         y_error = accumulated error from leaving out y_frac
     """
 
-    def __init__(self, parent, x_dist_=2.8, y_dist_=2.8, dwell=2, scan=False):
+    def __init__(self, parent, x_dist_=2.8, y_dist_=2.8, dwell=2, scan=False, mode='E'):
         tk.Tk.__init__(self, parent)
         self.parent = parent
         self.motor = MotorDriver()
         self.scan = scan
         if self.scan:
-            self.narda = NARDAcontroller(dwell=dwell)
+            self.narda = NARDAcontroller(type=mode, dwell=dwell)
         self.x_dist, self.y_dist, self.dwell = x_dist_, y_dist_, int(dwell)
         self.x_steps = int(self.x_dist / self.motor.step_unit)
         self.y_steps = int(self.y_dist / self.motor.step_unit)

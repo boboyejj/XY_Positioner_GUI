@@ -19,6 +19,7 @@ def move_to_pos_one(moto, num_steps, x, y):
     moto.reverse_motor_one(int(num_steps * x / 2.0))
     moto.reverse_motor_two(int(num_steps * y / 2.0))
 
+
 def generate_grid(rows, columns):
     """Create grid traversal visual in format of numpy matrix.
     Looks like a normal sequential matrix, but every other row is in reverse order.
@@ -55,8 +56,13 @@ def run_scan(args):
     # Check ports and instantiate relevant objects
     m = MotorDriver()
     narda = None
+    mode = 'E'
+    if args.magnetic_a:
+        mode = 'Ha'
+    elif args.magnetic_b:
+        mode = 'Hb'
     if args.measure:
-        narda = NARDAcontroller(args.start_freq, args.step_freq, args.stop_freq)
+        narda = NARDAcontroller(args.start_freq, args.step_freq, args.stop_freq, mode, args.dwell_time)
 
     # Visualization of robot progress will be done using python Turtle (temporary)
     franklin = turtle.Turtle()
@@ -73,7 +79,7 @@ def run_scan(args):
         narda.reset()
         narda.read_data()
         values[0][0] = tuple((narda.get_wide_band(), narda.get_highest_peak()))
-    count = 1   # Tracks our current progress through the grid
+    count = 1  # Tracks our current progress through the grid
     progress[progress == count] = 0
     print values
     # print np.argwhere(grid == count)[0], count
@@ -81,16 +87,16 @@ def run_scan(args):
     # Create an accumulator for the fraction of a step lost each time a grid space is moved
     frac_step = num_steps - int(num_steps)
     num_steps = int(num_steps)
-    x_error, y_error = 0, 0     # Accumulator for x and y directions
+    x_error, y_error = 0, 0  # Accumulator for x and y directions
 
     # Main loop
-    going_forward = True    # Start by moving forward
+    going_forward = True  # Start by moving forward
     j = 0
     for i in range(y_points):
         while j < x_points - 1:
             if going_forward:
-                x_error += frac_step    # Add to error
-                m.forward_motor_one(num_steps + int(x_error))   # Increase distance moved by adding error
+                x_error += frac_step  # Add to error
+                m.forward_motor_one(num_steps + int(x_error))  # Increase distance moved by adding error
                 franklin.circle(2)
                 franklin.forward(20)
                 # TODO: MEASURE HERE
@@ -98,11 +104,11 @@ def run_scan(args):
                     narda.reset()
                     narda.read_data()
                     values[i][j] = tuple((narda.get_wide_band(), narda.get_highest_peak()))
-                x_error = x_error - int(x_error)    # Subtract integer number of steps that were moved
+                x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
             # Do the same for when the robot is moving backwards as well
             else:
                 x_error -= frac_step
-                m.reverse_motor_one(num_steps + int(x_error))   # Should be |x_error|?
+                m.reverse_motor_one(num_steps + int(x_error))  # Should be |x_error|?
                 franklin.circle(2)
                 franklin.backward(20)
                 # TODO: MEASURE HERE
@@ -116,7 +122,7 @@ def run_scan(args):
             j += 1
             progress[progress == count] = 0
             print values
-        count += 1      # Increment our progress counter
+        count += 1  # Increment our progress counter
         # If counter is outside accepted bounds, measure once and exit
         if count > x_points * y_points:
             franklin.circle(2)

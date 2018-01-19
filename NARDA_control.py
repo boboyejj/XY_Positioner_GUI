@@ -41,11 +41,13 @@ class NARDAcontroller():
         self.port.flushInput()
         self.port.flushOutput()
 
-        # 1 is Ex, 2 is Ey, 3 is Ez, magnetic modes require different commands
+        # mode=0 is Ex, mode=1 is Ey, mode=2 is Ez
+        # mode=3 is HxA, mode=4 is HyA, mode=5 is HyA
+        # mode=6 is HxB, mode=7 is HyB, mode=8 is HyB
         if mode < 6:
             self.port.write(str.encode('#00' + chr(126) + 'C' + chr(mode + 1) + chr(0) + '*\r'))
         else:
-            self.port.write(str.encode('#00' + chr(126) + 'C' + chr(mode + 1) + chr(80) + '*\r'))
+            self.port.write(str.encode('#00' + chr(126) + 'C' + chr(mode - 2) + chr(80) + '*\r'))
         self.port.readline()
         # print 'Select ' + self.modes[mode] + ': ', out
 
@@ -118,58 +120,58 @@ class NARDAcontroller():
         # print 'Set stop freq to ' + str(stop - step) + ' Hz: Done'  # , out
         self.port.flush()
 
-        modes_to_do = []
-        if 'E' in self.type:
-            modes_to_do.append(1)
+        mode = 0
         if 'Ha' in self.type:
-            modes_to_do.append(3)
-        if 'Hb' in self.type:
-            modes_to_do.append(5)
+            mode = 3
+        elif 'Hb' in self.type:
+            mode = 6
 
-        for i in modes_to_do:
-            out1 = self.read_one_mode(i, start, stop + step, step)
-            self.port.flush()
-            self.port.flushOutput()
-            self.port.flushInput()
-            out2 = self.read_one_mode(i + 1, start, stop + step, step)
-            self.port.flush()
-            self.port.flushOutput()
-            self.port.flushInput()
-            out3 = self.read_one_mode(i + 2, start, stop + step, step)
-            self.port.flush()
-            self.port.flushOutput()
-            self.port.flushInput()
-            for j in range(len(out1)):
-                mag = self.get_magnitude(out1[j], out2[j], out3[j])
-                if i == 1:
-                    self.electrical.append(mag)
-                elif i == 3:
-                    self.magnetic_a.append(mag)
-                elif i == 5:
-                    self.magnetic_b.append(mag)
+        out1 = self.read_one_mode(mode, start, stop + step, step)
+        self.port.flush()
+        self.port.flushOutput()
+        self.port.flushInput()
+        print out1
+        out2 = self.read_one_mode(mode + 1, start, stop + step, step)
+        self.port.flush()
+        self.port.flushOutput()
+        self.port.flushInput()
+        print out2
+        out3 = self.read_one_mode(mode + 2, start, stop + step, step)
+        self.port.flush()
+        self.port.flushOutput()
+        self.port.flushInput()
+        print out3
+        for j in range(len(out1)):
+            mag = self.get_magnitude(out1[j], out2[j], out3[j])
+            if mode == 0:
+                self.electrical.append(mag)
+            elif mode == 3:
+                self.magnetic_a.append(mag)
+            elif mode == 6:
+                self.magnetic_b.append(mag)
 
     def get_magnitude(self, x, y, z):
-        return x ** 2.0 + y ** 2.0 + z ** 2.0
+        return math.sqrt(x ** 2.0 + y ** 2.0 + z ** 2.0)
 
-    def get_wide_band(self, mode='E'):
+    def get_wide_band(self):
         # Integral of squared values to calculate Wide Band
         # return np.trapz([k ** 2 for k in self.totals[mode]], dx=self.step / 1000.0)
-        if 'E' in mode:
+        if 'E' in self.type:
             return np.trapz([k for k in self.electrical], dx=self.step / 1000.0)
-        elif 'Ha' in mode:
+        elif 'Ha' in self.type:
             return np.trapz([k for k in self.magnetic_a], dx=self.step / 1000.0)
-        elif 'Hb' in mode:
+        elif 'Hb' in self.type:
             return np.trapz([k for k in self.magnetic_b], dx=self.step / 1000.0)
         return
 
-    def get_highest_peak(self, mode='E'):
-        if 'E' in mode:
+    def get_highest_peak(self):
+        if 'E' in self.type:
             highest = np.amax(self.electrical)
             return highest, int(np.argwhere(self.electrical == highest)[0]) * self.step + self.start
-        elif 'Ha' in mode:
+        elif 'Ha' in self.type:
             highest = np.amax(self.magnetic_a)
             return highest, int(np.argwhere(self.magnetic_a == highest)[0]) * self.step + self.start
-        elif 'Hb' in mode:
+        elif 'Hb' in self.type:
             highest = np.amax(self.magnetic_b)
             return highest, int(np.argwhere(self.magnetic_b == highest)[0]) * self.step + self.start
 
