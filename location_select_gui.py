@@ -33,7 +33,7 @@ class LocationSelectGUI(tk.Tk):
         label = tk.Label(self, text='Please select a location to move to.', background='lightgreen', padx=20, pady=10)
         label.grid(row=0, column=0)
 
-        # Set up button grid (value of button = value at grid point)
+        # Set up button grid (value of button = value at grid point) Extra comment
         innerFrame = tk.Frame(self, background='orange')
         for i in range(len(self.grid)):
             for j in range(len(self.grid[0])):
