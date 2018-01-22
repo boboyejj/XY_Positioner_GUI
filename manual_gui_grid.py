@@ -1,12 +1,11 @@
 """
-    Created by Ganesh Arvapalli on 1/16/18
+    Created by Ganesh Arvapalli on 1/22/18
     ganesh.arvapalli@pctest.com
 """
 
 import Tkinter as tk
 from tkFont import Font
 from motor_driver import MotorDriver
-from PIL import ImageTk, Image
 from numpy import linspace, meshgrid
 from matplotlib.mlab import griddata
 import matplotlib.pyplot as plt
@@ -45,6 +44,7 @@ class ManualGridGUI(tk.Tk):
         self.x_pts = []
         self.y_pts = []
         self.z_pts = []
+        self.checked_pts = []
         self.setup()
 
     def update_variables(self):
@@ -141,6 +141,10 @@ class ManualGridGUI(tk.Tk):
             return
         # if self.x_loc not in self.x_pts or self.y_loc not in self.y_pts:
         # if self.y_pts[self.x_pts.index(self.x_loc)] == self.y_loc:        Better but what if x_pts not found?
+        if (self.x_loc, self.y_loc) in self.checked_pts:
+            print 'Already measured.'
+            return
+        self.checked_pts.append((self.x_loc, self.y_loc))
         self.x_pts.append(self.x_loc)
         self.y_pts.append(self.y_loc)
         self.z_pts.append(float(self.value_entry.get()))
@@ -235,5 +239,6 @@ def main():
     man = ManualGridGUI(None, float(2.8), float(2.8))
     man.title('Manual Control')
     man.mainloop()
+
 
 if __name__ == '__main__': main()
