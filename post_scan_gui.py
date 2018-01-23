@@ -40,7 +40,24 @@ class PostScanGUI(tk.Tk):
         #w = tk.Tk()
         #w.withdraw()
         # self.destroy()
-        self.quit()
+        try:
+            self.eval('::ttk::CancelRepeat')
+            self.destroy()
+            self.quit()
+        except:
+            print ''
 
     def get_gui_value(self):
         return self.choiceVar
+
+
+def main():
+    post_gui = PostScanGUI(None)
+    post_gui.title('Post Scan Options')
+    post_gui.mainloop()
+
+    print post_gui.get_gui_value()
+
+
+if __name__ == '__main__':
+    main()

@@ -188,15 +188,18 @@ def run_scan(args):
                 narda.destroy()
             exit(0)
         elif choice == 'Save Data':
+
             # TODO: Save file method that creates place for files
             if args.measure:
                 file = open(args.outfile_location + './results/raw_values.txt', 'w+')
                 for line in values:
                     np.savetxt(file, line, fmt='%.3f')
                 file.close()
+                plt.savefig(args.outfile_location + './results/contour_plot.png', bbox_inches='tight')
             else:
                 print 'No data to save.'
         elif choice == 'Zoom Scan':
+            plt.close()
             print 'Please select location.'
             loc_gui = LocationSelectGUI(None, grid)
             loc_gui.title('Location Selection')
@@ -221,6 +224,7 @@ def run_scan(args):
 
             count = location
         elif choice == 'Correct Previous Value':
+            plt.close()
             print 'Please select location.'
             loc_gui = LocationSelectGUI(None, grid)
             loc_gui.title('Location Selection')
