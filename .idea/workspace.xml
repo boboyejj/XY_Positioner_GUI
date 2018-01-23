@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ec7ee67b-dab4-49e8-8d2e-33367546fbb8" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change beforePath="$PROJECT_DIR$/src/grid_scan_manual.py" afterPath="$PROJECT_DIR$/src/grid_scan_manual.py" />
-      <change beforePath="$PROJECT_DIR$/xy_positioner_gui.py" afterPath="$PROJECT_DIR$/advanced_xy_positioner_gui.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,8 +16,8 @@
       <file leaf-file-name="grid_scan_manual.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/grid_scan_manual.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="176">
-              <caret line="203" column="42" lean-forward="true" selection-start-line="203" selection-start-column="42" selection-end-line="203" selection-end-column="42" />
+            <state relative-caret-position="230">
+              <caret line="285" column="40" lean-forward="true" selection-start-line="285" selection-start-column="40" selection-end-line="285" selection-end-column="40" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -785,8 +783,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/grid_scan_manual.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="203" column="42" lean-forward="true" selection-start-line="203" selection-start-column="42" selection-end-line="203" selection-end-column="42" />
+        <state relative-caret-position="230">
+          <caret line="285" column="40" lean-forward="true" selection-start-line="285" selection-start-column="40" selection-end-line="285" selection-end-column="40" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
