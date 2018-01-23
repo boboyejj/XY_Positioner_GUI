@@ -3,6 +3,7 @@ from motor_driver import MotorDriver
 from post_scan_gui import PostScanGUI
 from location_select_gui import LocationSelectGUI
 from matplotlib import pyplot as plt
+from matplotlib import mlab
 from data_entry_gui import DataEntryGUI
 import turtle
 
@@ -35,6 +36,32 @@ def generate_grid(rows, columns):
             row.reverse()
         g[i] = row
     return g
+
+
+def convert_to_pts(dist, arr):
+    x_dim = len(arr)
+    y_dim = len(arr[0])
+    xpts = []
+    ypts = []
+    zpts = []
+    for i in range(x_dim):
+        for j in range(y_dim):
+            if i < x_dim / 2:
+                x_pt = -1.0/2 * i * dist
+            else:
+                x_pt = 1.0/2 * i * dist
+            if j < y_dim / 2:
+                y_pt = -1.0/2 * j *dist
+            else:
+                y_pt = 1.0/2 * j *dist
+            xpts.append(x_pt)
+            ypts.append(y_pt)
+            zpts.append(arr[i][j])
+
+    return xpts, ypts, zpts
+
+def add_zoom_pts(zooms, vals, place):
+    print 'a'
 
 
 def run_scan(args):
@@ -96,7 +123,7 @@ def run_scan(args):
                 m.forward_motor_one(num_steps + int(x_error))  # Increase distance moved by adding error
                 count += 1
                 loc = np.argwhere(grid == count)[0]
-                print loc
+                print '------------'
                 # franklin.circle(2)
                 # franklin.forward(20)
                 # TODO: MEASURE HERE
@@ -112,7 +139,7 @@ def run_scan(args):
                 m.reverse_motor_one(num_steps + int(x_error))  # Should be |x_error|?
                 count += 1
                 loc = np.argwhere(grid == count)[0]
-                print loc
+                print '------------'
                 # franklin.circle(2)
                 # franklin.backward(20)
                 # TODO: MEASURE HERE
@@ -145,7 +172,7 @@ def run_scan(args):
             # print values
             break
         loc = np.argwhere(grid == count)[0]
-        print loc
+        print '------------'
         # franklin.circle(2)
         # franklin.right(90)
         # franklin.forward(20)
@@ -162,14 +189,24 @@ def run_scan(args):
         j = 0
 
     # Post area scan loop (unless auto zoom has been implemented)
+    zoom_pts = []
+    place = 0
     while True:
         # Plot results
         if args.measure:
+            X, Y, Z = convert_to_pts(args.grid_step_dist, np.flipud(values))
+            xi = np.linspace(min(X), max(X), 100)
+            yi = np.linspace(min(Y), max(Y), 100)
+            zi = mlab.griddata(X, Y, Z, xi, yi, interp='linear')
+
+            if place != 0:
+                add_zoom_pts(zoom_pts, values, place)
             fig, axes = plt.subplots(1, 1)
             axes.set_aspect('equal')
             # axes.hold(True)
-            graph = axes.contourf(np.flipud(values))
-            # axes.scatter(values, s=60, cmap=graph.cmap)
+            graph = axes.contour(xi, yi, zi, 15, linewidths=0.5, colors='k')
+            graph = axes.contourf(xi, yi, zi, 15, vmax=abs(zi).max(), vmin=abs(zi).min())
+            axes.scatter(X, Y, marker='o', s=5, cmap=graph.cmap)
             cbar = fig.colorbar(graph)
             cbar.set_label('Signal Level')
             axes.margins(0.05)
@@ -251,17 +288,6 @@ def run_scan(args):
                 man.mainloop()
                 values[grid_loc[0]][grid_loc[1]] = man.getval()
                 man.quit()
-
-                # fig, axes = plt.subplots(1, 1)
-                # axes.set_aspect('equal')
-                # # axes.hold(True)
-                # graph = axes.contourf(np.flipud(values))
-                # # axes.scatter(values, s=60, cmap=graph.cmap)
-                # cbar = fig.colorbar(graph)
-                # cbar.set_label('Signal Level')
-                # axes.margins(0.05)
-                # plt.show(block=False)
-
         else:
             print 'Invalid choice'
             m.destroy()
@@ -270,3 +296,19 @@ def run_scan(args):
             exit(1)
 
     # TODO: Auto-zoom-scan mode
+
+
+def auto_zoom_scan(args, vals):
+    print 'a'
+
+
+def main():
+    vals = np.ones((2,3))
+    X, Y, Z = convert_to_pts(2.4, vals)
+    print X
+    print Y
+    print Z
+
+
+if __name__ == '__main__':
+    main()

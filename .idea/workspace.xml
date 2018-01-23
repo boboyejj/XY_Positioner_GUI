@@ -2,24 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ec7ee67b-dab4-49e8-8d2e-33367546fbb8" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/extended_scan.py" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/NARDA_control.py" afterPath="$PROJECT_DIR$/src/NARDA_control.py" />
-      <change beforePath="$PROJECT_DIR$/basic_xy_positioner_gui.py" afterPath="$PROJECT_DIR$/basic_xy_positioner_gui.py" />
-      <change beforePath="$PROJECT_DIR$/c4motor_scan.py" afterPath="$PROJECT_DIR$/src/c4motor_scan.py" />
-      <change beforePath="$PROJECT_DIR$/data_entry_gui.py" afterPath="$PROJECT_DIR$/src/data_entry_gui.py" />
-      <change beforePath="$PROJECT_DIR$/extended_scan.py" afterPath="$PROJECT_DIR$/src/__init__.py" />
-      <change beforePath="$PROJECT_DIR$/grid_scan.py" afterPath="$PROJECT_DIR$/src/grid_scan.py" />
-      <change beforePath="$PROJECT_DIR$/grid_scan_manual.py" afterPath="$PROJECT_DIR$/src/grid_scan_manual.py" />
-      <change beforePath="$PROJECT_DIR$/location_select_gui.py" afterPath="$PROJECT_DIR$/src/location_select_gui.py" />
-      <change beforePath="$PROJECT_DIR$/manual_gui.py" afterPath="$PROJECT_DIR$/src/manual_gui.py" />
-      <change beforePath="$PROJECT_DIR$/manual_gui_grid.py" afterPath="$PROJECT_DIR$/src/manual_gui_grid.py" />
-      <change beforePath="$PROJECT_DIR$/motor_control.py" afterPath="$PROJECT_DIR$/src/motor_control.py" />
-      <change beforePath="$PROJECT_DIR$/motor_driver.py" afterPath="$PROJECT_DIR$/src/motor_driver.py" />
-      <change beforePath="$PROJECT_DIR$/post_scan_gui.py" afterPath="$PROJECT_DIR$/src/post_scan_gui.py" />
-      <change beforePath="$PROJECT_DIR$/pySerial_testing.py" afterPath="$PROJECT_DIR$/src/pySerial_testing.py" />
-      <change beforePath="$PROJECT_DIR$/timer_gui.py" afterPath="$PROJECT_DIR$/src/timer_gui.py" />
-      <change beforePath="$PROJECT_DIR$/xy_positioner_gui.py" afterPath="$PROJECT_DIR$/xy_positioner_gui.py" />
+      <change beforePath="$PROJECT_DIR$/src/grid_scan_manual.py" afterPath="$PROJECT_DIR$/src/grid_scan_manual.py" />
+      <change beforePath="$PROJECT_DIR$/xy_positioner_gui.py" afterPath="$PROJECT_DIR$/advanced_xy_positioner_gui.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -30,11 +15,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="grid_scan_manual.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="grid_scan_manual.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/grid_scan_manual.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1616">
-              <caret line="101" column="18" lean-forward="false" selection-start-line="101" selection-start-column="18" selection-end-line="101" selection-end-column="18" />
+            <state relative-caret-position="176">
+              <caret line="203" column="42" lean-forward="true" selection-start-line="203" selection-start-column="42" selection-end-line="203" selection-end-column="42" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -42,11 +27,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="basic_xy_positioner_gui.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="basic_xy_positioner_gui.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/basic_xy_positioner_gui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="94" column="37" lean-forward="false" selection-start-line="94" selection-start-column="37" selection-end-line="94" selection-end-column="37" />
+            <state relative-caret-position="154">
+              <caret line="93" column="19" lean-forward="true" selection-start-line="93" selection-start-column="19" selection-end-line="93" selection-end-column="19" />
               <folding>
                 <element signature="e#84#107#0" expanded="true" />
               </folding>
@@ -165,6 +150,7 @@
         <option value="$PROJECT_DIR$/post_scan_gui.py" />
         <option value="$PROJECT_DIR$/grid_scan_manual.py" />
         <option value="$PROJECT_DIR$/basic_xy_positioner_gui.py" />
+        <option value="$PROJECT_DIR$/src/grid_scan_manual.py" />
       </list>
     </option>
   </component>
@@ -247,19 +233,19 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
-    <configuration name="data_entry_gui" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="grid_scan_manual" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <module name="PythonGUI" />
-      <option name="SCRIPT_NAME" value="C:\Users\ganesh.arvapalli\Documents\C4MotorControl\PythonGUI\src\data_entry_gui.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/grid_scan_manual.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -320,19 +306,19 @@
       <option name="MODULE_MODE" value="false" />
     </configuration>
     <list size="5">
-      <item index="0" class="java.lang.String" itemvalue="Python.data_entry_gui" />
-      <item index="1" class="java.lang.String" itemvalue="Python.basic_xy_positioner_gui" />
-      <item index="2" class="java.lang.String" itemvalue="Python.timer_gui" />
-      <item index="3" class="java.lang.String" itemvalue="Python.post_scan_gui" />
-      <item index="4" class="java.lang.String" itemvalue="Python.timer_gui (1)" />
+      <item index="0" class="java.lang.String" itemvalue="Python.basic_xy_positioner_gui" />
+      <item index="1" class="java.lang.String" itemvalue="Python.timer_gui" />
+      <item index="2" class="java.lang.String" itemvalue="Python.post_scan_gui" />
+      <item index="3" class="java.lang.String" itemvalue="Python.timer_gui (1)" />
+      <item index="4" class="java.lang.String" itemvalue="Python.grid_scan_manual" />
     </list>
     <recent_temporary>
       <list size="5">
         <item index="0" class="java.lang.String" itemvalue="Python.basic_xy_positioner_gui" />
-        <item index="1" class="java.lang.String" itemvalue="Python.timer_gui (1)" />
-        <item index="2" class="java.lang.String" itemvalue="Python.post_scan_gui" />
-        <item index="3" class="java.lang.String" itemvalue="Python.timer_gui" />
-        <item index="4" class="java.lang.String" itemvalue="Python.data_entry_gui" />
+        <item index="1" class="java.lang.String" itemvalue="Python.grid_scan_manual" />
+        <item index="2" class="java.lang.String" itemvalue="Python.timer_gui (1)" />
+        <item index="3" class="java.lang.String" itemvalue="Python.post_scan_gui" />
+        <item index="4" class="java.lang.String" itemvalue="Python.timer_gui" />
       </list>
     </recent_temporary>
   </component>
@@ -363,8 +349,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2001488" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2001488" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2713816" sideWeight="0.5029762" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32894737" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
@@ -410,7 +397,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/xy_positioner_gui.py">
+    <entry file="file://$PROJECT_DIR$/advanced_xy_positioner_gui.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2048">
           <caret line="136" column="23" lean-forward="true" selection-start-line="136" selection-start-column="23" selection-end-line="136" selection-end-column="23" />
@@ -456,7 +443,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/xy_positioner_gui.py">
+    <entry file="file://$PROJECT_DIR$/advanced_xy_positioner_gui.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1024">
           <caret line="72" column="50" lean-forward="true" selection-start-line="72" selection-start-column="50" selection-end-line="72" selection-end-column="50" />
@@ -509,7 +496,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/xy_positioner_gui.py">
+    <entry file="file://$PROJECT_DIR$/advanced_xy_positioner_gui.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="112">
           <caret line="7" column="41" lean-forward="false" selection-start-line="7" selection-start-column="41" selection-end-line="7" selection-end-column="41" />
@@ -699,7 +686,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/xy_positioner_gui.py">
+    <entry file="file://$PROJECT_DIR$/advanced_xy_positioner_gui.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="176">
           <caret line="38" column="56" lean-forward="true" selection-start-line="38" selection-start-column="56" selection-end-line="38" selection-end-column="56" />
@@ -731,16 +718,6 @@
           <caret line="35" column="0" lean-forward="true" selection-start-line="35" selection-start-column="0" selection-end-line="35" selection-end-column="0" />
           <folding>
             <element signature="e#84#104#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/grid_scan_manual.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1616">
-          <caret line="101" column="18" lean-forward="false" selection-start-line="101" selection-start-column="18" selection-end-line="101" selection-end-column="18" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -798,10 +775,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/basic_xy_positioner_gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="94" column="37" lean-forward="false" selection-start-line="94" selection-start-column="37" selection-end-line="94" selection-end-column="37" />
+        <state relative-caret-position="154">
+          <caret line="93" column="19" lean-forward="true" selection-start-line="93" selection-start-column="19" selection-end-line="93" selection-end-column="19" />
           <folding>
             <element signature="e#84#107#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/grid_scan_manual.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="176">
+          <caret line="203" column="42" lean-forward="true" selection-start-line="203" selection-start-column="42" selection-end-line="203" selection-end-column="42" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>
