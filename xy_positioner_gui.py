@@ -4,14 +4,12 @@
 """
 
 from gooey import Gooey
-import random
-from NARDA_control import NARDAcontroller
 import numpy as np
 import argparse
-from grid_scan import run_scan, generate_grid, move_to_pos_one
-from motor_driver import MotorDriver
-from location_select_gui import LocationSelectGUI
-from manual_gui import ManualGUI
+from src.grid_scan import run_scan, generate_grid, move_to_pos_one
+from src.motor_driver import MotorDriver
+from src.location_select_gui import LocationSelectGUI
+from src.manual_gui import ManualGUI
 
 
 @Gooey(program_name='NARDA Grid Scan', monospace_display=True, default_size=(800, 600), advanced=True)

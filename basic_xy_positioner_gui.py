@@ -4,13 +4,12 @@
 """
 
 from gooey import Gooey
-import random
 import numpy as np
 import argparse
-from grid_scan_manual import run_scan, generate_grid, move_to_pos_one
-from motor_driver import MotorDriver
-from location_select_gui import LocationSelectGUI
-from manual_gui import ManualGUI
+from src.grid_scan_manual import run_scan, generate_grid, move_to_pos_one
+from src.motor_driver import MotorDriver
+from src.location_select_gui import LocationSelectGUI
+from src.manual_gui_grid import ManualGridGUI
 
 
 @Gooey(program_name='NARDA Grid Scan', monospace_display=True, default_size=(800, 600), advanced=True)
@@ -51,12 +50,6 @@ def run_gui():
     manual_move.add_argument('x_dist', default=2.8, help='How far an x step will move left or right (in cm)')
     manual_move.add_argument('y_dist', default=2.8, help='How far a y step will move up or down (in cm)')
     manual_move.add_argument('dwell_time', default=240, help='Dwell time at single measurement point (in s)')
-    manual_move.add_argument('--measure', action='store_true', default=False, help='perform measurement '
-                                                                                   '(can be disabled to test motors)')
-    manual_mode = manual_move.add_mutually_exclusive_group()
-    manual_mode.add_argument('--electrical', action='store_true', default=True, help='run electrical mode (default')
-    manual_mode.add_argument('--magnetic_a', action='store_true', default=False, help='run magnetic mode A')
-    manual_mode.add_argument('--magnetic_b', action='store_true', default=False, help='run magnetic mode B')
 
     args = parser.parse_args()
     # print args
@@ -100,12 +93,7 @@ def run_gui():
             print 'Please check the box and try again. You must wait until the motors are done resetting.'
             exit(1)
     elif args.subparser_name == 'manual':
-        mode = 'E'
-        if args.magnetic_a:
-            mode = 'Ha'
-        elif args.magnetic_b:
-            mode = 'Hb'
-        man = ManualGUI(None, float(args.x_dist), float(args.y_dist), int(args.dwell_time), bool(args.measure), mode)
+        man = ManualGridGUI(None, float(args.x_dist), float(args.y_dist))
         man.title('Manual Control')
         man.mainloop()
         exit(0)

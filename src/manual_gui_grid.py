@@ -5,7 +5,7 @@
 
 import Tkinter as tk
 from tkFont import Font
-from motor_driver import MotorDriver
+from src.motor_driver import MotorDriver
 from numpy import linspace, meshgrid
 from matplotlib.mlab import griddata
 import matplotlib.pyplot as plt

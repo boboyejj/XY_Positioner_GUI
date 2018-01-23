@@ -188,14 +188,14 @@ def run_scan(args):
                 narda.destroy()
             exit(0)
         elif choice == 'Save Data':
-
             # TODO: Save file method that creates place for files
             if args.measure:
+                plt.savefig(args.outfile_location + './results/contour_plot.png', bbox_inches='tight')
+                plt.close()
                 file = open(args.outfile_location + './results/raw_values.txt', 'w+')
                 for line in values:
                     np.savetxt(file, line, fmt='%.3f')
                 file.close()
-                plt.savefig(args.outfile_location + './results/contour_plot.png', bbox_inches='tight')
             else:
                 print 'No data to save.'
         elif choice == 'Zoom Scan':
