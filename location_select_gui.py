@@ -58,6 +58,7 @@ class LocationSelectGUI(tk.Tk):
         :return:
         """
         self.choiceVar = self.grid[row][col]
+        self.destroy()
         self.quit()
 
     def get_gui_value(self):

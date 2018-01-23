@@ -4,6 +4,7 @@
 """
 
 import Tkinter as tk
+import sys
 
 
 class DataEntryGUI(tk.Tk):
@@ -20,15 +21,24 @@ class DataEntryGUI(tk.Tk):
         sv = tk.StringVar()
         sv.trace("w", lambda name, index, mode, sv=sv: self.callback(sv))
         entry = tk.Entry(self, textvariable=sv)
+        entry.focus()
         entry.grid(row=0,column=1, padx=10, pady=10)
         self.grid_rowconfigure(1)
         self.grid_columnconfigure(2)
 
+        self.bind('<Return>', self.exit_gui)
+
     def callback(self, sv):
-        self.value = float(sv.get())
+        try:
+            self.value = float(sv.get())
+        except ValueError:
+            print 'Please type a valid number.'
 
     def getval(self):
         return self.value
+
+    def exit_gui(self, event):
+        self.destroy()
 
 
 def main():
@@ -37,6 +47,15 @@ def main():
     man.mainloop()
     print man.getval()
 
+    man = DataEntryGUI(None)
+    man.title('Data Entry')
+    man.mainloop()
+    print man.getval()
+
+    man = DataEntryGUI(None)
+    man.title('Data Entry')
+    man.mainloop()
+    print man.getval()
 
 if __name__ == '__main__':
     main()

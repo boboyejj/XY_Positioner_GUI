@@ -39,6 +39,7 @@ class PostScanGUI(tk.Tk):
         self.choiceVar = self.combobox.get()
         #w = tk.Tk()
         #w.withdraw()
+        # self.destroy()
         self.quit()
 
     def get_gui_value(self):
