@@ -18,16 +18,21 @@ class MotorDriver:
     """
 
     def __init__(self, step_unit_=0.00508):
-        """Init MotorDriver with step_unit and port = COM3"""
+        """Init MotorDriver with step_unit and port = COM #, # = 1,2,3..."""
+        for i in range(256):
+            try:
+                self.port = serial.Serial('COM'+str(i))
+            except (OSError, serial.SerialException):
+                pass
         try:
             # self.port = serial.Serial('COM3', timeout=1.5)
-            self.port = serial.Serial('COM5', timeout=1.5)
+            # self.port = serial.Serial('COM5', timeout=1.5)
             self.port.flushOutput()
             self.port.flushInput()
             self.port.flush()
             self.step_unit = step_unit_
         except serial.SerialException:
-            print 'Error opening port. Check which port is connected to what.'
+            print 'Error connecting to port. Check cables.'
             exit(1)
 
 
