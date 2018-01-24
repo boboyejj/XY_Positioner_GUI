@@ -81,7 +81,8 @@ def run_scan(args):
     values = np.zeros(grid.shape)
     print 'Current values: '
     print values
-    grid_points = []
+    print '------------'
+    # grid_points = []
 
     # Check ports and instantiate relevant objects
     m = MotorDriver()
@@ -191,47 +192,45 @@ def run_scan(args):
     # print grid_points
     grid_points = convert_to_point_list(values)
 
-    # Post area scan loop (unless auto zoom has been implemented)
-    zoom_pts = []
+
+    zoomed_points = []
+    # Automatic zoom scan if set, otherwise, post scan loop
     place = None
+    if args.auto_zoom_scan:
+        place = np.unravel_index(values.argmax(), values.shape)
+        count = grid[place[0]][place[1]]
+        # place[1] = y_points - place[1]
+        # corrected_place = (place[0], y_points - place[1])
+        print place
+        print count
+        zoomed = auto_zoom(args, m)
+        zoomed_points = combine_matrices(grid_points, zoomed, place)
+        print zoomed_points
+
     while True:
+        grid_points = convert_to_point_list(np.flipud(values))
+
         # Plot results
         if args.measure:
-            # Known to work more or less
-            # plt.imshow(values, interpolation='bilinear')
-            # cbar = plt.colorbar()
-            # cbar.set_label('Signal Level')
-            # plt.show(block=False)
-
-            # X, Y, Z = convert_to_pts(values, args.grid_step_dist)
-
-            # X, Y = np.meshgrid(np.arange(-values.shape[0]/2, values.shape[0]/2), np.arange(-values.shape[1]/2, values.shape[1]/2))
-            # print X, Y
-            # plt.scatter(X, Y, c=values)
-            # plt.show()
             if place is not None:
-                x_off = (place[0] - values.shape[0] / 2) * args.grid_step_dist
-                y_off = (place[1] - values.shape[1] / 2) * args.grid_step_dist
-                zoomX, zoomY, zoomZ = convert_to_pts(zoom_pts, args.grid_step_dist / 4, x_off, y_off)
-                print zoomX
-                print zoomY
-                print zoomZ
-                # X.extend(zoomX)
-                # Y.extend(zoomY)
-                # Z.extend(zoomZ)
+                x, y, z = split_into_three(zoomed_points)
+                # Plotting
+                # Generate meshgrid first
+                xi, yi = np.linspace(x.min(), x.max(), 300), np.linspace(y.min(), y.max(), 300)
+                xi, yi = np.meshgrid(xi, yi, indexing='ij')
 
-           # xi = np.linspace(min(X), max(X), 100)
-           # yi = np.linspace(min(Y), max(Y), 100)
-           # zi = mlab.griddata(X, Y, Z, xi, yi, interp='linear')
-           # fig, axes = plt.subplots(1, 1)
-           # axes.set_aspect('equal')
-           # graph = axes.contour(xi, yi, zi, 15, linewidths=0.5)
-           # graph = axes.contourf(xi, yi, zi, 15, vmax=abs(zi).max(), vmin=abs(zi).min())
-           # axes.scatter(X, Y, marker='o', s=5, cmap=graph.cmap)
-           # cbar = fig.colorbar(graph)
-          #  cbar.set_label('Signal Level')
-          #  axes.margins(0.05)
-          #  plt.show(block=False)
+                # Interpolate (linear)
+                zi = interpolate.griddata((x, y), z, (xi, yi), method='linear')
+
+                plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower', extent=[x.min(), x.max(), y.min(), y.max()])
+                cbar = plt.colorbar()
+                cbar.set_label('Signal Level')
+                plt.show(block=False)
+            else:
+                plt.imshow(values, interpolation='bilinear')
+                cbar = plt.colorbar()
+                cbar.set_label('Signal Level')
+                plt.show(block=False)
 
         post_gui = PostScanGUI(None)
         post_gui.title('Post Scan Options')
@@ -245,17 +244,14 @@ def run_scan(args):
             if narda is not None:
                 narda.destroy()
             exit(0)
-
-        # TODO: Remember to uncomment plt save fig!
-
         elif choice == 'Save Data':
             # TODO: Save file method that creates place for files
             if args.measure:
-                # plt.savefig(args.outfile_location + './results/contour_plot.png', bbox_inches='tight')
+                plt.savefig(args.outfile_location + './results/contour_plot.png', bbox_inches='tight')
                 plt.close()
                 if not os.path.exists(args.outfile_location):
                     print 'Path does not exist, using default results folder'
-                    os.chdir('..')
+                    # os.chdir('..')
                     if not os.path.exists('results'):
                         os.makedirs('results')
                     args.outfile_location = 'results'
@@ -270,6 +266,7 @@ def run_scan(args):
         elif choice == 'Zoom Scan':
             # First need to move to correct position (find max and move to it)
             place = np.unravel_index(values.argmax(), values.shape)
+            # corrected_place = (place[0], y_points - place[1])
             count = grid[place[0]][place[1]]
             print place
             print count
@@ -295,10 +292,9 @@ def run_scan(args):
 
             # TODO: Implement zoom scan GUI
 
-            if not args.auto_zoom_scan:
-                zoomed = auto_zoom(args, m)
-                grid_points = combine_matrices(grid_points, zoomed, place)
-                zoom_pts = 32 * np.ones((5, 5))
+            # zoomed = auto_zoom(args, m)
+            zoomed = convert_to_point_list(np.tri(5))
+            zoomed_points = combine_matrices(grid_points, zoomed, place)
         elif choice == 'Correct Previous Value':
             plt.close()
             print 'Please select location.'
@@ -308,7 +304,7 @@ def run_scan(args):
             location = loc_gui.get_gui_value()
             # print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
             grid_move = (np.argwhere(grid == location) - np.argwhere(grid == count))[0]
-            # print 'Need to move', grid_move
+            print 'Need to move', grid_move
             if grid_move[1] > 0:
                 m.forward_motor_one(num_steps * grid_move[1])
             else:
@@ -319,7 +315,7 @@ def run_scan(args):
                 m.reverse_motor_two(num_steps * grid_move[0])
             count = location
             grid_loc = np.argwhere(grid == count)[0]
-            print grid_loc
+            # print grid_loc
             # TODO: MEASURE HERE
             if args.measure:
                 man = DataEntryGUI(None)
@@ -340,7 +336,13 @@ def auto_zoom(args, m):
     y_points = 5
     grid = generate_grid(x_points, y_points)
     values = np.zeros(grid.shape)
-    zoom_points = []
+
+    print 'Zoom Path: '
+    print grid
+
+    print 'Current Values: '
+    print values
+    # zoom_points = []
 
     # Calculate number of motor steps necessary to move one grid space
     num_steps = args.grid_step_dist / (4.0 * m.step_unit)
@@ -353,7 +355,7 @@ def auto_zoom(args, m):
         man.mainloop()
         values[0][0] = man.getval()
         loc = np.argwhere(grid == 1)[0]
-        zoom_points.append((loc * args.grid_step_dist, man.getval()))
+        # zoom_points.append((loc * args.grid_step_dist, man.getval()))
     count = 1  # Tracks our current progress through the grid
 
     print values
@@ -380,7 +382,7 @@ def auto_zoom(args, m):
                     man.title('Data Entry')
                     man.mainloop()
                     values[loc[0]][loc[1]] = man.getval()
-                    zoom_points.append((loc * args.grid_step_dist, man.getval()))
+                    # zoom_points.append((loc * args.grid_step_dist, man.getval()))
                 x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
             # Do the same for when the robot is moving backwards as well
             else:
@@ -395,7 +397,7 @@ def auto_zoom(args, m):
                     man.title('Data Entry')
                     man.mainloop()
                     values[loc[0]][loc[1]] = man.getval()
-                    zoom_points.append((loc * args.grid_step_dist, man.getval()))
+                    # zoom_points.append((loc * args.grid_step_dist, man.getval()))
                 x_error = x_error - int(x_error)
             # Increment our progress counter and print out current set of values
             j += 1
@@ -419,31 +421,28 @@ def auto_zoom(args, m):
             man.title('Data Entry')
             man.mainloop()
             values[loc[0]][loc[1]] = man.getval()
-            zoom_points.append((loc * args.grid_step_dist, man.getval()))
+            # zoom_points.append((loc * args.grid_step_dist, man.getval()))
         print values
         y_error = y_error - int(y_error)
         going_forward = not going_forward
         j = 0
 
-    return zoom_points
+    return convert_to_point_list(np.flipud(values))
 
 
 # Puts m2 into m1 with equal spacing between positions
 # Matrix list formatted as (array(x, y), z)
 # pos formatted as (i, j)
 def combine_matrices(m1_list, m2_list, pos):
-    print 'Initial list:', m1_list
-    print 'To combine with:', m2_list
     final_list = m1_list
     for point in m2_list:
         xy = point[0]
-        xy = ((xy[0] - 2) / 4 + pos[0], (xy[1] - 2) / 4 + pos[1])
-        xy += pos
+        xy = ((xy[0] - 2.0) / 4 + pos[1], (xy[1] - 2.0) / 4 + pos[0])
         z = point[1]
         final_list.append((xy, z))
-    print 'Final results:', final_list
     return final_list
 
+# Output formatted as list of ((x, y), z) points
 def convert_to_point_list(matrix):
     point_list = []
     for i in range(matrix.shape[0]):
@@ -452,10 +451,39 @@ def convert_to_point_list(matrix):
 
     return point_list
 
+# "combined" is in the format of list of ((x, y), z) elements
+def split_into_three(combined):
+    x = []
+    y = []
+    z = []
+    for point in combined:
+        x.append(point[0][0])
+        y.append(point[0][1])
+        z.append(point[1])
+    return np.array(x), np.array(y), np.array(z)
 
 def main():
     a = Args()
-    run_scan(a)
+    matrix1 = np.random.random((2, 2))
+    matrix2 = 6 * np.random.random((5, 5)) + 3
+    print np.unravel_index(np.argmax(matrix1), matrix1.shape)
+    final = combine_matrices(convert_to_point_list(matrix1), convert_to_point_list(matrix2), np.unravel_index(np.argmax(matrix1), matrix1.shape))
+    x, y, z = split_into_three(final)
+
+    # Plotting
+    # Interpolate; there's also method='cubic' for 2-D data such as here
+    xi, yi = np.linspace(x.min(), x.max(), 300), np.linspace(y.min(), y.max(), 300)
+    xi, yi = np.meshgrid(xi, yi)
+
+    # Interpolate; there's also method='cubic' for 2-D data such as here
+    zi = interpolate.griddata((x, y), z, (xi, yi), method='linear')
+
+    plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower',
+               extent=[x.min(), x.max(), y.min(), y.max()])
+    plt.colorbar()
+    plt.show()
+
+    #####run_scan(a)
     # vals = np.ones((2, 3))
     # X, Y, Z = convert_to_pts(2.4, vals)
     # print X

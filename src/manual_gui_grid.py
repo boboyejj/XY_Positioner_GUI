@@ -164,6 +164,9 @@ class ManualGridGUI(tk.Tk):
         return X, Y, Z
 
     def plot(self):
+        if True:
+            print 'Currently a work in progress.'
+            return
         if len(self.x_pts) < 4:
             print 'Not enough values. Collect more data.'
             return

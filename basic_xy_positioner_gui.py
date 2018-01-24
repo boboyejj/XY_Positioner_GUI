@@ -28,7 +28,7 @@ def run_gui():
                                                                                 '(can be disabled to test motors)')
     area_scan.add_argument('--auto_zoom_scan', action='store_true', default=False,
                            help='perform zoom scan automatically (can be disabled to conduct multiple area scans')
-    area_scan.add_argument('--outfile_location', default='', help='choose directory where data will be output')
+    area_scan.add_argument('--filename', default='', help='choose what to call the saved file')
 
     # Arguments for moving to a specific position in the grid
     pos_move = sub.add_parser('pos_move', help='Move to specified position')
@@ -37,13 +37,15 @@ def run_gui():
     pos_move.add_argument('grid_step_dist', type=float, default=2.8, help='distance to between grid points (in cm)')
     pos_move.add_argument('--measure', action='store_true', default=False, help='perform measurement '
                                                                                 '(can be disabled to test motors)')
-    pos_move.add_argument('--outfile_location', default='', help='choose directory where data will be output')
+    # pos_move.add_argument('--outfile_location', default='', help='choose directory where data will be output')
 
     # Arguments for moving motors back to center position
     reset_motors = sub.add_parser('reset_motors', help='Move motors back to their original positions')
     reset_motors.add_argument('--wait', action='store_true', default=False,
-                              help='Check this box to signify that you understand you are not allowed to touch '
-                                   'anything while the motors are moving back to their home positions')
+                              help='Check this box to say that you understand you are not allowed to touch '
+                                   'anything while the motors are homing!')
+    reset_motors.add_argument('--scan_30', action='store_true', default=True,
+                              help='choose if you are using the 30-inch system')
 
     # Arguments for moving motors manually
     manual_move = sub.add_parser('manual', help='Move motors manually according to a specified distance')
@@ -75,7 +77,7 @@ def run_gui():
         grid_loc = np.argwhere(grid == location)[0]
 
         m = MotorDriver()
-        num_steps = args.grid_step_dist / m.step_unit
+        num_steps = int(args.grid_step_dist / m.step_unit)
 
         # Move to first position in grid, then move to correct grid location
         move_to_pos_one(m, num_steps, x_points, y_points)
@@ -85,7 +87,10 @@ def run_gui():
     elif args.subparser_name == 'reset_motors':
         # Ensure that user waits until motors are completely done homing before continuing on
         if args.wait:
-            m = MotorDriver()
+            if args.scan30:
+                m = MotorDriver(home=(6000, 5000))
+            else:
+                m = MotorDriver()
             m.home_motors()
             m.destroy()
             exit(0)
