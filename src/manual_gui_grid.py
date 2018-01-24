@@ -59,69 +59,69 @@ class ManualGridGUI(tk.Tk):
         self.y_frac = self.y_dist / self.motor.step_unit - self.y_steps
         print 'Distances changed: X =', self.x_dist, 'Y =', self.y_dist
 
-
     def setup(self):
         self.title('Please select a location on the grid')
         self.config(background='lightblue')
         my_font = Font(family='Nirmala UI', size=15)
 
         # Button control grid
-        controlFrame = tk.Frame(background='lightblue', padx=10, pady=30)
-        btnUp = tk.Button(controlFrame, text='Up', command=self.button_up, padx=10, pady=15, bg='cyan', font=my_font)
-        btnDown = tk.Button(controlFrame, text='Down', command=self.button_down, padx=10, pady=15, bg='cyan',
+        control_frame = tk.Frame(background='lightblue', padx=10, pady=30)
+        btn_up = tk.Button(control_frame, text='Up', command=self.button_up, padx=10, pady=15, bg='cyan', font=my_font)
+        btn_down = tk.Button(control_frame, text='Down', command=self.button_down, padx=10, pady=15, bg='cyan',
                             font=my_font)
-        btnLeft = tk.Button(controlFrame, text='Left', command=self.button_left, padx=15, pady=15, bg='cyan',
+        btn_left = tk.Button(control_frame, text='Left', command=self.button_left, padx=15, pady=15, bg='cyan',
                             font=my_font)
-        btnRight = tk.Button(controlFrame, text='Right', command=self.button_right, padx=15, pady=15, bg='cyan',
-                             font=my_font)
+        btn_right = tk.Button(control_frame, text='Right', command=self.button_right, padx=15, pady=15, bg='cyan',
+                              font=my_font)
 
-        entry_center = tk.Label(controlFrame, text=':)')
-        btnUp.grid(row=0, column=1, sticky='NSEW')
-        btnDown.grid(row=2, column=1, sticky='NSEW')
-        btnLeft.grid(row=1, column=0, sticky='NSEW')
-        btnRight.grid(row=1, column=2, sticky='NSEW')
+        entry_center = tk.Label(control_frame, text=':)')
+        btn_up.grid(row=0, column=1, sticky='NSEW')
+        btn_down.grid(row=2, column=1, sticky='NSEW')
+        btn_left.grid(row=1, column=0, sticky='NSEW')
+        btn_right.grid(row=1, column=2, sticky='NSEW')
         entry_center.grid(row=1, column=1)
 
-        controlFrame.grid_rowconfigure(3, weight=1)
-        controlFrame.grid_columnconfigure(3, weight=1)
-        controlFrame.grid(row=0, column=0, padx=10, pady=10)
+        control_frame.grid_rowconfigure(3, weight=1)
+        control_frame.grid_columnconfigure(3, weight=1)
+        control_frame.grid(row=0, column=0, padx=10, pady=10)
 
         # Display the location of the robot relative to the start position
         self.loc = tk.Label(self, text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc), font=my_font,
-                         bg='white')
+                            bg='white')
         self.loc.grid(row=2, column=0, sticky='NSEW', padx=150, pady=10)
 
         # For changing the set distances mid-program
-        modifyFrame = tk.Frame(bg='lightblue')
-        self.x_entry = tk.Entry(modifyFrame, font=my_font)
-        self.y_entry = tk.Entry(modifyFrame, font=my_font)
+        modify_frame = tk.Frame(bg='lightblue')
+        self.x_entry = tk.Entry(modify_frame, font=my_font)
+        self.y_entry = tk.Entry(modify_frame, font=my_font)
         self.x_entry.insert(0, str(self.x_dist))
         self.y_entry.insert(0, str(self.y_dist))
         self.x_entry.grid(row=1, column=0, sticky='NSEW', padx=5, pady=5)
         self.y_entry.grid(row=1, column=2, sticky='NSEW', padx=5, pady=5)
 
-        x_entry_label = tk.Label(modifyFrame, text='X Distance', font=my_font, bg='cyan', padx=5, pady=5)
-        y_entry_label = tk.Label(modifyFrame, text='Y Distance', font=my_font, bg='cyan', padx=5, pady=5)
+        x_entry_label = tk.Label(modify_frame, text='X Distance', font=my_font, bg='cyan', padx=5, pady=5)
+        y_entry_label = tk.Label(modify_frame, text='Y Distance', font=my_font, bg='cyan', padx=5, pady=5)
         x_entry_label.grid(row=0, column=0, sticky='NSEW')
         y_entry_label.grid(row=0, column=2, sticky='NSEW')
 
-        submitBtn = tk.Button(modifyFrame, text='Change settings', command=self.update_variables, padx=5, pady=5,
-                              font=my_font)
-        submitBtn.grid(row=2, column=1)
-        modifyFrame.grid_rowconfigure(3, weight=1)
-        modifyFrame.grid_columnconfigure(3, weight=1)
-        modifyFrame.grid(row=0, column=1, padx=10, pady=10)
+        submit_btn = tk.Button(modify_frame, text='Change settings', command=self.update_variables, padx=5, pady=5,
+                               font=my_font)
+        submit_btn.grid(row=2, column=1)
+        modify_frame.grid_rowconfigure(3, weight=1)
+        modify_frame.grid_columnconfigure(3, weight=1)
+        modify_frame.grid(row=0, column=1, padx=10, pady=10)
 
         data_frame = tk.Frame(bg='lightblue')
         value_label = tk.Label(data_frame, text='Enter value here: ', font=my_font, bg='white')
         self.value_entry = tk.Entry(data_frame, font=my_font)
-        measure_here = tk.Button(data_frame, text='Add to graph', padx=10, pady=10, font=my_font, command=self.add_to_data)
-        gridBtn = tk.Button(data_frame, text='Generate graph', padx=10, pady=10, font=my_font, command=self.plot)
+        measure_here = tk.Button(data_frame, text='Add to graph', padx=10, pady=10, font=my_font,
+                                 command=self.add_to_data)
+        grid_btn = tk.Button(data_frame, text='Generate graph', padx=10, pady=10, font=my_font, command=self.plot)
 
         value_label.grid(row=0, column=0, padx=10, pady=10)
         self.value_entry.grid(row=0, column=1, padx=10, pady=10)
         measure_here.grid(row=0, column=2, padx=10, pady=10)
-        gridBtn.grid(row=0, column=3, padx=10, pady=10)
+        grid_btn.grid(row=0, column=3, padx=10, pady=10)
         data_frame.grid_rowconfigure(1, weight=1)
         data_frame.grid_columnconfigure(4, weight=1)
         data_frame.grid(row=2, column=1)

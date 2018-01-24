@@ -20,7 +20,8 @@ class MotorDriver:
     def __init__(self, step_unit_=0.00508):
         """Init MotorDriver with step_unit and port = COM3"""
         try:
-            self.port = serial.Serial('COM3', timeout=1.5)
+            # self.port = serial.Serial('COM3', timeout=1.5)
+            self.port = serial.Serial('COM5', timeout=1.5)
             self.port.flushOutput()
             self.port.flushInput()
             self.port.flush()
@@ -74,9 +75,9 @@ class MotorDriver:
     def home_motors(self):
         """Reset motors back to center of grid."""
         # Set home of motor 1 to be 6000 steps away, home of motor 2 to be 13000 steps away
-        self.port.write(str.encode('!1wh1,r,5000\r'))
+        self.port.write(str.encode('!1wh1,r,3788\r'))
         self.port.readline()
-        self.port.write(str.encode('!1wh2,r,6500\r'))
+        self.port.write(str.encode('!1wh2,r,4300\r'))
         self.port.readline()
         # print 'Home settings written (a if yes), ', port.readline()
         self.port.flush()

@@ -5,6 +5,8 @@ from location_select_gui import LocationSelectGUI
 from matplotlib import pyplot as plt
 from matplotlib import mlab
 from data_entry_gui import DataEntryGUI
+from scipy import interpolate
+from timer_gui import TimerGUI
 import turtle
 
 
@@ -38,30 +40,27 @@ def generate_grid(rows, columns):
     return g
 
 
-def convert_to_pts(dist, arr):
-    x_dim = len(arr)
-    y_dim = len(arr[0])
+def convert_to_pts(arr, dist, x_off=0, y_off=0):
+    x_dim = arr.shape[1]
+    y_dim = arr.shape[0]
     xpts = []
     ypts = []
     zpts = []
-    for i in range(x_dim):
-        for j in range(y_dim):
-            if i < x_dim / 2:
-                x_pt = -1.0/2 * i * dist
+    for j in range(x_dim):
+        for i in range(y_dim):
+            if j < x_dim / 2.0:
+                x_pt = -1.0 / 2 * i * dist + x_off
             else:
-                x_pt = 1.0/2 * i * dist
-            if j < y_dim / 2:
-                y_pt = -1.0/2 * j *dist
+                x_pt = 1.0 / 2 * i * dist + x_off
+            if i < y_dim / 2.0:
+                y_pt = -1.0 / 2 * j * dist + y_off
             else:
-                y_pt = 1.0/2 * j *dist
+                y_pt = 1.0 / 2 * j * dist + y_off
             xpts.append(x_pt)
             ypts.append(y_pt)
             zpts.append(arr[i][j])
-
+    print xpts, ypts, zpts
     return xpts, ypts, zpts
-
-def add_zoom_pts(zooms, vals, place):
-    print 'a'
 
 
 def run_scan(args):
@@ -117,7 +116,6 @@ def run_scan(args):
     j = 0
     for i in range(y_points):
         while j < x_points - 1:
-
             if going_forward:
                 x_error += frac_step  # Add to error
                 m.forward_motor_one(num_steps + int(x_error))  # Increase distance moved by adding error
@@ -153,24 +151,18 @@ def run_scan(args):
             j += 1
             print values
 
-        # Else update counter, measure, and move down. Reverse direction
         y_error += frac_step
-        m.forward_motor_two(num_steps + int(y_error))
+        # m.forward_motor_two(num_steps + int(y_error))
         count += 1  # Increment our progress counter
-        # If counter is outside accepted bounds, measure once and exit
+        # If counter is outside accepted bounds, exit
         if count > x_points * y_points:
             count -= 1  # Reset count to end of grid
             loc = np.argwhere(grid == count)[0]
             # print loc
             # franklin.circle(2)
-            # TODO: MEASURE HERE
-            # if args.measure:
-            #    man = DataEntryGUI(None)
-            #    man.title('Data Entry')
-            #    man.mainloop()
-            #    values[loc[0]][loc[1]] = man.getval()
-            # print values
             break
+        m.forward_motor_two(num_steps + int(y_error))
+        # Else update counter, measure, and move down. Reverse direction
         loc = np.argwhere(grid == count)[0]
         print '------------'
         # franklin.circle(2)
@@ -190,21 +182,39 @@ def run_scan(args):
 
     # Post area scan loop (unless auto zoom has been implemented)
     zoom_pts = []
-    place = 0
+    place = None
     while True:
         # Plot results
         if args.measure:
-            X, Y, Z = convert_to_pts(args.grid_step_dist, np.flipud(values))
+            # Known to work more or less
+            # plt.imshow(values, interpolation='bilinear')
+            # cbar = plt.colorbar()
+            # cbar.set_label('Signal Level')
+            # plt.show(block=False)
+
+            # X, Y, Z = convert_to_pts(values, args.grid_step_dist)
+
+            X, Y = np.meshgrid(np.arange(-values.shape[0]/2, values.shape[0]/2), np.arange(-values.shape[1]/2, values.shape[1]/2))
+            print X, Y
+            # plt.scatter(X, Y, c=values)
+            # plt.show()
+            if place is not None:
+                x_off = (place[0] - values.shape[0] / 2) * args.grid_step_dist
+                y_off = (place[1] - values.shape[1] / 2) * args.grid_step_dist
+                zoomX, zoomY, zoomZ = convert_to_pts(zoom_pts, args.grid_step_dist / 4, x_off, y_off)
+                print zoomX
+                print zoomY
+                print zoomZ
+                X.extend(zoomX)
+                Y.extend(zoomY)
+                # Z.extend(zoomZ)
+
             xi = np.linspace(min(X), max(X), 100)
             yi = np.linspace(min(Y), max(Y), 100)
             zi = mlab.griddata(X, Y, Z, xi, yi, interp='linear')
-
-            if place != 0:
-                add_zoom_pts(zoom_pts, values, place)
             fig, axes = plt.subplots(1, 1)
             axes.set_aspect('equal')
-            # axes.hold(True)
-            graph = axes.contour(xi, yi, zi, 15, linewidths=0.5, colors='k')
+            graph = axes.contour(xi, yi, zi, 15, linewidths=0.5)
             graph = axes.contourf(xi, yi, zi, 15, vmax=abs(zi).max(), vmin=abs(zi).min())
             axes.scatter(X, Y, marker='o', s=5, cmap=graph.cmap)
             cbar = fig.colorbar(graph)
@@ -237,29 +247,30 @@ def run_scan(args):
                 print 'No data to save.'
         elif choice == 'Zoom Scan':
             plt.close()
-            print 'Please select location.'
-            loc_gui = LocationSelectGUI(None, grid)
-            loc_gui.title('Location Selection')
-            loc_gui.mainloop()
-            location = loc_gui.get_gui_value()
-            print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
-            grid_move = (np.argwhere(grid == location) - np.argwhere(grid == count))[0]
-            print 'Need to move', grid_move
-            if grid_move[1] > 0:
-                m.forward_motor_one(num_steps * grid_move[1])
-            else:
-                m.reverse_motor_one(num_steps * grid_move[1])
-            if grid_move[0] > 0:
-                m.forward_motor_two(num_steps * grid_move[0])
-            else:
-                m.reverse_motor_two(num_steps * grid_move[0])
-            count = location
-            grid_loc = np.argwhere(grid == count)[0]
-            print 'Please enter required parameters'
+            # print 'Please select location.'
+            # loc_gui = LocationSelectGUI(None, grid)
+            # loc_gui.title('Location Selection')
+            # loc_gui.mainloop()
+            # location = loc_gui.get_gui_value()
+            # # print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
+            # grid_move = (np.argwhere(grid == location) - np.argwhere(grid == count))[0]
+            # # print 'Need to move', grid_move
+            # if grid_move[1] > 0:
+            #     m.forward_motor_one(num_steps * grid_move[1])
+            # else:
+            #     m.reverse_motor_one(num_steps * grid_move[1])
+            # if grid_move[0] > 0:
+            #     m.forward_motor_two(num_steps * grid_move[0])
+            # else:
+            #     m.reverse_motor_two(num_steps * grid_move[0])
+            # count = location
 
             # TODO: Implement zoom scan GUI
+            place = np.unravel_index(values.argmax(), values.shape)
+            count = grid[place[0]][place[1]]
+            print place
 
-            count = location
+            zoom_pts = 32 * np.ones((5, 5))
         elif choice == 'Correct Previous Value':
             plt.close()
             print 'Please select location.'
@@ -267,9 +278,9 @@ def run_scan(args):
             loc_gui.title('Location Selection')
             loc_gui.mainloop()
             location = loc_gui.get_gui_value()
-            print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
+            # print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
             grid_move = (np.argwhere(grid == location) - np.argwhere(grid == count))[0]
-            print 'Need to move', grid_move
+            # print 'Need to move', grid_move
             if grid_move[1] > 0:
                 m.forward_motor_one(num_steps * grid_move[1])
             else:
@@ -303,7 +314,7 @@ def auto_zoom_scan(args, vals):
 
 
 def main():
-    vals = np.ones((2,3))
+    vals = np.ones((2, 3))
     X, Y, Z = convert_to_pts(2.4, vals)
     print X
     print Y
