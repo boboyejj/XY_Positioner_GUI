@@ -4,13 +4,25 @@
 """
 
 import Tkinter as tk
+import tkFont
 import winsound
 
 
 class TimerGUI(tk.Tk):
     def __init__(self, time):
         tk.Tk.__init__(self)
-        self.label = tk.Label(self, text="", width=10)
+        self.title('Timer for ' + str(time) + ' seconds')
+        self.config(bg='#73AB84')
+
+        # Center on screen
+        width, height = 300, 300
+        screen_w, screen_h = self.winfo_screenwidth(), self.winfo_screenheight()
+        x = (screen_w / 2) - (width / 2)
+        y = (screen_h / 2) - (height / 2)
+        self.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
+        my_font = tkFont.Font(family='Nirmala UI', size=24)
+        self.label = tk.Label(self, text="", width=10, pady=150, font=my_font, bg='#73AB84')
         self.label.pack()
         self.remaining = 0
         self.countdown(time)

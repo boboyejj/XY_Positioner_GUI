@@ -61,17 +61,17 @@ class ManualGridGUI(tk.Tk):
 
     def setup(self):
         self.title('Please select a location on the grid')
-        self.config(background='lightblue')
+        self.config(background='#1C3E52')
         my_font = Font(family='Nirmala UI', size=15)
 
         # Button control grid
-        control_frame = tk.Frame(background='lightblue', padx=10, pady=30)
-        btn_up = tk.Button(control_frame, text='Up', command=self.button_up, padx=10, pady=15, bg='cyan', font=my_font)
-        btn_down = tk.Button(control_frame, text='Down', command=self.button_down, padx=10, pady=15, bg='cyan',
+        control_frame = tk.Frame(background='#1C3E52', padx=10, pady=30)
+        btn_up = tk.Button(control_frame, text='Away \nmotor2 (Up)', command=self.button_up, padx=10, pady=15, bg='#A3A3A3', font=my_font)
+        btn_down = tk.Button(control_frame, text='Toward \nmotor2 (Down)', command=self.button_down, padx=10, pady=15, bg='#A3A3A3',
                             font=my_font)
-        btn_left = tk.Button(control_frame, text='Left', command=self.button_left, padx=15, pady=15, bg='cyan',
+        btn_left = tk.Button(control_frame, text='Away \nmotor1 (Left)', command=self.button_left, padx=15, pady=15, bg='#A3A3A3',
                             font=my_font)
-        btn_right = tk.Button(control_frame, text='Right', command=self.button_right, padx=15, pady=15, bg='cyan',
+        btn_right = tk.Button(control_frame, text='Toward \nmotor1 (Right)', command=self.button_right, padx=15, pady=15, bg='#A3A3A3',
                               font=my_font)
 
         entry_center = tk.Label(control_frame, text=':)')
@@ -88,10 +88,10 @@ class ManualGridGUI(tk.Tk):
         # Display the location of the robot relative to the start position
         self.loc = tk.Label(self, text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc), font=my_font,
                             bg='white')
-        self.loc.grid(row=2, column=0, sticky='NSEW', padx=150, pady=10)
+        self.loc.grid(row=2, column=0, sticky='NSEW', padx=100, pady=50)
 
         # For changing the set distances mid-program
-        modify_frame = tk.Frame(bg='lightblue')
+        modify_frame = tk.Frame(bg='#1C3E52')
         self.x_entry = tk.Entry(modify_frame, font=my_font)
         self.y_entry = tk.Entry(modify_frame, font=my_font)
         self.x_entry.insert(0, str(self.x_dist))
@@ -99,8 +99,8 @@ class ManualGridGUI(tk.Tk):
         self.x_entry.grid(row=1, column=0, sticky='NSEW', padx=5, pady=5)
         self.y_entry.grid(row=1, column=2, sticky='NSEW', padx=5, pady=5)
 
-        x_entry_label = tk.Label(modify_frame, text='X Distance', font=my_font, bg='cyan', padx=5, pady=5)
-        y_entry_label = tk.Label(modify_frame, text='Y Distance', font=my_font, bg='cyan', padx=5, pady=5)
+        x_entry_label = tk.Label(modify_frame, text='X Distance', font=my_font, bg='#A3A3A3', padx=5, pady=5)
+        y_entry_label = tk.Label(modify_frame, text='Y Distance', font=my_font, bg='#A3A3A3', padx=5, pady=5)
         x_entry_label.grid(row=0, column=0, sticky='NSEW')
         y_entry_label.grid(row=0, column=2, sticky='NSEW')
 
@@ -111,7 +111,7 @@ class ManualGridGUI(tk.Tk):
         modify_frame.grid_columnconfigure(3, weight=1)
         modify_frame.grid(row=0, column=1, padx=10, pady=10)
 
-        data_frame = tk.Frame(bg='lightblue')
+        data_frame = tk.Frame(bg='#1C3E52')
         value_label = tk.Label(data_frame, text='Enter value here: ', font=my_font, bg='white')
         self.value_entry = tk.Entry(data_frame, font=my_font)
         measure_here = tk.Button(data_frame, text='Add to graph', padx=10, pady=10, font=my_font,
@@ -124,7 +124,7 @@ class ManualGridGUI(tk.Tk):
         grid_btn.grid(row=0, column=3, padx=10, pady=10)
         data_frame.grid_rowconfigure(1, weight=1)
         data_frame.grid_columnconfigure(4, weight=1)
-        data_frame.grid(row=2, column=1)
+        data_frame.grid(row=2, column=1, pady=30, padx=30)
 
         self.grid_rowconfigure(4, weight=1)
         self.grid_columnconfigure(2, weight=1)
@@ -146,7 +146,7 @@ class ManualGridGUI(tk.Tk):
             return
         self.checked_pts.append((self.x_loc, self.y_loc))
         self.x_pts.append(self.x_loc)
-        self.y_pts.append(self.y_loc)
+        self.y_pts.append(-1 * self.y_loc)
         self.z_pts.append(float(self.value_entry.get()))
         print '[', self.x_loc, ',', self.y_loc, ']: ', float(self.value_entry.get())
         print self.x_pts
@@ -159,14 +159,15 @@ class ManualGridGUI(tk.Tk):
     def grid(self, resX=100, resY=100):
         xi = linspace(min(self.x_pts), max(self.x_pts), resX)
         yi = linspace(min(self.y_pts), max(self.y_pts), resY)
-        Z = griddata(self.x_pts, [-1 * k for k in self.y_pts], self.z_pts, xi, yi, interp='linear')
-        X, Y = meshgrid(xi, yi)
+        Z = griddata(self.x_pts, [k for k in self.y_pts], self.z_pts, xi, yi, interp='linear')
+        # Z = griddata(self.x_pts, [k for k in self.y_pts], self.z_pts, xi, yi, interp='linear')
+        X, Y = meshgrid(xi, yi, indexing='xy')
         return X, Y, Z
 
     def plot(self):
-        if True:
-            print 'Currently a work in progress.'
-            return
+        # if True:
+        #     print 'Currently a work in progress.'
+        #     return
         if len(self.x_pts) < 4:
             print 'Not enough values. Collect more data.'
             return
@@ -175,7 +176,8 @@ class ManualGridGUI(tk.Tk):
         axes.set_aspect('equal')
         # axes.hold(True)
         graph = axes.contourf(X, Y, Z)
-        axes.scatter(self.x_pts, [-1 * k for k in self.y_pts], c=self.z_pts, s=60, cmap=graph.cmap)
+        axes.scatter(self.x_pts, [k for k in self.y_pts], c=self.z_pts, s=60, cmap=graph.cmap)
+        # axes.scatter(self.x_pts, [k for k in self.y_pts], c=self.z_pts, s=60, cmap=graph.cmap)
         cbar = fig.colorbar(graph)
         cbar.set_label('Signal Level')
         axes.margins(0.05)

@@ -24,6 +24,7 @@ def run_gui():
     area_scan.add_argument('x_distance', type=float, default=6 * 2.8, help='distance in the x direction (in cm)')
     area_scan.add_argument('y_distance', type=float, default=4 * 2.8, help='distance in the y direction (in cm)')
     area_scan.add_argument('grid_step_dist', type=float, default=2.8, help='distance to between grid points (in cm)')
+    area_scan.add_argument('dwell_time', type=int, default=0, help='dwell time at single measurement point (in s)')
     area_scan.add_argument('--measure', action='store_true', default=True, help='perform measurement '
                                                                                 '(can be disabled to test motors)')
     area_scan.add_argument('--auto_zoom_scan', action='store_true', default=False,

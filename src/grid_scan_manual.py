@@ -100,8 +100,12 @@ def run_scan(args):
     move_to_pos_one(m, int(num_steps), x_points, y_points)
     # TODO: MEASURE HERE
     if args.measure:
+        if args.dwell_time is not 0:
+            t = TimerGUI(args.dwell_time)
+            t.mainloop()
         man = DataEntryGUI(None)
         man.title('Data Entry')
+        man.focus()
         man.mainloop()
         values[0][0] = man.getval()
         # loc = np.argwhere(grid == 1)[0]
@@ -132,8 +136,12 @@ def run_scan(args):
                 # franklin.forward(20)
                 # TODO: MEASURE HERE
                 if args.measure:
+                    if args.dwell_time is not 0:
+                        t = TimerGUI(args.dwell_time)
+                        t.mainloop()
                     man = DataEntryGUI(None)
                     man.title('Data Entry')
+                    man.focus()
                     man.mainloop()
                     values[loc[0]][loc[1]] = man.getval()
                     # grid_points.append((loc * args.grid_step_dist, man.getval()))
@@ -149,8 +157,12 @@ def run_scan(args):
                 # franklin.backward(20)
                 # TODO: MEASURE HERE
                 if args.measure:
+                    if args.dwell_time is not 0:
+                        t = TimerGUI(args.dwell_time)
+                        t.mainloop()
                     man = DataEntryGUI(None)
                     man.title('Data Entry')
+                    man.focus()
                     man.mainloop()
                     values[loc[0]][loc[1]] = man.getval()
                     # grid_points.append((loc * args.grid_step_dist, man.getval()))
@@ -179,8 +191,12 @@ def run_scan(args):
         # franklin.left(90)
         # TODO: MEASURE HERE
         if args.measure:
+            if args.dwell_time is not 0:
+                t = TimerGUI(args.dwell_time)
+                t.mainloop()
             man = DataEntryGUI(None)
             man.title('Data Entry')
+            man.focus()
             man.mainloop()
             values[loc[0]][loc[1]] = man.getval()
             # grid_points.append((loc * args.grid_step_dist, man.getval()))
@@ -194,7 +210,7 @@ def run_scan(args):
 
 
     zoomed_points = []
-    zoom_values = np.ones((5, 5))
+    zoom_values = np.zeros((5, 5))
     zoom_grid = generate_grid(5, 5)
     # Automatic zoom scan if set, otherwise, post scan loop
     place = None
@@ -336,6 +352,9 @@ def run_scan(args):
             # print grid_loc
             # TODO: MEASURE HERE
             if args.measure:
+                if args.dwell_time is not 0:
+                    t = TimerGUI(args.dwell_time)
+                    t.mainloop()
                 man = DataEntryGUI(None)
                 man.title('Data Entry')
                 man.mainloop()
@@ -368,6 +387,9 @@ def auto_zoom(args, m):
     move_to_pos_one(m, int(num_steps), x_points, y_points)
     # TODO: MEASURE HERE
     if args.measure:
+        if args.dwell_time is not 0:
+            t = TimerGUI(args.dwell_time)
+            t.mainloop()
         man = DataEntryGUI(None)
         man.title('Data Entry')
         man.mainloop()
@@ -396,6 +418,9 @@ def auto_zoom(args, m):
                 print '------------'
                 # TODO: MEASURE HERE
                 if args.measure:
+                    if args.dwell_time is not 0:
+                        t = TimerGUI(args.dwell_time)
+                        t.mainloop()
                     man = DataEntryGUI(None)
                     man.title('Data Entry')
                     man.mainloop()
@@ -411,6 +436,9 @@ def auto_zoom(args, m):
                 print '------------'
                 # TODO: MEASURE HERE
                 if args.measure:
+                    if args.dwell_time is not 0:
+                        t = TimerGUI(args.dwell_time)
+                        t.mainloop()
                     man = DataEntryGUI(None)
                     man.title('Data Entry')
                     man.mainloop()
@@ -435,6 +463,9 @@ def auto_zoom(args, m):
         print '------------'
         # TODO: MEASURE HERE
         if args.measure:
+            if args.dwell_time is not 0:
+                t = TimerGUI(args.dwell_time)
+                t.mainloop()
             man = DataEntryGUI(None)
             man.title('Data Entry')
             man.mainloop()
@@ -517,7 +548,7 @@ class Args:
         self.filename = 'raw_values'
         self.measure = True
         self.auto_zoom_scan = False
-
+        self.dwell_time = 0
 
 if __name__ == '__main__':
     main()
