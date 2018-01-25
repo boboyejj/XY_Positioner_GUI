@@ -24,27 +24,44 @@ help make controlling the motors more intuitive.
 are downloading **Python 2.7** and NOT Python 3. You may also choose to install [Anaconda or Miniconda](https://github.com/BurntSushi/nfldb/wiki/Python-&-pip-Windows-installation) to manage the packages
 we will be using.
 
-2. Install an IDE such as [PyCharm](https://www.jetbrains.com/pycharm/download/) or use Spyder (included in Anaconda)
+2. Install an IDE such as [PyCharm](https://www.jetbrains.com/pycharm/download/) or use Spyder (included in Anaconda). Open the folder
+containing the files you downloaded using this IDE.
 
-3. You must then open up the "Terminal" inside the IDE you are using to run the following command to install relevant packages.
-Unfortunately these packages take up a sizable amount of space so ensure that the computer you are working on has at least 1 GB of room.
+3. Next we must set up our virtual environment to continue using python properly. This can be slightly complicated, so use this link
+for [reference for PyCharm](https://www.jetbrains.com/help/pycharm/configuring-python-interpreter.html#configuring-venv) and this link
+for [reference for Anaconda](https://conda.io/docs/user-guide/tasks/manage-environments.html). If you have configured the PATH variables
+for Windows, this shouldn't be necessary. I will go through the exact steps for PyCharm
+here:
+    - Go to Help > Find Action in the top bar or press Ctrl+Shift+A
+    - Search for "Project Interpreter" and click the first result
+    - The term "Project Interpreter" should be highlighted. It is next to a long dropdown bar. Next to that bar is a settings 
+    gear icon. Click on it and choose "Add Local"
+    - Specify a "Location" for the virtual environment. For the "Base Interpreter", navigate to the folder where you installed Python
+    (probably `C:/Python27` or `C:/ProgramFiles/Python27`). Choose the file "python.exe" to make sure PyCharm knows how to run your code.
+    - Before you exit out of this window, on the left hand side, there should be an option that says "System Interpreter". For the "Interpreter"
+    choose the exact same location you specified for the "Base Interpreter" (the python.exe file from before).
+    - Click "Ok" and exit the "Settings" window.
 
-4. Run the following command to install all packages at once:
+4. You must then open up the "Terminal" inside the IDE you are using to run the following command to install relevant packages.
+The button to open it can be found in the very bottom left corner (it looks like a gray square). Mousing over it will allow the
+user the option to open the terminal.
+
+5. Run the following command in the terminal (within your IDE) to install all packages at once. These packages take up about 1 GB of space:
 
 ```bash
-pip install numpy matplotlib Gooey pyserial
+pip install numpy matplotlib Gooey pyserial scipy
 ```
 
 Alternatively, if you are using Anaconda, use the following command:
 
 ```bash
-conda install numpy matplotlib Gooey pyserial
+conda install numpy matplotlib Gooey pyserial scipy
 ```
 
 ## Deployment
 
-Open the file ["basic_xy_positioner_gui.py"](basic_xy_positioner_gui.py) in your favorite IDE and click run.
-That should be it!
+Open the file ["basic_xy_positioner_gui.py"](basic_xy_positioner_gui.py) in your favorite IDE and click run 
+(the green play button at the top for PyCharm). If you have to enter run configurations, the only That should be it!
 
 Running from the command line on Linux/Mac systems can be done by simply typing:
 
@@ -146,6 +163,7 @@ Note that this graph IS NOT SAVED unless you click the save button and choose a 
 * [PySerial](https://github.com/pyserial/pyserial) - Dependency Management
 * [Numpy](http://www.numpy.org/) - Used for matrix manipulations and structuring data
 * [Matplotlib](https://matplotlib.org/) - Used for interpolation and contour plotting
+* [SciPy](https://www.scipy.org/) - Used for additional interpolation
 * [Gooey](https://github.com/chriskiehl/Gooey) - Used to construct initial menu selection
 
 ## Contributing
