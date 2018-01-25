@@ -14,7 +14,7 @@ What things you need to install the software and how to install them
 
 It is recommended that you install an **I**ntegrated **D**evelopment **E**nvironment (IDE) for viewing and running Python files. [PyCharm](https://www.jetbrains.com/pycharm/download/) is recommended as it does not require admin privileges. 
 
-Spyder should also work and it comes preinstalled with [Anaconda]((https://github.com/BurntSushi/nfldb/wiki/Python-&-pip-Windows-installation)).
+Spyder should also work and it comes preinstalled with [Anaconda](https://github.com/BurntSushi/nfldb/wiki/Python-&-pip-Windows-installation).
 Future versions should include a Jupyter Notebook to make data management testing easier.
 
 It is also assumed that you already have a built XY Positioning system (either 18 or 30 inch model). This code will simply
@@ -43,8 +43,6 @@ Alternatively, if you are using Anaconda, use the following command:
 conda install numpy matplotlib Gooey pyserial
 ```
 
-=======
-
 ## Deployment
 
 Add additional notes about how to deploy this on a live system
@@ -72,19 +70,17 @@ It may be necessary to purchase a USB-to-Serial cable as the one currently in us
 breaking. Ensure that the stopper is in place for motor 1 on the 30 inch system to ensure homing
 works correctly.
 
-### Running an Area Scan
+##### NOTE THAT BEFORE RUNNING ANY SCANS YOU MUST FIRST [RESET THE MOTORS](#resetting-Motors-(reset_motors)).
+
+### Running an Area Scan (area_scan)
 
 ##### Required Arguments
-
-==========
 
 * Input the dimensions of the object (x goes across and is controlled by motor #1, y goes up and down by using motor #2) into *x_distance* and *y_distance*.
 * The *grid_step_dist* selects how far apart each measurement point should be.
 * The *dwell_time* is by default set to 1, but can be changed to 0 to allow for the user to wait an indefinite amount of time before inputting a value.
 
 ##### Optional Arguments
-
-==========
 
 * The *filename* is a prefix that will appear at the beginning of all resulting file output. All output can be found in the folder
 `results/` which will be automatically generated if not present.
@@ -94,11 +90,57 @@ to it. Zoom scan data is stored separately from area scan data.
 
 The default settings create a 4x6 grid with spacing of 2.8 cm with a 1 second dwell time. The default file prefix is "raw_values" and the automatic zoom scan is not conducted.
 
-### Moving to a Grid Position
+Once the area scan is complete, you may select more options from the post-scan GUI that pops up afterward. You may choose to
+* correct a previous value
+* run a zoom scan
+* save your data into `results/`
+* ...or exit the program
+ 
+Note that the plot will also be saved and you do not have to choose the save button on the graph pop up unless you would like 
+to save it in another folder.
+
+### Moving to a Grid Position (pos_move)
+
+##### Required Arguments
+
+* Input the dimensions of the object (x goes across and is controlled by motor #1, y goes up and down by using motor #2) into *x_distance* and *y_distance*.
+* The *grid_step_dist* selects how far apart each measurement point should be.
+
+After the command is selected, a grid GUI will pop up with a series of buttons. Click on where you want to go within the grid
+and the motors will move there after moving to the first position in the grid.
 
 ### Running a Zoom Scan
 
-### Manual Control
+To run a zoom scan over a single point, it is recommended that you first run [pos_move](#moving-to-a-grid-position-(pos_move))
+and then conduct an area scan with smaller step size.
+
+Make sure to indicate in your filename that you are conducting a zoom scan!
+The program is built to assume that if you choose [area_scan](#running-an-area-scan-(area_scan)), you are expecting data outputted
+into a file called "_area".
+
+You can also choose to run a zoom scan after the area scan is complete or set it to be run automatically after an area scan.
+
+### Resetting Motors (reset_motors)
+
+This command resets the motors to their start position at the center of the XY positioner. Please run this command every time you
+are finished using the positioner. It will take approximately a minute to complete the reset, but PLEASE DO NOT RUN ANY SCANS while
+the motors are moving. This will throw off position calculations.
+
+You may also select whether you would like to go to the center of the 18 inch system or the 30 inch system.
+
+### Manual Control (manual)
+
+The manual control option assumes that you know your exact positions for grid coordinates and allows for free movement of the motors.
+
+The settings for "up, down, left, and right" may be altered depending on your perspective relative to the positioner. For this reason,
+the buttons have been labelled "towards/away" depending on the motor they are associated with.
+
+The distance moved by pressing a button can be changed by using the text boxes in the top right section of the GUI.
+
+To generate a graph (scatter + contour) you require at least 4 data points. To add a data point, type a value into the textbox and click "Add
+to graph". Unfortunately, overwriting data points is **not** supported at this time, so be sure of your value before you click "Add to graph"!
+
+Note that this graph IS NOT SAVED unless you click the save button and choose a location/filename.
 
 ## Built With
 

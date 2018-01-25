@@ -38,8 +38,8 @@ def run_gui():
     pos_move.add_argument('x_distance', type=float, default=6 * 2.8, help='distance in the x direction (in cm)')
     pos_move.add_argument('y_distance', type=float, default=4 * 2.8, help='distance in the y direction (in cm)')
     pos_move.add_argument('grid_step_dist', type=float, default=2.8, help='distance to between grid points (in cm)')
-    pos_move.add_argument('--measure', action='store_true', default=False, help='perform measurement '
-                                                                                '(can be disabled to test motors)')
+    # pos_move.add_argument('--measure', action='store_true', default=False, help='perform measurement '
+    #                                                                             '(can be disabled to test motors)')
     # pos_move.add_argument('--outfile_location', default='', help='choose directory where data will be output')
 
     # Arguments for moving motors back to center position
