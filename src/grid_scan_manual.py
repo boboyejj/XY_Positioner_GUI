@@ -194,6 +194,8 @@ def run_scan(args):
 
 
     zoomed_points = []
+    zoom_values = np.ones((5, 5))
+    zoom_grid = generate_grid(5, 5)
     # Automatic zoom scan if set, otherwise, post scan loop
     place = None
     if args.auto_zoom_scan:
@@ -247,19 +249,34 @@ def run_scan(args):
         elif choice == 'Save Data':
             # TODO: Save file method that creates place for files
             if args.measure:
-                plt.savefig(args.outfile_location + './results/contour_plot.png', bbox_inches='tight')
+                if not os.path.exists('results'):
+                    os.makedirs('results')
+                my_path = os.path.join(os.getcwd(), 'results')
+
+                # Save figure as <filename>_contour_plot.png
+                plt.savefig(os.path.join(my_path, args.filename.replace('.txt', '') + '_area_contour_plot.png'), bbox_inches='tight')
                 plt.close()
-                if not os.path.exists(args.outfile_location):
-                    print 'Path does not exist, using default results folder'
-                    # os.chdir('..')
-                    if not os.path.exists('results'):
-                        os.makedirs('results')
-                    args.outfile_location = 'results'
-                my_path = os.path.join(os.getcwd(), args.outfile_location, 'raw_values.txt')
-                print my_path
-                file = open(my_path, 'w+')
-                for line in values:
-                    file.write(str(line) + '\n')
+
+                # Save area scan data in matrix format
+                np.savetxt(os.path.join(my_path, args.filename.replace('.txt', '') + '_area_matrix.txt'),
+                           np.asarray(values), fmt='%.4f', delimiter='\t')
+
+                # Save area scan data in column format
+                file = open(os.path.join(my_path, args.filename.replace('.txt', '') + '_area_column.txt'), 'w+')
+                for i in range(x_points * y_points):
+                    pos = np.argwhere(grid == i + 1)[0]
+                    file.write(str(values[pos[0]][pos[1]]) + '\n')
+                file.close()
+
+                # Save zoom scan data in matrix format
+                np.savetxt(os.path.join(my_path, args.filename.replace('.txt', '') + '_zoom_matrix.txt'),
+                           np.asarray(zoom_values), fmt='%.4f', delimiter='\t')
+
+                # Save zoom scan data in column format
+                file = open(os.path.join(my_path, args.filename.replace('.txt', '') + '_zoom_column.txt'), 'w+')
+                for i in range(zoom_values.size):
+                    pos = np.argwhere(zoom_grid == i + 1)[0]
+                    file.write(str(zoom_values[pos[0]][pos[1]]) + '\n')
                 file.close()
             else:
                 print 'No data to save.'
@@ -292,7 +309,8 @@ def run_scan(args):
 
             # TODO: Implement zoom scan GUI
 
-            # zoomed = auto_zoom(args, m)
+            zoom_values = auto_zoom(args, m)
+            # zoomed = convert_to_point_list(np.flipud(zoom_values))
             zoomed = convert_to_point_list(np.tri(5))
             zoomed_points = combine_matrices(grid_points, zoomed, place)
         elif choice == 'Correct Previous Value':
@@ -427,7 +445,7 @@ def auto_zoom(args, m):
         going_forward = not going_forward
         j = 0
 
-    return convert_to_point_list(np.flipud(values))
+    return values
 
 
 # Puts m2 into m1 with equal spacing between positions
@@ -464,26 +482,26 @@ def split_into_three(combined):
 
 def main():
     a = Args()
-    matrix1 = np.random.random((2, 2))
-    matrix2 = 6 * np.random.random((5, 5)) + 3
-    print np.unravel_index(np.argmax(matrix1), matrix1.shape)
-    final = combine_matrices(convert_to_point_list(matrix1), convert_to_point_list(matrix2), np.unravel_index(np.argmax(matrix1), matrix1.shape))
-    x, y, z = split_into_three(final)
+    # matrix1 = np.random.random((2, 2))
+    # matrix2 = 6 * np.random.random((5, 5)) + 3
+    # print np.unravel_index(np.argmax(matrix1), matrix1.shape)
+    # final = combine_matrices(convert_to_point_list(matrix1), convert_to_point_list(matrix2), np.unravel_index(np.argmax(matrix1), matrix1.shape))
+    # x, y, z = split_into_three(final)
+    #
+    # # Plotting
+    # # Interpolate; there's also method='cubic' for 2-D data such as here
+    # xi, yi = np.linspace(x.min(), x.max(), 300), np.linspace(y.min(), y.max(), 300)
+    # xi, yi = np.meshgrid(xi, yi)
+    #
+    # # Interpolate; there's also method='cubic' for 2-D data such as here
+    # zi = interpolate.griddata((x, y), z, (xi, yi), method='linear')
+    #
+    # plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower',
+    #            extent=[x.min(), x.max(), y.min(), y.max()])
+    # plt.colorbar()
+    # plt.show()
 
-    # Plotting
-    # Interpolate; there's also method='cubic' for 2-D data such as here
-    xi, yi = np.linspace(x.min(), x.max(), 300), np.linspace(y.min(), y.max(), 300)
-    xi, yi = np.meshgrid(xi, yi)
-
-    # Interpolate; there's also method='cubic' for 2-D data such as here
-    zi = interpolate.griddata((x, y), z, (xi, yi), method='linear')
-
-    plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower',
-               extent=[x.min(), x.max(), y.min(), y.max()])
-    plt.colorbar()
-    plt.show()
-
-    #####run_scan(a)
+    run_scan(a)
     # vals = np.ones((2, 3))
     # X, Y, Z = convert_to_pts(2.4, vals)
     # print X
@@ -496,9 +514,9 @@ class Args:
         self.x_distance = 2
         self.y_distance = 2
         self.grid_step_dist = 1
-        self.outfile_location = ''
+        self.filename = 'raw_values'
         self.measure = True
-        self.auto_zoom_scan = True
+        self.auto_zoom_scan = False
 
 
 if __name__ == '__main__':

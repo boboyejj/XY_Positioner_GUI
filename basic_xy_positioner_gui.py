@@ -28,7 +28,7 @@ def run_gui():
                                                                                 '(can be disabled to test motors)')
     area_scan.add_argument('--auto_zoom_scan', action='store_true', default=False,
                            help='perform zoom scan automatically (can be disabled to conduct multiple area scans')
-    area_scan.add_argument('--filename', default='', help='choose what to call the saved file')
+    area_scan.add_argument('--filename', default='raw_values', help='choose what to call the saved file')
 
     # Arguments for moving to a specific position in the grid
     pos_move = sub.add_parser('pos_move', help='Move to specified position')
