@@ -384,7 +384,7 @@ def auto_zoom(args, m):
     # Calculate number of motor steps necessary to move one grid space
     num_steps = args.grid_step_dist / (4.0 * m.step_unit)
     # Move to the initial position (top left) of grid scan and measure once
-    move_to_pos_one(m, int(num_steps), x_points, y_points)
+    move_to_pos_one(m, num_steps, x_points, y_points)
     # TODO: MEASURE HERE
     if args.measure:
         if args.dwell_time is not 0:
