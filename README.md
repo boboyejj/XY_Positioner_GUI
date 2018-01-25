@@ -68,7 +68,7 @@ It may be necessary to purchase a USB-to-Serial cable as the one currently in us
 breaking. Ensure that the stopper is in place for motor 1 on the 30 inch system to ensure homing
 works correctly.
 
-##### NOTE THAT BEFORE RUNNING ANY SCANS YOU MUST FIRST [RESET THE MOTORS](#resetting-Motors-(reset_motors)).
+##### NOTE THAT BEFORE RUNNING ANY SCANS YOU MUST FIRST [RESET THE MOTORS](#resetting-Motors-reset_motors).
 
 ### Running an Area Scan (area_scan)
 
@@ -109,11 +109,11 @@ and the motors will move there after moving to the first position in the grid.
 
 ### Running a Zoom Scan
 
-To run a zoom scan over a single point, it is recommended that you first run [pos_move](#moving-to-a-grid-position-(pos_move))
+To run a zoom scan over a single point, it is recommended that you first run [pos_move](#moving-to-a-grid-position-pos_move)
 and then conduct an area scan with smaller step size.
 
 Make sure to indicate in your filename that you are conducting a zoom scan!
-The program is built to assume that if you choose [area_scan](#running-an-area-scan-(area_scan)), you are expecting data outputted
+The program is built to assume that if you choose [area_scan](#running-an-area-scan-area_scan), you are expecting data outputted
 into a file called "_area".
 
 You can also choose to run a zoom scan after the area scan is complete or set it to be run automatically after an area scan.
