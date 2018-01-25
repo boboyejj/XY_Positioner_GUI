@@ -6,8 +6,6 @@ code was written in Python 2.7.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
-
 ### Prerequisites
 
 What things you need to install the software and how to install them
@@ -45,9 +43,9 @@ conda install numpy matplotlib Gooey pyserial
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
-
 Open the file ["basic_xy_positioner_gui.py"](basic_xy_positioner_gui.py) in your favorite IDE and click run.
+That should be it!
+
 Running from the command line on Linux/Mac systems can be done by simply typing:
 
 ```bash
@@ -124,9 +122,9 @@ You can also choose to run a zoom scan after the area scan is complete or set it
 
 This command resets the motors to their start position at the center of the XY positioner. Please run this command every time you
 are finished using the positioner. It will take approximately a minute to complete the reset, but PLEASE DO NOT RUN ANY SCANS while
-the motors are moving. This will throw off position calculations.
+the motors are moving. This will throw off position calculations. To that effect, check the "wait" box to say that you understand this. :+1:
 
-You may also select whether you would like to go to the center of the 18 inch system or the 30 inch system.
+You may also select whether you would like to go to the center of the 18 inch system or the 30 inch system. ("scan_30")
 
 ### Manual Control (manual)
 
