@@ -141,6 +141,7 @@ class ManualGridGUI(tk.Tk):
             return
         # if self.x_loc not in self.x_pts or self.y_loc not in self.y_pts:
         # if self.y_pts[self.x_pts.index(self.x_loc)] == self.y_loc:        Better but what if x_pts not found?
+        # Currently does not support remeasuring points
         if (self.x_loc, self.y_loc) in self.checked_pts:
             print 'Already measured.'
             return
@@ -149,9 +150,9 @@ class ManualGridGUI(tk.Tk):
         self.y_pts.append(-1 * self.y_loc)
         self.z_pts.append(float(self.value_entry.get()))
         print '[', self.x_loc, ',', self.y_loc, ']: ', float(self.value_entry.get())
-        print self.x_pts
-        print self.y_pts
-        print self.z_pts
+        # print self.x_pts
+        # print self.y_pts
+        # print self.z_pts
         # else:
         #     print 'Point already has value. Updating to new value'
         #     self.z_pts.insert(self.x_pts.index(self.x_loc), float(self.value_entry.get()))

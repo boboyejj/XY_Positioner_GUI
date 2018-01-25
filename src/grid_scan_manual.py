@@ -550,5 +550,6 @@ class Args:
         self.auto_zoom_scan = False
         self.dwell_time = 0
 
+
 if __name__ == '__main__':
     main()
