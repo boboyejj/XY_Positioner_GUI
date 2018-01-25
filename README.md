@@ -24,6 +24,8 @@ help make controlling the motors more intuitive.
 are downloading **Python 2.7** and NOT Python 3. You may also choose to install [Anaconda or Miniconda](https://github.com/BurntSushi/nfldb/wiki/Python-&-pip-Windows-installation) to manage the packages
 we will be using.
 
+![Install Python 2.7.x](docs/pyversion.png)
+
 2. Install an IDE such as [PyCharm](https://www.jetbrains.com/pycharm/download/) or use Spyder (included in Anaconda). Open the folder
 containing the files you downloaded using this IDE.
 
@@ -36,15 +38,26 @@ here:
     - Search for "Project Interpreter" and click the first result
     - The term "Project Interpreter" should be highlighted. It is next to a long dropdown bar. Next to that bar is a settings 
     gear icon. Click on it and choose "Add Local"
+    
+    ![Add local virtual environment](docs/addlocal.png)
+    
     - Specify a "Location" for the virtual environment. For the "Base Interpreter", navigate to the folder where you installed Python
     (probably `C:/Python27` or `C:/ProgramFiles/Python27`). Choose the file "python.exe" to make sure PyCharm knows how to run your code.
+    
+    ![Create virtual environment](docs/createvenv.png)
+    
     - Before you exit out of this window, on the left hand side, there should be an option that says "System Interpreter". For the "Interpreter"
     choose the exact same location you specified for the "Base Interpreter" (the python.exe file from before).
+    
+    ![Instantiate virtual environment](docs/instantiatevenv.png)
+    
     - Click "Ok" and exit the "Settings" window.
 
 4. You must then open up the "Terminal" inside the IDE you are using to run the following command to install relevant packages.
-The button to open it can be found in the very bottom left corner (it looks like a gray square). Mousing over it will allow the
+The button to open it in PyCharm can be found in the very bottom left corner (it looks like a gray square). Hovering over it will allow the
 user the option to open the terminal.
+
+    ![Choose Terminal](docs/terminalchoose.png)
 
 5. Run the following command in the terminal (within your IDE) to install all packages at once. These packages take up about 1 GB of space:
 
