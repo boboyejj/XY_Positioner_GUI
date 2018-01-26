@@ -1,3 +1,7 @@
+"""
+    Created by Ganesh Arvapalli on 1/18/18
+"""
+
 import numpy as np
 from motor_driver import MotorDriver
 from post_scan_gui import PostScanGUI
@@ -8,7 +12,7 @@ from data_entry_gui import DataEntryGUI
 import os
 from scipy import interpolate
 from timer_gui import TimerGUI
-import turtle
+# import turtle
 
 
 def move_to_pos_one(moto, num_steps, x, y):
@@ -240,7 +244,7 @@ def run_scan(args):
 
         count = grid[np.argwhere(values == max_val)[0]]
         zoomed = auto_zoom(args, m)
-        zoomed_points = combine_matrices(grid_points, zoomed, np.argwhere(values == max_val)[0])
+        zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
         print zoomed_points
 
     while True:
@@ -304,13 +308,13 @@ def run_scan(args):
 
                 # Save zoom scan data in matrix format
                 np.savetxt(os.path.join(my_path, args.filename.replace('.txt', '') + '_zoom_matrix.txt'),
-                           np.asarray(zoom_values), fmt='%.4f', delimiter='\t')
+                           np.asarray(zoomed), fmt='%.4f', delimiter='\t')
 
                 # Save zoom scan data in column format
                 file = open(os.path.join(my_path, args.filename.replace('.txt', '') + '_zoom_column.txt'), 'w+')
                 for i in range(zoom_values.size):
                     pos = np.argwhere(zoom_grid == i + 1)[0]
-                    file.write(str(zoom_values[pos[0]][pos[1]]) + '\n')
+                    file.write(str(zoomed[pos[0]][pos[1]]) + '\n')
                 file.close()
             else:
                 print 'No data to save.'
@@ -335,7 +339,9 @@ def run_scan(args):
 
             count = grid[np.argwhere(values == max_val)[0]]
             zoomed = auto_zoom(args, m)
-            zoomed_points = combine_matrices(grid_points, zoomed, np.argwhere(values == max_val)[0])
+            # zoomed = np.tri(5)        # Uncomment to debug plotting
+            print zoomed
+            zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
         elif choice == 'Correct Previous Value':
             plt.close()
             print 'Please select location.'
@@ -500,6 +506,7 @@ def auto_zoom(args, m):
 def combine_matrices(m1_list, m2_list, pos):
     final_list = m1_list
     for point in m2_list:
+        print point, pos
         xy = point[0]
         xy = ((xy[0] - 2.0) / 4 + pos[1], (xy[1] - 2.0) / 4 + pos[0])
         z = point[1]
