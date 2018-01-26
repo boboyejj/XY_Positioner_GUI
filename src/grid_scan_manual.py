@@ -221,7 +221,7 @@ def run_scan(args):
     grid_points = convert_to_point_list(values)
 
     zoomed_points = []
-    zoom_values = np.zeros((5, 5))
+    zoomed = np.zeros((5, 5))
     zoom_grid = generate_grid(5, 5)
     # Automatic zoom scan if set, otherwise, post scan loop
     max_val = -1
@@ -312,7 +312,7 @@ def run_scan(args):
 
                 # Save zoom scan data in column format
                 file = open(os.path.join(my_path, args.filename.replace('.txt', '') + '_zoom_column.txt'), 'w+')
-                for i in range(zoom_values.size):
+                for i in range(zoomed.size):
                     pos = np.argwhere(zoom_grid == i + 1)[0]
                     file.write(str(zoomed[pos[0]][pos[1]]) + '\n')
                 file.close()
@@ -329,11 +329,11 @@ def run_scan(args):
             if grid_move[1] > 0:
                 m.forward_motor_one(num_steps * grid_move[1])
             else:
-                m.reverse_motor_one(num_steps * grid_move[1])
+                m.reverse_motor_one(-1 * num_steps * grid_move[1])
             if grid_move[0] > 0:
                 m.forward_motor_two(num_steps * grid_move[0])
             else:
-                m.reverse_motor_two(num_steps * grid_move[0])
+                m.reverse_motor_two(-1 * num_steps * grid_move[0])
 
             plt.close()
 
@@ -355,11 +355,11 @@ def run_scan(args):
             if grid_move[1] > 0:
                 m.forward_motor_one(num_steps * grid_move[1])
             else:
-                m.reverse_motor_one(num_steps * grid_move[1])
+                m.reverse_motor_one(-1 * num_steps * grid_move[1])
             if grid_move[0] > 0:
                 m.forward_motor_two(num_steps * grid_move[0])
             else:
-                m.reverse_motor_two(num_steps * grid_move[0])
+                m.reverse_motor_two(-1 * num_steps * grid_move[0])
             count = location
             grid_loc = np.argwhere(grid == count)[0]
             # print grid_loc
@@ -567,8 +567,8 @@ def main():
 
 class Args:
     def __init__(self):
-        self.x_distance = 2
-        self.y_distance = 2
+        self.x_distance = 3
+        self.y_distance = 3
         self.grid_step_dist = 1
         self.filename = 'raw_values'
         self.measure = True

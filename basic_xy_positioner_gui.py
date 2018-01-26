@@ -52,9 +52,9 @@ def run_gui():
 
     # Arguments for moving motors manually
     manual_move = sub.add_parser('manual', help='Move motors manually according to a specified distance')
-    manual_move.add_argument('x_dist', default=2.8, help='How far an x step will move left or right (in cm)')
-    manual_move.add_argument('y_dist', default=2.8, help='How far a y step will move up or down (in cm)')
-    manual_move.add_argument('dwell_time', default=240, help='Dwell time at single measurement point (in s)')
+    manual_move.add_argument('x_distance', default=2.8, help='How far an x step will move left or right (in cm)')
+    manual_move.add_argument('y_distance', default=2.8, help='How far a y step will move up or down (in cm)')
+    # manual_move.add_argument('dwell_time', default=240, help='Dwell time at single measurement point (in s)')
 
     args = parser.parse_args()
     # print args
@@ -90,8 +90,8 @@ def run_gui():
     elif args.subparser_name == 'reset_motors':
         # Ensure that user waits until motors are completely done homing before continuing on
         if args.wait:
-            if args.scan30:
-                m = MotorDriver(home=(6000, 5000))
+            if args.scan_30:
+                m = MotorDriver(home=(5000, 6000))
             else:
                 m = MotorDriver()
             m.home_motors()
@@ -101,7 +101,7 @@ def run_gui():
             print 'Please check the box and try again. You must wait until the motors are done resetting.'
             exit(1)
     elif args.subparser_name == 'manual':
-        man = ManualGridGUI(None, float(args.x_dist), float(args.y_dist))
+        man = ManualGridGUI(None, float(args.x_distance), float(args.y_distance))
         man.title('Manual Control')
         man.mainloop()
         exit(0)
