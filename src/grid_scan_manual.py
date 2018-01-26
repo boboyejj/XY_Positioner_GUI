@@ -83,8 +83,8 @@ def run_scan(args):
     :return: None
     """
     # Calculate dimensions of grid and generate it
-    x_points = int(np.ceil(np.around(args.x_distance / args.grid_step_dist, decimals=3)))
-    y_points = int(np.ceil(np.around(args.y_distance / args.grid_step_dist, decimals=3)))
+    x_points = int(np.ceil(np.around(args.x_distance / args.grid_step_dist, decimals=3))) + 1
+    y_points = int(np.ceil(np.around(args.y_distance / args.grid_step_dist, decimals=3))) + 1
     grid = generate_grid(y_points, x_points)
     print 'Path: '
     print grid
