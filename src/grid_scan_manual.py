@@ -42,6 +42,14 @@ def generate_grid(rows, columns):
 
 
 def convert_to_pts(arr, dist, x_off=0, y_off=0):
+    """Convert matrix to set of points
+
+    :param arr: matrix to convert
+    :param dist: distance between points in matrix
+    :param x_off: offset to add in x direction (if not at (0,0))
+    :param y_off: offset to add in y direction (if not at (0,0))
+    :return: xpts, ypts, zpts: List of points on each axis
+    """
     x_dim = arr.shape[1]
     y_dim = arr.shape[0]
     xpts = []
@@ -208,21 +216,31 @@ def run_scan(args):
     # print grid_points
     grid_points = convert_to_point_list(values)
 
-
     zoomed_points = []
     zoom_values = np.zeros((5, 5))
     zoom_grid = generate_grid(5, 5)
     # Automatic zoom scan if set, otherwise, post scan loop
-    place = None
+    max_val = -1
     if args.auto_zoom_scan:
-        place = np.unravel_index(values.argmax(), values.shape)
-        count = grid[place[0]][place[1]]
-        # place[1] = y_points - place[1]
+        # First need to move to correct position (find max and move to it)
+        max_val = values.max()
+        # print location
         # corrected_place = (place[0], y_points - place[1])
-        print place
-        print count
+        # count = grid[location[0]][location[1]]
+        grid_move = (np.argwhere(values == max_val) - np.argwhere(grid == count))[0]
+        print 'Need to move', grid_move
+        if grid_move[1] > 0:
+            m.forward_motor_one(num_steps * grid_move[1])
+        else:
+            m.reverse_motor_one(num_steps * grid_move[1])
+        if grid_move[0] > 0:
+            m.forward_motor_two(num_steps * grid_move[0])
+        else:
+            m.reverse_motor_two(num_steps * grid_move[0])
+
+        count = grid[np.argwhere(values == max_val)[0]]
         zoomed = auto_zoom(args, m)
-        zoomed_points = combine_matrices(grid_points, zoomed, place)
+        zoomed_points = combine_matrices(grid_points, zoomed, np.argwhere(values == max_val)[0])
         print zoomed_points
 
     while True:
@@ -230,7 +248,7 @@ def run_scan(args):
 
         # Plot results
         if args.measure:
-            if place is not None:
+            if max_val != -1:
                 x, y, z = split_into_three(zoomed_points)
                 # Plotting
                 # Generate meshgrid first
@@ -298,37 +316,26 @@ def run_scan(args):
                 print 'No data to save.'
         elif choice == 'Zoom Scan':
             # First need to move to correct position (find max and move to it)
-            place = np.unravel_index(values.argmax(), values.shape)
+            max_val = values.max()
+            # print location
             # corrected_place = (place[0], y_points - place[1])
-            count = grid[place[0]][place[1]]
-            print place
-            print count
+            # count = grid[location[0]][location[1]]
+            grid_move = (np.argwhere(values == max_val) - np.argwhere(grid == count))[0]
+            print 'Need to move', grid_move
+            if grid_move[1] > 0:
+                m.forward_motor_one(num_steps * grid_move[1])
+            else:
+                m.reverse_motor_one(num_steps * grid_move[1])
+            if grid_move[0] > 0:
+                m.forward_motor_two(num_steps * grid_move[0])
+            else:
+                m.reverse_motor_two(num_steps * grid_move[0])
 
             plt.close()
-            # print 'Please select location.'
-            # loc_gui = LocationSelectGUI(None, grid)
-            # loc_gui.title('Location Selection')
-            # loc_gui.mainloop()
-            # location = loc_gui.get_gui_value()
-            # # print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
-            # grid_move = (np.argwhere(grid == location) - np.argwhere(grid == count))[0]
-            # # print 'Need to move', grid_move
-            # if grid_move[1] > 0:
-            #     m.forward_motor_one(num_steps * grid_move[1])
-            # else:
-            #     m.reverse_motor_one(num_steps * grid_move[1])
-            # if grid_move[0] > 0:
-            #     m.forward_motor_two(num_steps * grid_move[0])
-            # else:
-            #     m.reverse_motor_two(num_steps * grid_move[0])
-            # count = location
 
-            # TODO: Implement zoom scan GUI
-
-            zoom_values = auto_zoom(args, m)
-            # zoomed = convert_to_point_list(np.flipud(zoom_values))
-            zoomed = convert_to_point_list(np.tri(5))
-            zoomed_points = combine_matrices(grid_points, zoomed, place)
+            count = grid[np.argwhere(values == max_val)[0]]
+            zoomed = auto_zoom(args, m)
+            zoomed_points = combine_matrices(grid_points, zoomed, np.argwhere(values == max_val)[0])
         elif choice == 'Correct Previous Value':
             plt.close()
             print 'Please select location.'
@@ -476,6 +483,14 @@ def auto_zoom(args, m):
         going_forward = not going_forward
         j = 0
 
+    # Then move back to original location
+    if going_forward:
+        m.reverse_motor_one(int(2 * num_steps))
+        m.reverse_motor_two(int(2 * num_steps))
+    else:
+        m.forward_motor_one(int(2 * num_steps))
+        m.reverse_motor_two(int(2 * num_steps))
+
     return values
 
 
@@ -491,6 +506,7 @@ def combine_matrices(m1_list, m2_list, pos):
         final_list.append((xy, z))
     return final_list
 
+
 # Output formatted as list of ((x, y), z) points
 def convert_to_point_list(matrix):
     point_list = []
@@ -499,6 +515,7 @@ def convert_to_point_list(matrix):
             point_list.append(((i, j), matrix[i, j]))
 
     return point_list
+
 
 # "combined" is in the format of list of ((x, y), z) elements
 def split_into_three(combined):
@@ -510,6 +527,7 @@ def split_into_three(combined):
         y.append(point[0][1])
         z.append(point[1])
     return np.array(x), np.array(y), np.array(z)
+
 
 def main():
     a = Args()
