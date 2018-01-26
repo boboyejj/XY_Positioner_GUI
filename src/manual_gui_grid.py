@@ -9,6 +9,7 @@ from src.motor_driver import MotorDriver
 from numpy import linspace, meshgrid
 from matplotlib.mlab import griddata
 import matplotlib.pyplot as plt
+import os
 
 
 class ManualGridGUI(tk.Tk):
@@ -29,6 +30,13 @@ class ManualGridGUI(tk.Tk):
     def __init__(self, parent, x_dist=2.8, y_dist=2.8):
         tk.Tk.__init__(self, parent)
         self.parent = parent
+
+        # Center on screen
+        width, height = 1050, 550
+        screen_w, screen_h = self.winfo_screenwidth(), self.winfo_screenheight()
+        x = (screen_w / 2) - (width / 2)
+        y = (screen_h / 2) - (height / 2)
+        self.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
         # Setting up motor-related variables
         self.motor = MotorDriver()
@@ -88,7 +96,7 @@ class ManualGridGUI(tk.Tk):
 
         # Display the location of the robot relative to the start position
         self.loc = tk.Label(self, text='Current location:\n[%.3f, %.3f]' % (self.x_loc, self.y_loc), font=my_font,
-                            bg='white')
+                            bg='#CFCFCF')
         self.loc.grid(row=2, column=0, sticky='NSEW', padx=50, pady=50)
 
         # For changing the set distances mid-program
@@ -97,37 +105,44 @@ class ManualGridGUI(tk.Tk):
         self.y_entry = tk.Entry(modify_frame, font=my_font)
         self.x_entry.insert(0, str(self.x_dist))
         self.y_entry.insert(0, str(self.y_dist))
-        self.x_entry.grid(row=1, column=0, sticky='NSEW', padx=5, pady=5)
-        self.y_entry.grid(row=1, column=2, sticky='NSEW', padx=5, pady=5)
+        self.x_entry.grid(row=1, column=0, sticky='NSEW', padx=5, pady=15)
+        self.y_entry.grid(row=3, column=0, sticky='NSEW', padx=5, pady=15)
 
         x_entry_label = tk.Label(modify_frame, text='X Distance', font=my_font, bg='#A3A3A3', padx=5, pady=5)
         y_entry_label = tk.Label(modify_frame, text='Y Distance', font=my_font, bg='#A3A3A3', padx=5, pady=5)
         x_entry_label.grid(row=0, column=0, sticky='NSEW')
-        y_entry_label.grid(row=0, column=2, sticky='NSEW')
+        y_entry_label.grid(row=2, column=0, sticky='NSEW')
 
         submit_btn = tk.Button(modify_frame, text='Change settings', command=self.update_variables, padx=5, pady=5,
                                font=my_font)
-        submit_btn.grid(row=2, column=1)
-        modify_frame.grid_rowconfigure(3, weight=1)
-        modify_frame.grid_columnconfigure(3, weight=1)
+        submit_btn.grid(row=4, column=0)
+        modify_frame.grid_rowconfigure(5, weight=1)
+        modify_frame.grid_columnconfigure(2, weight=1)
         modify_frame.grid(row=0, column=1)
 
         data_frame = tk.Frame(bg='#1C3E52')
-        value_label = tk.Label(data_frame, text='Enter value here: ', font=my_font, bg='white')
+        btn_frame = tk.Frame(bg='#1C3E52')
+        value_label = tk.Label(data_frame, text='Enter value here: ', font=my_font, bg='#CFCFCF')
         self.value_entry = tk.Entry(data_frame, font=my_font)
-        measure_here = tk.Button(data_frame, text='Add to graph', padx=10, pady=10, font=my_font,
-                                 command=self.add_to_data)
-        grid_btn = tk.Button(data_frame, text='Generate graph', padx=10, pady=10, font=my_font, command=self.plot)
+        measure_here = tk.Button(data_frame, text='Add to graph', padx=10, font=my_font, command=self.add_to_data)
 
-        value_label.grid(row=0, column=0, padx=10, pady=10)
-        self.value_entry.grid(row=0, column=1, padx=10, pady=10)
-        measure_here.grid(row=0, column=2, padx=10, pady=10)
-        grid_btn.grid(row=0, column=3)
+        value_label.grid(row=0, column=0, padx=10)
+        self.value_entry.grid(row=0, column=1, padx=10)
+        measure_here.grid(row=0, column=2, padx=10)
         data_frame.grid_rowconfigure(1, weight=1)
-        data_frame.grid_columnconfigure(4, weight=1)
-        data_frame.grid(row=2, column=1, pady=30, padx=30)
+        data_frame.grid_columnconfigure(3, weight=1)
+        data_frame.grid(row=2, column=1, padx=30, pady=10)
 
-        self.grid_rowconfigure(4, weight=1)
+        grid_btn = tk.Button(btn_frame, text='Generate graph', padx=10, pady=5, font=my_font, command=self.plot)
+        save_btn = tk.Button(btn_frame, text='Save data', padx=10, pady=5, font=my_font, command=self.save_data)
+
+        grid_btn.grid(row=1, column=0, padx=10, pady=5)
+        save_btn.grid(row=1, column=1, padx=10, pady=5)
+        btn_frame.grid_rowconfigure(1, weight=1)
+        btn_frame.grid_columnconfigure(2, weight=1)
+        btn_frame.grid(row=3, column=1, padx=10, pady=5)
+
+        self.grid_rowconfigure(5, weight=1)
         self.grid_columnconfigure(2, weight=1)
 
         # Keyboard controls
@@ -135,6 +150,7 @@ class ManualGridGUI(tk.Tk):
         self.bind('<Down>', self.key_down)
         self.bind('<Left>', self.key_left)
         self.bind('<Right>', self.key_right)
+        # self.bind('<Control-S>', self.save_data)
 
     def add_to_data(self):
         if self.value_entry.get() is None or self.value_entry.get() == '':
@@ -184,6 +200,20 @@ class ManualGridGUI(tk.Tk):
         cbar.set_label('Signal Level')
         axes.margins(0.05)
         plt.show(block=False)
+
+    def save_data(self):
+        if not os.path.exists('results'):
+            os.makedirs('results')
+        my_path = os.path.join(os.getcwd(), 'results')
+        if plt.get_fignums():
+            plt.savefig(os.path.join(my_path, 'manual_contour_plot.png'), bbox_inches='tight')
+        else:
+            print 'No graph to save.'
+        file = open(os.path.join(my_path, 'manual_data.txt'), 'w+')
+        file.write('X: ' + str(self.x_pts) + '\n')
+        file.write('Y: ' + str(self.y_pts) + '\n')
+        file.write('Z: ' + str(self.z_pts) + '\n')
+        file.close()
 
     def button_up(self):
         self.y_loc -= self.y_dist
