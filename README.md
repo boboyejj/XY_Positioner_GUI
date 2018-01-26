@@ -94,6 +94,8 @@ Note that this is completely optional and that the program can still be run thro
 
 The GUI should pop up with options that you may define. Additional parameters can be tweaked by modifying the source files.
 
+![GUI in action](docs/GUI_img.png)
+
 It may be necessary to purchase a USB-to-Serial cable as the one currently in use is liable to
 breaking. Ensure that the stopper is in place for motor 1 on the 30 inch system to ensure homing
 works correctly.
