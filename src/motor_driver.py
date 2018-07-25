@@ -20,21 +20,27 @@ class MotorDriver:
     def __init__(self, step_unit_=0.00508, home=(3788, 4300)):
         """Init MotorDriver with step_unit and port = COM #, # = 1,2,3..."""
         self.home = home
+        entered = False
         for i in range(256):
             try:
+                print str(i) + '\r\n'
                 self.port = serial.Serial('COM'+str(i), timeout=1.5)
-                break
-            except (OSError, serial.SerialException):
+                self.port.write('!1fp\r')  # Check if we have connected to the right COM Port/machine
+                received_str = self.port.read(2)
+                print "Code received from the COM PORT: " + received_str.decode()
+                if received_str == "C4":
+                    self.port.flushOutput()
+                    self.port.flushInput()
+                    self.port.flush()
+                    self.step_unit = step_unit_
+                    entered = True
+            except serial.SerialException as e:
                 pass
-        try:
-            self.port.flushOutput()
-            self.port.flushInput()
-            self.port.flush()
-            self.step_unit = step_unit_
-        except serial.SerialException:
-            print 'Error connecting to port. Check cables.'
+                # print e.message
+        if not entered:
+            raise serial.SerialException
+            print 'Error: Connection to C4 controller was not found. Check cables.'
             exit(1)
-
 
     def forward_motor_one(self, steps):
         """Move motor 1 forward the specified number of steps."""
