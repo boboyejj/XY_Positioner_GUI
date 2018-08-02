@@ -91,7 +91,7 @@ def run_gui():
         # Ensure that user waits until motors are completely done homing before continuing on
         if args.wait:
             if args.scan_30:
-                m = MotorDriver(home=(5000, 6000))
+                m = MotorDriver(home=(4000, 5000))
             else:
                 m = MotorDriver()
             m.home_motors()
