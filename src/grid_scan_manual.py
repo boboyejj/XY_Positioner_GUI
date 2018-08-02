@@ -42,6 +42,7 @@ def generate_grid(rows, columns):
         if i % 2 != 0:
             row.reverse()
         g[i] = row
+        print("row ", row)  # TODO: Debugging, remove later
     return g
 
 
