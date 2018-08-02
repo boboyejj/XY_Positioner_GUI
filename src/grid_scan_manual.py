@@ -38,10 +38,14 @@ def generate_grid(rows, columns):
     """
     g = np.zeros((rows, columns))
     for i in range(rows):
-        row = range(i * columns + 1, (i + 1) * columns + 1)
+        row = list(range(i * columns + 1, (i + 1) * columns + 1))
         if i % 2 != 0:
             row = reversed(row)
+        for j in range(columns):
+            print(j)
+            g[j] = row[j]
         g[i] = row
+    print(g)
     return g
 
 
