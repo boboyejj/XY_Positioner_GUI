@@ -3,15 +3,15 @@
 """
 
 import numpy as np
-from motor_driver import MotorDriver
-from post_scan_gui import PostScanGUI
-from location_select_gui import LocationSelectGUI
+from src.motor_driver import MotorDriver
+from src.post_scan_gui import PostScanGUI
+from src.location_select_gui import LocationSelectGUI
 from matplotlib import pyplot as plt
 from matplotlib import mlab
-from data_entry_gui import DataEntryGUI
+from src.data_entry_gui import DataEntryGUI
 import os
 from scipy import interpolate
-from timer_gui import TimerGUI
+from src.timer_gui import TimerGUI
 # import turtle
 
 
@@ -72,7 +72,7 @@ def convert_to_pts(arr, dist, x_off=0, y_off=0):
             xpts.append(x_pt)
             ypts.append(y_pt)
             zpts.append(arr[i][j])
-    print xpts, ypts, zpts
+    print(xpts, ypts, zpts)
     return xpts, ypts, zpts
 
 
@@ -86,14 +86,14 @@ def run_scan(args):
     x_points = int(np.ceil(np.around(args.x_distance / args.grid_step_dist, decimals=3))) + 1
     y_points = int(np.ceil(np.around(args.y_distance / args.grid_step_dist, decimals=3))) + 1
     grid = generate_grid(y_points, x_points)
-    print 'Path: '
-    print grid
+    print("Path: ")
+    print(grid)
 
     # For storing values of highest peak/wide-band
     values = np.zeros(grid.shape)
-    print 'Current values: '
-    print values
-    print '------------'
+    print("Current values: ")
+    print(values)
+    print("------------")
     # grid_points = []
 
     # Check ports and instantiate relevant objects
@@ -124,7 +124,7 @@ def run_scan(args):
         # grid_points.append((loc * args.grid_step_dist, man.getval()))
     count = 1  # Tracks our current progress through the grid
 
-    print values
+    print(values)
     # print np.argwhere(grid == count)[0], count
 
     # Create an accumulator for the fraction of a step lost each time a grid space is moved
@@ -143,7 +143,7 @@ def run_scan(args):
                 m.forward_motor_one(num_steps + int(x_error))  # Increase distance moved by adding error
                 count += 1
                 loc = np.argwhere(grid == count)[0]
-                print '------------'
+                print("------------")
                 # franklin.circle(2)
                 # franklin.forward(20)
                 # TODO: MEASURE HERE
@@ -164,7 +164,7 @@ def run_scan(args):
                 m.reverse_motor_one(num_steps + int(x_error))  # Should be |x_error|?
                 count += 1
                 loc = np.argwhere(grid == count)[0]
-                print '------------'
+                print("------------")
                 # franklin.circle(2)
                 # franklin.backward(20)
                 # TODO: MEASURE HERE
@@ -181,7 +181,7 @@ def run_scan(args):
                 x_error = x_error - int(x_error)
             # Increment our progress counter and print out current set of values
             j += 1
-            print values
+            print(values)
 
         y_error += frac_step
         # m.forward_motor_two(num_steps + int(y_error))
@@ -196,7 +196,7 @@ def run_scan(args):
         m.forward_motor_two(num_steps + int(y_error))
         # Else update counter, measure, and move down. Reverse direction
         loc = np.argwhere(grid == count)[0]
-        print '------------'
+        print("------------")
         # franklin.circle(2)
         # franklin.right(90)
         # franklin.forward(20)
@@ -212,7 +212,7 @@ def run_scan(args):
             man.mainloop()
             values[loc[0]][loc[1]] = man.getval()
             # grid_points.append((loc * args.grid_step_dist, man.getval()))
-        print values
+        print(values)
         y_error = y_error - int(y_error)
         going_forward = not going_forward
         j = 0
@@ -232,7 +232,7 @@ def run_scan(args):
         # corrected_place = (place[0], y_points - place[1])
         # count = grid[location[0]][location[1]]
         grid_move = (np.argwhere(values == max_val) - np.argwhere(grid == count))[0]
-        print 'Need to move', grid_move
+        print("Need to move", grid_move)
         if grid_move[1] > 0:
             m.forward_motor_one(num_steps * grid_move[1])
         else:
@@ -245,7 +245,7 @@ def run_scan(args):
         count = grid[np.argwhere(values == max_val)[0]]
         zoomed = auto_zoom(args, m)
         zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
-        print zoomed_points
+        print(zoomed_points)
 
     while True:
         grid_points = convert_to_point_list(np.flipud(values))
@@ -277,9 +277,9 @@ def run_scan(args):
         post_gui.mainloop()
 
         choice = post_gui.get_gui_value()
-        print choice
+        print(choice)
         if choice == 'Exit':
-            print 'Exiting program...'
+            print("Exiting program...")
             m.destroy()
             if narda is not None:
                 narda.destroy()
@@ -317,7 +317,7 @@ def run_scan(args):
                     file.write(str(zoomed[pos[0]][pos[1]]) + '\n')
                 file.close()
             else:
-                print 'No data to save.'
+                print("No data to save.")
         elif choice == 'Zoom Scan':
             # First need to move to correct position (find max and move to it)
             max_val = values.max()
@@ -325,7 +325,7 @@ def run_scan(args):
             # corrected_place = (place[0], y_points - place[1])
             # count = grid[location[0]][location[1]]
             grid_move = (np.argwhere(values == max_val) - np.argwhere(grid == count))[0]
-            print 'Need to move', grid_move
+            print("Need to move", grid_move)
             if grid_move[1] > 0:
                 m.forward_motor_one(num_steps * grid_move[1])
             else:
@@ -340,18 +340,18 @@ def run_scan(args):
             count = grid[np.argwhere(values == max_val)[0]]
             zoomed = auto_zoom(args, m)
             # zoomed = np.tri(5)        # Uncomment to debug plotting
-            print zoomed
+            print(zoomed)
             zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
         elif choice == 'Correct Previous Value':
             plt.close()
-            print 'Please select location.'
+            print("Please select location.")
             loc_gui = LocationSelectGUI(None, grid)
             loc_gui.title('Location Selection')
             loc_gui.mainloop()
             location = loc_gui.get_gui_value()
             # print "Current location: ", np.argwhere(grid == count), "Desired location: ", np.argwhere(grid == location)
             grid_move = (np.argwhere(grid == location) - np.argwhere(grid == count))[0]
-            print 'Need to move', grid_move
+            print("Need to move", grid_move)
             if grid_move[1] > 0:
                 m.forward_motor_one(num_steps * grid_move[1])
             else:
@@ -374,7 +374,7 @@ def run_scan(args):
                 values[grid_loc[0]][grid_loc[1]] = man.getval()
                 man.quit()
         else:
-            print 'Invalid choice'
+            print("Invalid choice")
             m.destroy()
             if narda is not None:
                 narda.destroy()
@@ -387,11 +387,11 @@ def auto_zoom(args, m):
     grid = generate_grid(x_points, y_points)
     values = np.zeros(grid.shape)
 
-    print 'Zoom Path: '
-    print grid
+    print("Zoom Path: ")
+    print(grid)
 
-    print 'Current Values: '
-    print values
+    print("Current Values: ")
+    print(values)
     # zoom_points = []
 
     # Calculate number of motor steps necessary to move one grid space
@@ -411,7 +411,7 @@ def auto_zoom(args, m):
         # zoom_points.append((loc * args.grid_step_dist, man.getval()))
     count = 1  # Tracks our current progress through the grid
 
-    print values
+    print(values)
 
     # Create an accumulator for the fraction of a step lost each time a grid space is moved
     frac_step = num_steps - int(num_steps)
@@ -428,7 +428,7 @@ def auto_zoom(args, m):
                 m.forward_motor_one(num_steps + int(x_error))  # Increase distance moved by adding error
                 count += 1
                 loc = np.argwhere(grid == count)[0]
-                print '------------'
+                print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
                     if args.dwell_time is not 0:
@@ -446,7 +446,7 @@ def auto_zoom(args, m):
                 m.reverse_motor_one(num_steps + int(x_error))  # Should be |x_error|?
                 count += 1
                 loc = np.argwhere(grid == count)[0]
-                print '------------'
+                print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
                     if args.dwell_time is not 0:
@@ -460,7 +460,7 @@ def auto_zoom(args, m):
                 x_error = x_error - int(x_error)
             # Increment our progress counter and print out current set of values
             j += 1
-            print values
+            print(values)
 
         y_error += frac_step
         # m.forward_motor_two(num_steps + int(y_error))
@@ -473,7 +473,7 @@ def auto_zoom(args, m):
         m.forward_motor_two(num_steps + int(y_error))
         # Else update counter, measure, and move down. Reverse direction
         loc = np.argwhere(grid == count)[0]
-        print '------------'
+        print("------------")
         # TODO: MEASURE HERE
         if args.measure:
             if args.dwell_time is not 0:
@@ -484,7 +484,7 @@ def auto_zoom(args, m):
             man.mainloop()
             values[loc[0]][loc[1]] = man.getval()
             # zoom_points.append((loc * args.grid_step_dist, man.getval()))
-        print values
+        print(values)
         y_error = y_error - int(y_error)
         going_forward = not going_forward
         j = 0
@@ -506,7 +506,7 @@ def auto_zoom(args, m):
 def combine_matrices(m1_list, m2_list, pos):
     final_list = m1_list
     for point in m2_list:
-        print point, pos
+        print(point, pos)
         xy = point[0]
         xy = ((xy[0] - 2.0) / 4 + pos[1], (xy[1] - 2.0) / 4 + pos[0])
         z = point[1]

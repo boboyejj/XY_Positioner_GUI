@@ -3,8 +3,8 @@
     ganesh.arvapalli@pctest.com
 """
 
-import Tkinter as tk
-from tkFont import Font
+import tkinter as tk
+from tkinter import font as tkFont
 from src.motor_driver import MotorDriver
 from numpy import linspace, meshgrid
 from matplotlib.mlab import griddata
@@ -57,7 +57,7 @@ class ManualGridGUI(tk.Tk):
 
     def update_variables(self):
         if float(self.x_entry.get()) < 0 or float(self.y_entry.get()) < 0:
-            print 'Please enter a valid distance.'
+            print("Please enter a valid distance.")
             return
         self.x_dist = float(self.x_entry.get())
         self.y_dist = float(self.y_entry.get())
@@ -65,12 +65,12 @@ class ManualGridGUI(tk.Tk):
         self.y_steps = int(self.y_dist / self.motor.step_unit)
         self.x_frac = self.x_dist / self.motor.step_unit - self.x_steps
         self.y_frac = self.y_dist / self.motor.step_unit - self.y_steps
-        print 'Distances changed: X =', self.x_dist, 'Y =', self.y_dist
+        print("Distances changed: X =", self.x_dist, "Y =", self.y_dist)
 
     def setup(self):
         self.title('Please select a location on the grid')
         self.config(background='#1C3E52')
-        my_font = Font(family='Nirmala UI', size=12)
+        my_font = tkFont(family='Nirmala UI', size=12)
 
         # Button control grid
         control_frame = tk.Frame(background='#1C3E52', padx=5, pady=5)
@@ -154,19 +154,19 @@ class ManualGridGUI(tk.Tk):
 
     def add_to_data(self):
         if self.value_entry.get() is None or self.value_entry.get() == '':
-            print 'Please enter a valid value.'
+            print("Please enter a valid value.")
             return
         # if self.x_loc not in self.x_pts or self.y_loc not in self.y_pts:
         # if self.y_pts[self.x_pts.index(self.x_loc)] == self.y_loc:        Better but what if x_pts not found?
         # Currently does not support remeasuring points
         if (self.x_loc, self.y_loc) in self.checked_pts:
-            print 'Already measured.'
+            print("Already measured.")
             return
         self.checked_pts.append((self.x_loc, self.y_loc))
         self.x_pts.append(self.x_loc)
         self.y_pts.append(-1 * self.y_loc)
         self.z_pts.append(float(self.value_entry.get()))
-        print '[', self.x_loc, ',', self.y_loc, ']: ', float(self.value_entry.get())
+        print("[", self.x_loc, ",", self.y_loc, "]: ", float(self.value_entry.get()))
         # print self.x_pts
         # print self.y_pts
         # print self.z_pts
@@ -187,7 +187,7 @@ class ManualGridGUI(tk.Tk):
         #     print 'Currently a work in progress.'
         #     return
         if len(self.x_pts) < 4:
-            print 'Not enough values. Collect more data.'
+            print("Not enough values. Collect more data.")
             return
         X, Y, Z = self.grid()
         fig, axes = plt.subplots(1, 1)
@@ -208,7 +208,7 @@ class ManualGridGUI(tk.Tk):
         if plt.get_fignums():
             plt.savefig(os.path.join(my_path, 'manual_contour_plot.png'), bbox_inches='tight')
         else:
-            print 'No graph to save.'
+            print("No graph to save.")
         file = open(os.path.join(my_path, 'manual_data.txt'), 'w+')
         file.write('X: ' + str(self.x_pts) + '\n')
         file.write('Y: ' + str(self.y_pts) + '\n')

@@ -3,7 +3,7 @@
     ganesh.arvapalli@pctest.com
 """
 
-import Tkinter as tk
+import tkinter as tk
 
 
 class LocationSelectGUI(tk.Tk):

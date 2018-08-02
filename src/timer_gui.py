@@ -3,8 +3,8 @@
     ganesh.arvapalli@pctest.com
 """
 
-import Tkinter as tk
-import tkFont
+import tkinter as tk
+from tkinter import font as tkFont
 import winsound
 
 

@@ -24,9 +24,9 @@ class MotorDriver:
         for i in range(256):
             try:
                 self.port = serial.Serial('COM'+str(i), timeout=1.5)
-                self.port.write('!1fp\r')  # Check if we have connected to the right COM Port/machine
+                self.port.write('!1fp\r'.encode())  # Check if we have connected to the right COM Port/machine
                 received_str = self.port.read(2)
-                print "Code received from the COM PORT: " + received_str.decode()
+                print("Code received from the COM PORT: " + received_str.decode())
                 if received_str == "C4":
                     self.port.flushOutput()
                     self.port.flushInput()
@@ -38,7 +38,7 @@ class MotorDriver:
                 # print e.message
         if not entered:
             raise serial.SerialException
-            print 'Error: Connection to C4 controller was not found. Check cables.'
+            print("Error: Connection to C4 controller was not found. Check cables.")
             exit(1)
 
     def forward_motor_one(self, steps):
@@ -46,7 +46,7 @@ class MotorDriver:
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
-        self.port.write('!1m1r' + str(steps) + 'n\r')
+        self.port.write(('!1m1r' + str(steps) + 'n\r').encode())
         out = self.port.readline()
         self.port.flush()
         return out
@@ -56,7 +56,7 @@ class MotorDriver:
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
-        self.port.write('!1m1f' + str(steps) + 'n\r')
+        self.port.write(('!1m1f' + str(steps) + 'n\r').encode())
         out = self.port.readline()
         self.port.flush()
         return out
@@ -66,7 +66,7 @@ class MotorDriver:
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
-        self.port.write('!1m2r' + str(steps) + 'n\r')
+        self.port.write(('!1m2r' + str(steps) + 'n\r').encode())
         out = self.port.readline()
         self.port.flush()
         return out
@@ -76,7 +76,7 @@ class MotorDriver:
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
-        self.port.write('!1m2f' + str(steps) + 'n\r')
+        self.port.write(('!1m2f' + str(steps) + 'n\r').encode())
         out = self.port.readline()
         self.port.flush()
         return out
@@ -103,7 +103,7 @@ class MotorDriver:
         # print 'Moving home: ', port.readline()
         self.port.flush()
 
-        print 'Motors reset. Exit program and run again.'
+        print("Motors reset. Exit program and run again.")
 
     def destroy(self):
         """Flush remaining data and close port."""

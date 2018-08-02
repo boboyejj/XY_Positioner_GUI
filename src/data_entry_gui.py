@@ -3,7 +3,7 @@
     ganesh.arvapalli@pctest.com
 """
 
-import Tkinter as tk
+import tkinter as tk
 import sys
 
 
@@ -32,7 +32,7 @@ class DataEntryGUI(tk.Tk):
         try:
             self.value = float(sv.get())
         except ValueError:
-            print 'Please type a valid number.'
+            print("Please type a valid number.")
 
     def getval(self):
         return self.value
@@ -45,17 +45,17 @@ def main():
     man = DataEntryGUI(None)
     man.title('Data Entry')
     man.mainloop()
-    print man.getval()
+    print(man.getval())
 
     man = DataEntryGUI(None)
     man.title('Data Entry')
     man.mainloop()
-    print man.getval()
+    print(man.getval())
 
     man = DataEntryGUI(None)
     man.title('Data Entry')
     man.mainloop()
-    print man.getval()
+    print(man.getval())
 
 if __name__ == '__main__':
     main()

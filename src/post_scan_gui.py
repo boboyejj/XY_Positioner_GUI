@@ -3,8 +3,8 @@
     ganesh.arvapalli@pctest.com
 """
 
-import Tkinter as tk
-import ttk
+import tkinter as tk
+from tkinter import ttk
 
 
 class PostScanGUI(tk.Tk):
@@ -45,7 +45,7 @@ class PostScanGUI(tk.Tk):
             self.destroy()
             self.quit()
         except:
-            print ''
+            print("")
 
     def get_gui_value(self):
         return self.choiceVar
@@ -56,7 +56,7 @@ def main():
     post_gui.title('Post Scan Options')
     post_gui.mainloop()
 
-    print post_gui.get_gui_value()
+    print(post_gui.get_gui_value())
 
 
 if __name__ == '__main__':

@@ -75,7 +75,7 @@ def run_gui():
         loc_gui.mainloop()
         location = loc_gui.get_gui_value()
         if location == None or location == 0:
-            print 'Please select an appropriate value'
+            print("Please select an appropriate value")
             exit(1)
         grid_loc = np.argwhere(grid == location)[0]
 
@@ -98,7 +98,7 @@ def run_gui():
             m.destroy()
             exit(0)
         else:
-            print 'Please check the box and try again. You must wait until the motors are done resetting.'
+            print("Please check the box and try again. You must wait until the motors are done resetting.")
             exit(1)
     elif args.subparser_name == 'manual':
         man = ManualGridGUI(None, float(args.x_distance), float(args.y_distance))
