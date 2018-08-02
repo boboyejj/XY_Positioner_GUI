@@ -43,6 +43,7 @@ def generate_grid(rows, columns):
             row.reverse()
         g[i] = row
         print("row ", row)  # TODO: Debugging, remove later
+    print(g)
     return g
 
 
