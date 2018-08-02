@@ -4,7 +4,7 @@
 """
 
 import tkinter as tk
-from tkinter import font as tkFont
+from tkinter import font
 from src.motor_driver import MotorDriver
 from numpy import linspace, meshgrid
 from matplotlib.mlab import griddata
@@ -70,7 +70,7 @@ class ManualGridGUI(tk.Tk):
     def setup(self):
         self.title('Please select a location on the grid')
         self.config(background='#1C3E52')
-        my_font = tkFont(family='Nirmala UI', size=12)
+        my_font = font.Font(family='Nirmala UI', size=12)
 
         # Button control grid
         control_frame = tk.Frame(background='#1C3E52', padx=5, pady=5)

@@ -27,7 +27,7 @@ class MotorDriver:
                 self.port.write('!1fp\r'.encode())  # Check if we have connected to the right COM Port/machine
                 received_str = self.port.read(2)
                 print("Code received from the COM PORT: " + received_str.decode())
-                if received_str == "C4":
+                if received_str.decode() == "C4":
                     self.port.flushOutput()
                     self.port.flushInput()
                     self.port.flush()
