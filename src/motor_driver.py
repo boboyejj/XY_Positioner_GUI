@@ -23,7 +23,6 @@ class MotorDriver:
         entered = False
         for i in range(256):
             try:
-                print str(i) + '\r\n'
                 self.port = serial.Serial('COM'+str(i), timeout=1.5)
                 self.port.write('!1fp\r')  # Check if we have connected to the right COM Port/machine
                 received_str = self.port.read(2)
