@@ -36,16 +36,16 @@ def generate_grid(rows, columns):
     :param columns: Number of columns in grid
     :return: Numpy matrix of correct values
     """
-    g = np.zeros((rows, columns))
+    #g = np.zeros((rows, columns))
+    g = []
     for i in range(rows):
         row = list(range(i * columns + 1, (i + 1) * columns + 1))
         if i % 2 != 0:
-            row = reversed(row)
-        for j in range(columns):
-            print(j)
-            g[j] = row[j]
-        g[i] = row
+            row = list(reversed(row))
+        g += row
+        #g[i] = row
     print(g)
+    g = np.array(g).reshape(rows, columns)
     return g
 
 
