@@ -40,7 +40,7 @@ def generate_grid(rows, columns):
     for i in range(rows):
         row = range(i * columns + 1, (i + 1) * columns + 1)
         if i % 2 != 0:
-            row.reverse()
+            row = reversed(row)
         g[i] = row
     return g
 
