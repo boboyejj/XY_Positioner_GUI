@@ -49,6 +49,7 @@ class PostScanGUI(tk.Tk):
 
     def get_gui_value(self):
         if self.choiceVar is tk.StringVar:
+            print("BLABLABLA")
             return 'Exit'
         else:
             return self.choiceVar

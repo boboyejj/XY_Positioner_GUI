@@ -220,7 +220,6 @@ def run_scan(args):
             #values[loc[0]][loc[1]] = man.getval()
             values[loc[0]][loc[1]] = 4
             # grid_points.append((loc * args.grid_step_dist, man.getval()))
-        print("Values: ")
         print(values)
         y_error = y_error - int(y_error)
         going_forward = not going_forward
@@ -290,7 +289,7 @@ def run_scan(args):
         print(choice)
         print("type: ")
         print(type(choice))
-        if choice == 'Exit' or choice == 'PY_VAR0' or choice == 'PY_VAR1':
+        if choice == 'Exit':
             print("Exiting program...")
             m.destroy()
             if narda is not None:
