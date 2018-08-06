@@ -47,10 +47,13 @@ class MotorDriver:
         self.port.flushOutput()
         self.port.flush()
         self.port.write(('!1m1r' + str(steps) + 'n\r').encode())
-        out = self.port.read()
+        while self.port.read().decode() != 'o':
+            pass
+        print("Done moving")
+        #out = self.port.read()
         #out = self.port.readline()
         self.port.flush()
-        return out
+        #return out
 
     def reverse_motor_one(self, steps):
         """Move motor 1 backward the specified number of steps."""
@@ -58,9 +61,13 @@ class MotorDriver:
         self.port.flushOutput()
         self.port.flush()
         self.port.write(('!1m1f' + str(steps) + 'n\r').encode())
-        out = self.port.readline()
+        while self.port.read().decode() != 'o':
+            pass
+        print("Done moving")
+        #out = self.port.read()
+        #out = self.port.readline()
         self.port.flush()
-        return out
+        #return out
 
     def forward_motor_two(self, steps):
         """Move motor 2 forward the specified number of steps."""
@@ -68,9 +75,13 @@ class MotorDriver:
         self.port.flushOutput()
         self.port.flush()
         self.port.write(('!1m2r' + str(steps) + 'n\r').encode())
-        out = self.port.readline()
+        while self.port.read().decode() != 'o':
+            pass
+        print("Done moving")
+        #out = self.port.read()
+        #out = self.port.readline()
         self.port.flush()
-        return out
+        #return out
 
     def reverse_motor_two(self, steps):
         """Move motor 2 backward the specified number of steps."""
@@ -78,9 +89,13 @@ class MotorDriver:
         self.port.flushOutput()
         self.port.flush()
         self.port.write(('!1m2f' + str(steps) + 'n\r').encode())
-        out = self.port.readline()
+        while self.port.read().decode() != 'o':
+            pass
+        print("Done moving")
+        #out = self.port.read()
+        #out = self.port.readline()
         self.port.flush()
-        return out
+        #return out
 
     # Home both motors to preset positions
     def home_motors(self):
