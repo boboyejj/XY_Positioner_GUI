@@ -220,6 +220,7 @@ def run_scan(args):
             #values[loc[0]][loc[1]] = man.getval()
             values[loc[0]][loc[1]] = 4
             # grid_points.append((loc * args.grid_step_dist, man.getval()))
+        print("Values: ")
         print(values)
         y_error = y_error - int(y_error)
         going_forward = not going_forward
@@ -250,7 +251,7 @@ def run_scan(args):
         else:
             m.reverse_motor_two(num_steps * grid_move[0])
 
-        count = grid[np.argwhere(values == max_val)[0]]
+        count = grid[np.argwhere(values == max_val)[0][0], np.argwhere(values == max_val)[0][1]]
         zoomed = auto_zoom(args, m)
         zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
         print(zoomed_points)
@@ -285,6 +286,7 @@ def run_scan(args):
         post_gui.mainloop()
 
         choice = post_gui.get_gui_value()
+        print("Choice: ")
         print(choice)
         if choice == 'Exit':
             print("Exiting program...")
@@ -344,8 +346,11 @@ def run_scan(args):
                 m.reverse_motor_two(-1 * num_steps * grid_move[0])
 
             plt.close()
-
-            count = grid[np.argwhere(values == max_val)[0]]
+            print("np.argwhere(values == max_val): ")
+            print(np.argwhere(values == max_val))
+            print("grid: ")
+            print(grid)
+            count = grid[np.argwhere(values == max_val)[0][0], np.argwhere(values == max_val)[0][1]]
             zoomed = auto_zoom(args, m)
             # zoomed = np.tri(5)        # Uncomment to debug plotting
             print(zoomed)
