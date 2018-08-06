@@ -285,10 +285,7 @@ def run_scan(args):
         post_gui.mainloop()
 
         choice = post_gui.get_gui_value()
-        print("Choice: ")
         print(choice)
-        print("type: ")
-        print(type(choice))
         if choice == 'Exit':
             print("Exiting program...")
             m.destroy()
