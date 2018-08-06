@@ -288,7 +288,9 @@ def run_scan(args):
         choice = post_gui.get_gui_value()
         print("Choice: ")
         print(choice)
-        if choice == 'Exit':
+        print("type: ")
+        print(type(choice))
+        if choice == 'Exit' or choice == 'PY_VAR0' or choice == 'PY_VAR1':
             print("Exiting program...")
             m.destroy()
             if narda is not None:
