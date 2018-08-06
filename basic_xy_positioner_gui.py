@@ -57,7 +57,7 @@ def run_gui():
     # manual_move.add_argument('dwell_time', default=240, help='Dwell time at single measurement point (in s)')
 
     args = parser.parse_args()
-    # print args
+    print(args)
 
     # Main cases
     if args.subparser_name == 'area_scan':

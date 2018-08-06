@@ -116,14 +116,15 @@ def run_scan(args):
     move_to_pos_one(m, int(num_steps), x_points, y_points)
     # TODO: MEASURE HERE
     if args.measure:
-        if args.dwell_time is not 0:
-            t = TimerGUI(args.dwell_time)
-            t.mainloop()
-        man = DataEntryGUI(None)
-        man.title('Data Entry')
-        man.focus()
-        man.mainloop()
-        values[0][0] = man.getval()
+        #if args.dwell_time is not 0:
+        #    t = TimerGUI(args.dwell_time)
+        #    t.mainloop()
+        #man = DataEntryGUI(None)
+        #man.title('Data Entry')
+        #man.focus()
+        #man.mainloop()
+        #values[0][0] = man.getval()
+        values[0][0] = 1
         # loc = np.argwhere(grid == 1)[0]
         # grid_points.append((loc * args.grid_step_dist, man.getval()))
     count = 1  # Tracks our current progress through the grid
@@ -152,14 +153,15 @@ def run_scan(args):
                 # franklin.forward(20)
                 # TODO: MEASURE HERE
                 if args.measure:
-                    if args.dwell_time is not 0:
-                        t = TimerGUI(args.dwell_time)
-                        t.mainloop()
-                    man = DataEntryGUI(None)
-                    man.title('Data Entry')
-                    man.focus()
-                    man.mainloop()
-                    values[loc[0]][loc[1]] = man.getval()
+                    #if args.dwell_time is not 0:
+                    #    t = TimerGUI(args.dwell_time)
+                    #    t.mainloop()
+                    #man = DataEntryGUI(None)
+                    #man.title('Data Entry')
+                    #man.focus()
+                    #man.mainloop()
+                    #values[loc[0]][loc[1]] = man.getval()
+                    values[loc[0]][loc[1]] = 2
                     # grid_points.append((loc * args.grid_step_dist, man.getval()))
                 x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
             # Do the same for when the robot is moving backwards as well
@@ -173,14 +175,15 @@ def run_scan(args):
                 # franklin.backward(20)
                 # TODO: MEASURE HERE
                 if args.measure:
-                    if args.dwell_time is not 0:
-                        t = TimerGUI(args.dwell_time)
-                        t.mainloop()
-                    man = DataEntryGUI(None)
-                    man.title('Data Entry')
-                    man.focus()
-                    man.mainloop()
-                    values[loc[0]][loc[1]] = man.getval()
+                    #if args.dwell_time is not 0:
+                    #    t = TimerGUI(args.dwell_time)
+                    #    t.mainloop()
+                    #man = DataEntryGUI(None)
+                    #man.title('Data Entry')
+                    #man.focus()
+                    #man.mainloop()
+                    #values[loc[0]][loc[1]] = man.getval()
+                    values[loc[0]][loc[1]] = 3
                     # grid_points.append((loc * args.grid_step_dist, man.getval()))
                 x_error = x_error - int(x_error)
             # Increment our progress counter and print out current set of values
@@ -207,14 +210,15 @@ def run_scan(args):
         # franklin.left(90)
         # TODO: MEASURE HERE
         if args.measure:
-            if args.dwell_time is not 0:
-                t = TimerGUI(args.dwell_time)
-                t.mainloop()
-            man = DataEntryGUI(None)
-            man.title('Data Entry')
-            man.focus()
-            man.mainloop()
-            values[loc[0]][loc[1]] = man.getval()
+            #if args.dwell_time is not 0:
+            #    t = TimerGUI(args.dwell_time)
+            #    t.mainloop()
+            #man = DataEntryGUI(None)
+            #man.title('Data Entry')
+            #man.focus()
+            #man.mainloop()
+            #values[loc[0]][loc[1]] = man.getval()
+            values[loc[0]][loc[1]] = 4
             # grid_points.append((loc * args.grid_step_dist, man.getval()))
         print(values)
         y_error = y_error - int(y_error)
@@ -369,14 +373,15 @@ def run_scan(args):
             # print grid_loc
             # TODO: MEASURE HERE
             if args.measure:
-                if args.dwell_time is not 0:
-                    t = TimerGUI(args.dwell_time)
-                    t.mainloop()
-                man = DataEntryGUI(None)
-                man.title('Data Entry')
-                man.mainloop()
-                values[grid_loc[0]][grid_loc[1]] = man.getval()
-                man.quit()
+                #if args.dwell_time is not 0:
+                #    t = TimerGUI(args.dwell_time)
+                #    t.mainloop()
+                #man = DataEntryGUI(None)
+                #man.title('Data Entry')
+                #man.mainloop()
+                #values[grid_loc[0]][grid_loc[1]] = man.getval()
+                values[grid_loc[0]][grid_loc[1]] = 5
+                #man.quit()
         else:
             print("Invalid choice")
             m.destroy()
@@ -404,13 +409,14 @@ def auto_zoom(args, m):
     move_to_pos_one(m, num_steps, x_points, y_points)
     # TODO: MEASURE HERE
     if args.measure:
-        if args.dwell_time is not 0:
-            t = TimerGUI(args.dwell_time)
-            t.mainloop()
-        man = DataEntryGUI(None)
-        man.title('Data Entry')
-        man.mainloop()
-        values[0][0] = man.getval()
+        #if args.dwell_time is not 0:
+        #    t = TimerGUI(args.dwell_time)
+        #    t.mainloop()
+        #man = DataEntryGUI(None)
+        #man.title('Data Entry')
+        #man.mainloop()
+        #values[0][0] = man.getval()
+        values[0][0] = 6
         loc = np.argwhere(grid == 1)[0]
         # zoom_points.append((loc * args.grid_step_dist, man.getval()))
     count = 1  # Tracks our current progress through the grid
@@ -435,13 +441,14 @@ def auto_zoom(args, m):
                 print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
-                    if args.dwell_time is not 0:
-                        t = TimerGUI(args.dwell_time)
-                        t.mainloop()
-                    man = DataEntryGUI(None)
-                    man.title('Data Entry')
-                    man.mainloop()
-                    values[loc[0]][loc[1]] = man.getval()
+                    #if args.dwell_time is not 0:
+                    #    t = TimerGUI(args.dwell_time)
+                    #    t.mainloop()
+                    #man = DataEntryGUI(None)
+                    #man.title('Data Entry')
+                    #man.mainloop()
+                    #values[loc[0]][loc[1]] = man.getval()
+                    values[loc[0]][loc[1]] = 7
                     # zoom_points.append((loc * args.grid_step_dist, man.getval()))
                 x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
             # Do the same for when the robot is moving backwards as well
@@ -453,13 +460,14 @@ def auto_zoom(args, m):
                 print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
-                    if args.dwell_time is not 0:
-                        t = TimerGUI(args.dwell_time)
-                        t.mainloop()
-                    man = DataEntryGUI(None)
-                    man.title('Data Entry')
-                    man.mainloop()
-                    values[loc[0]][loc[1]] = man.getval()
+                    #if args.dwell_time is not 0:
+                    #    t = TimerGUI(args.dwell_time)
+                    #    t.mainloop()
+                    #man = DataEntryGUI(None)
+                    #man.title('Data Entry')
+                    #man.mainloop()
+                    #values[loc[0]][loc[1]] = man.getval()
+                    values[loc[0]][loc[1]] = 8
                     # zoom_points.append((loc * args.grid_step_dist, man.getval()))
                 x_error = x_error - int(x_error)
             # Increment our progress counter and print out current set of values
@@ -480,13 +488,14 @@ def auto_zoom(args, m):
         print("------------")
         # TODO: MEASURE HERE
         if args.measure:
-            if args.dwell_time is not 0:
-                t = TimerGUI(args.dwell_time)
-                t.mainloop()
-            man = DataEntryGUI(None)
-            man.title('Data Entry')
-            man.mainloop()
-            values[loc[0]][loc[1]] = man.getval()
+            #if args.dwell_time is not 0:
+            #    t = TimerGUI(args.dwell_time)
+            #    t.mainloop()
+            #man = DataEntryGUI(None)
+            #man.title('Data Entry')
+            #man.mainloop()
+            #values[loc[0]][loc[1]] = man.getval()
+            values[loc[0]][loc[1]] = 9
             # zoom_points.append((loc * args.grid_step_dist, man.getval()))
         print(values)
         y_error = y_error - int(y_error)
