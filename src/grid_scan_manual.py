@@ -145,7 +145,13 @@ def run_scan(args):
         while j < x_points - 1:
             if going_forward:
                 x_error += frac_step  # Add to error
-                m.forward_motor_one(num_steps + int(x_error))  # Increase distance moved by adding error
+                print(m.forward_motor_one(num_steps + int(x_error)).decode())  # Increase distance moved by adding error
+                #while m.port.readline() == 'a':  # TODO: Debugging
+                while True:
+                    convs = str(m.port.read(), 'utf-8')
+                    print("hi")
+                    print(convs)  # TODO: Debugging
+                    print("hoh")
                 count += 1
                 loc = np.argwhere(grid == count)[0]
                 print("------------")

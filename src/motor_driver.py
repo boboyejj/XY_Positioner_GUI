@@ -47,7 +47,8 @@ class MotorDriver:
         self.port.flushOutput()
         self.port.flush()
         self.port.write(('!1m1r' + str(steps) + 'n\r').encode())
-        out = self.port.readline()
+        out = self.port.read()
+        #out = self.port.readline()
         self.port.flush()
         return out
 
