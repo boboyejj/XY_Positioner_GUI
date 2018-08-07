@@ -259,8 +259,6 @@ def run_scan(args):
         grid_points = convert_to_point_list(np.flipud(values))
 
         # Plot results
-        print("ZOOMIES")  # TODO: Debugging
-        print(zoomed_points)
         if args.measure:
             if max_val != -1:
                 #x, y, z = split_into_three(zoomed_points)
@@ -365,9 +363,7 @@ def run_scan(args):
             # zoomed = np.tri(5)        # Uncomment to debug plotting
             print(zoomed)
             zoomed_points = zoomed
-            zoomed_points2 = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
-            print(zoomed_points)  # TODO: Debugging
-            print(zoomed_points2)
+            #zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
         elif choice == 'Correct Previous Value':
             plt.close()
             print("Please select location.")
