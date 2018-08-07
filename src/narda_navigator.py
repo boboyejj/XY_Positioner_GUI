@@ -26,7 +26,13 @@ refpics_path = '../narda_navigator_referencepics'
 #        time.sleep(1)
 
 def selectModeTab():
-    
+    try:
+        if not pgui.locate
+        x, y, w, h = pgui.locateOnScreen(refpics_path + '/mode_tab_deselected.PNG')
+    except TypeError:
+        print('Reference image not found on screen...')
+        exit(1)
+
 
 def main():
     pass
