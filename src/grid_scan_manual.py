@@ -261,6 +261,7 @@ def run_scan(args):
         # Plot results
         if args.measure:
             if max_val != -1:
+                # TODO: This is the original plotting script - meshes the zoom scan into the entire area scan
                 #x, y, z = split_into_three(zoomed_points)
                 # Plotting
                 # Generate meshgrid first
