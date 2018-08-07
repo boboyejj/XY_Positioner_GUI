@@ -259,23 +259,35 @@ def run_scan(args):
         grid_points = convert_to_point_list(np.flipud(values))
 
         # Plot results
+        print("ZOOMIES")  # TODO: Debugging
+        print(zoomed_points)
         if args.measure:
             if max_val != -1:
-                x, y, z = split_into_three(zoomed_points)
+                #x, y, z = split_into_three(zoomed_points)
                 # Plotting
                 # Generate meshgrid first
-                xi, yi = np.linspace(x.min(), x.max(), 300), np.linspace(y.min(), y.max(), 300)
-                xi, yi = np.meshgrid(xi, yi, indexing='ij')
+                #xi, yi = np.linspace(x.min(), x.max(), 300), np.linspace(y.min(), y.max(), 300)
+                #xi, yi = np.meshgrid(xi, yi, indexing='ij')
 
                 # Interpolate (linear)
-                zi = interpolate.griddata((x, y), z, (xi, yi), method='linear')
-
-                plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower', extent=[x.min(), x.max(), y.min(), y.max()])
+                #zi = interpolate.griddata((x, y), z, (xi, yi), method='linear')
+                #print('ZI')  # TODO: Debugging
+                #print(zi)
+                #plt.clf()
+                #plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower', extent=[x.min(), x.max(), y.min(), y.max()])
+                #cbar = plt.colorbar()
+                #cbar.set_label('Signal Level')
+                #plt.show(block=False)
+                plt.clf()
+                plt.imshow(zoomed_points, interpolation='bilinear')
+                plt.title('Zoomed Points Heat Map')
                 cbar = plt.colorbar()
                 cbar.set_label('Signal Level')
                 plt.show(block=False)
             else:
+                plt.clf()
                 plt.imshow(values, interpolation='bilinear')
+                plt.title('Area Scan Heat Map')
                 cbar = plt.colorbar()
                 cbar.set_label('Signal Level')
                 plt.show(block=False)
@@ -352,7 +364,10 @@ def run_scan(args):
             zoomed = auto_zoom(args, m)
             # zoomed = np.tri(5)        # Uncomment to debug plotting
             print(zoomed)
-            zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
+            zoomed_points = zoomed
+            zoomed_points2 = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
+            print(zoomed_points)  # TODO: Debugging
+            print(zoomed_points2)
         elif choice == 'Correct Previous Value':
             plt.close()
             print("Please select location.")
