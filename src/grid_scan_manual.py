@@ -105,9 +105,6 @@ def run_scan(args):
     # Check ports and instantiate relevant objects
     m = MotorDriver()
     narda = NardaNavigator()
-    python3 = application.Application()
-    python3.connect(path="C:\\Users\\changhwan.choi\\AppData\\Local\\Continuum\\anaconda3\\Python.exe")
-    python3.p3.set_focus()
 
     # Visualization of robot progress will be done using python Turtle (temporary)
     # franklin = turtle.Turtle()
