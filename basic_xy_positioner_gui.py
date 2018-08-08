@@ -28,11 +28,13 @@ def run_gui():
     #area_scan.add_argument('x_distance', type=float, default=6 * 2.8, help='distance in the x direction (in cm)')
     #area_scan.add_argument('y_distance', type=float, default=4 * 2.8, help='distance in the y direction (in cm)')
     area_scan.add_argument('grid_step_dist', type=float, default=2.8, help='distance to between grid points (in cm)')
+    area_scan.add_argument('type', choices=['Limb', 'Body'], default='Limb')
+    area_scan.add_argument('field', choices=['Electric', 'Magnetic (Mode A)', 'Magnetic (Mode B)'],
+                                 default='Electric')
+    area_scan.add_argument('side', choices=['front', 'S', 'left', 'right', 'top', 'bottom'], default='front')
     area_scan.add_argument('dwell_time', type=float, default=1, help='dwell time at single measurement point (in s)')
     area_scan.add_argument('zoom_scan_dwell_time', type=float, default=1.5,
                            help='dwell time at single measurement point (in s) for zoom scan measurements')
-    area_scan.add_argument('field', choices=['Electric', 'Magnetic (Mode A)', 'Magnetic (Mode B)'],
-                                 default='Electric')
     area_scan.add_argument('--measure', action='store_true', default=True, help='perform measurement '
                                                                                 '(can be disabled to test motors)')
     area_scan.add_argument('--auto_zoom_scan', action='store_true', default=False,

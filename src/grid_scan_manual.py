@@ -116,9 +116,9 @@ def run_scan(args):
     # TODO: MEASURE HERE
     if args.measure:
         print('Measuring...')
+        build_filename(args.type, args.field, args.side, count)
         # time.sleep(args.dwell_time)
-
-        narda.takeMeasurement(args.dwell_time)
+        narda.takeMeasurement(args.dwell_time, 'asdf')
         values[0][0] = 1
         count += 1
 
@@ -507,6 +507,25 @@ def split_into_three(combined):
         y.append(point[0][1])
         z.append(point[1])
     return np.array(x), np.array(y), np.array(z)
+
+
+def build_filename(type, field, side, number):
+    filename = ''
+    # Adding type marker
+    if type == 'Limb':
+        filename += 'L'
+    else:
+        filename += 'B'
+    filename += '_'
+    # Adding field marker
+    if field == 'Electric':
+        filename += 'E'
+    else:
+        filename += 'H'
+    # Adding side marker
+
+    return filename
+    pass
 
 
 def main():

@@ -65,7 +65,7 @@ class NardaNavigator:
         else:
             print("Argument must be one of either 'elec', 'mag_a', or 'mag_b'")
 
-    def takeMeasurement(self, dwell_time):
+    def takeMeasurement(self, dwell_time, filename):
         # If not on the data tab, switch to it
         if not pgui.locateOnScreen(self.refpics_path + '/data_tab_selected.PNG'):
             pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/data_tab_deselected.PNG')))
