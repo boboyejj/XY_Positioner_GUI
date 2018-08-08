@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "C:/Users/changhwan.choi/PycharmProjects/XY_Positioner_GUI/basic_xy_positioner_gui.py", line 111, in <module>
+    run_gui()
+  File "C:\Users\changhwan.choi\AppData\Local\Continuum\anaconda3\lib\site-packages\gooey\python_bindings\gooey_decorator.py", line 89, in <lambda>
+    return lambda: func()
+  File "C:/Users/changhwan.choi/PycharmProjects/XY_Positioner_GUI/basic_xy_positioner_gui.py", line 64, in run_gui
+    run_scan(args)
+  File "C:\Users\changhwan.choi\PycharmProjects\XY_Positioner_GUI\src\grid_scan_manual.py", line 106, in run_scan
+    m = MotorDriver()
+  File "C:\Users\changhwan.choi\PycharmProjects\XY_Positioner_GUI\src\motor_driver.py", line 29, in __init__
+    print("Code received from the COM PORT: " + received_str.decode())
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xfe in position 1: invalid start byte

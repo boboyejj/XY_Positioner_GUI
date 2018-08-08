@@ -26,13 +26,18 @@ class MotorDriver:
                 self.port = serial.Serial('COM'+str(i), timeout=1.5)
                 self.port.write('!1fp\r'.encode())  # Check if we have connected to the right COM Port/machine
                 received_str = self.port.read(2)
-                print("Code received from the COM PORT: " + received_str.decode())
+                try:
+                    print("Code received from the COM PORT: " + received_str.decode())
+                except UnicodeDecodeError:
+                    print("Could not decode return message from COM port. Moving onto next COM port...")
+                    continue
                 if received_str.decode() == "C4":
                     self.port.flushOutput()
                     self.port.flushInput()
                     self.port.flush()
                     self.step_unit = step_unit_
                     entered = True
+                    break
             except serial.SerialException as e:
                 pass
                 # print e.message

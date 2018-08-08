@@ -7,11 +7,11 @@ import os
 import subprocess
 
 
-class NardaNavigator():
+class NardaNavigator:
 
     def __init__(self):
         pgui.PAUSE = 0
-        self.refpics_path = '../narda_navigator_referencepics'
+        self.refpics_path = 'narda_navigator_referencepics'
         self.ehp200_path = "C:\\Program Files (x86)\\NardaSafety\\EHP-TS\\EHP200-TS\\EHP200.exe"
         self.ehp200_app = application.Application()
         self.startNarda()
@@ -55,6 +55,16 @@ class NardaNavigator():
             print('Error: Reference images not found on screen...')
             exit(1)
 
+    def selectInputType(self, type):
+        if type.lower() == 'elec':
+            pass
+        elif type.lower() == 'mag_a':
+            pass
+        elif type.lower() == 'mag_b':
+            pass
+        else:
+            print("Argument must be one of either 'elec', 'mag_a', or 'mag_b'")
+
     def saveCurrentLocation(self):
         return pgui.position()
 
@@ -67,6 +77,9 @@ class NardaNavigator():
     def main(self):
         self.startNarda()
         self.bringToFront()
+        python3 = application.Application()
+        python3.connect(path="C:\\Users\\changhwan.choi\\AppData\\Local\\Continuum\\anaconda3\\Python.exe")
+        python3.p3.set_focus()
         self.selectTab('Mode')
         time.sleep(0.5)
         self.selectTab('Data')
