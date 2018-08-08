@@ -10,7 +10,7 @@ import subprocess
 class NardaNavigator:
 
     def __init__(self):
-        pgui.PAUSE = 0
+        pgui.PAUSE = 1
         self.refpics_path = 'narda_navigator_referencepics'
         self.ehp200_path = "C:\\Program Files (x86)\\NardaSafety\\EHP-TS\\EHP200-TS\\EHP200.exe"
         self.ehp200_app = application.Application()
@@ -65,8 +65,30 @@ class NardaNavigator:
         else:
             print("Argument must be one of either 'elec', 'mag_a', or 'mag_b'")
 
-    def takeMeasurement(self):
-        
+    def takeMeasurement(self, dwell_time):
+        # If not on the data tab, switch to it
+        if not pgui.locateOnScreen(self.refpics_path + '/data_tab_selected.PNG'):
+            pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/data_tab_deselected.PNG')))
+
+        # Reset measurement by clicking on 'Free Scan' radio button
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/free_scan.PNG')))
+
+        # Todo: figure out if we need to check max hold here too..
+
+        # Wait for the measurements to settle before taking measurements
+        time.sleep(dwell_time)
+
+        # Take the actual measurement after marking the highest peak
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/highest_peak.PNG')))
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/save_as_text.PNG')))
+
+        # Input comment
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/comment.PNG')))
+        pgui.typewrite("Hello world!")
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/ok.PNG')))
+
+        # Save file
+
 
     def saveCurrentLocation(self):
         return pgui.position()

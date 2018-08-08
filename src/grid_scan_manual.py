@@ -111,11 +111,16 @@ def run_scan(args):
     num_steps = args.grid_step_dist / m.step_unit
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
+
+    count = 0
     # TODO: MEASURE HERE
     if args.measure:
         print('Measuring...')
-        time.sleep(args.dwell_time)
+        # time.sleep(args.dwell_time)
+
+        narda.takeMeasurement(args.dwell_time)
         values[0][0] = 1
+        count += 1
 
     count = 1  # Tracks our current progress through the grid
 
