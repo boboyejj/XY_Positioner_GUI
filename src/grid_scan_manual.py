@@ -145,20 +145,9 @@ def run_scan(args):
                 count += 1
                 loc = np.argwhere(grid == count)[0]
                 print("------------")
-                # franklin.circle(2)
-                # franklin.forward(20)
                 # TODO: MEASURE HERE
                 if args.measure:
-                    #if args.dwell_time is not 0:
-                    #    t = TimerGUI(args.dwell_time)
-                    #    t.mainloop()
-                    #man = DataEntryGUI(None)
-                    #man.title('Data Entry')
-                    #man.focus()
-                    #man.mainloop()
-                    #values[loc[0]][loc[1]] = man.getval()
                     values[loc[0]][loc[1]] = 2
-                    # grid_points.append((loc * args.grid_step_dist, man.getval()))
                 x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
             # Do the same for when the robot is moving backwards as well
             else:
@@ -167,58 +156,32 @@ def run_scan(args):
                 count += 1
                 loc = np.argwhere(grid == count)[0]
                 print("------------")
-                # franklin.circle(2)
-                # franklin.backward(20)
                 # TODO: MEASURE HERE
                 if args.measure:
-                    #if args.dwell_time is not 0:
-                    #    t = TimerGUI(args.dwell_time)
-                    #    t.mainloop()
-                    #man = DataEntryGUI(None)
-                    #man.title('Data Entry')
-                    #man.focus()
-                    #man.mainloop()
-                    #values[loc[0]][loc[1]] = man.getval()
                     values[loc[0]][loc[1]] = 3
-                    # grid_points.append((loc * args.grid_step_dist, man.getval()))
                 x_error = x_error - int(x_error)
             # Increment our progress counter and print out current set of values
             j += 1
             print(values)
 
         y_error += frac_step
-        # m.forward_motor_two(num_steps + int(y_error))
         count += 1  # Increment our progress counter
         # If counter is outside accepted bounds, exit
         if count > x_points * y_points:
             count -= 1  # Reset count to end of grid
             loc = np.argwhere(grid == count)[0]
-            # print loc
-            # franklin.circle(2)
+            print("Warning: Counter outside accepted bounds.")
             break
         m.forward_motor_two(num_steps + int(y_error))
         # Else update counter, measure, and move down. Reverse direction
         loc = np.argwhere(grid == count)[0]
         print("------------")
-        # franklin.circle(2)
-        # franklin.right(90)
-        # franklin.forward(20)
-        # franklin.left(90)
         # TODO: MEASURE HERE
         if args.measure:
-            #if args.dwell_time is not 0:
-            #    t = TimerGUI(args.dwell_time)
-            #    t.mainloop()
-            #man = DataEntryGUI(None)
-            #man.title('Data Entry')
-            #man.focus()
-            #man.mainloop()
-            #values[loc[0]][loc[1]] = man.getval()
             values[loc[0]][loc[1]] = 4
-            # grid_points.append((loc * args.grid_step_dist, man.getval()))
         print(values)
         y_error = y_error - int(y_error)
-        going_forward = not going_forward
+        going_forward = not going_forward  # Reverse the direction of the horizontal motor movement
         j = 0
 
     # print grid_points
@@ -232,9 +195,6 @@ def run_scan(args):
     if args.auto_zoom_scan:
         # First need to move to correct position (find max and move to it)
         max_val = values.max()
-        # print location
-        # corrected_place = (place[0], y_points - place[1])
-        # count = grid[location[0]][location[1]]
         grid_move = (np.argwhere(values == max_val) - np.argwhere(grid == count))[0]
         print("Need to move", grid_move)
         if grid_move[1] > 0:
@@ -246,9 +206,10 @@ def run_scan(args):
         else:
             m.reverse_motor_two(num_steps * grid_move[0])
 
-        count = grid[np.argwhere(values == max_val)[0][0], np.argwhere(values == max_val)[0][1]]
+        count = grid[np.argwhere(values == max_val)[0][1], np.argwhere(values == max_val)[0][0]]
         zoomed = auto_zoom(args, m)
         zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
+        print("Henlo")
         print(zoomed_points)
 
     while True:
