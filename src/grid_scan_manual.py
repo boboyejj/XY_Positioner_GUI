@@ -6,6 +6,7 @@ import numpy as np
 from src.motor_driver import MotorDriver
 from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
+from src.narda_navigator import NardaNavigator
 from matplotlib import pyplot as plt
 from matplotlib import mlab
 from src.data_entry_gui import DataEntryGUI
@@ -102,7 +103,7 @@ def run_scan(args):
 
     # Check ports and instantiate relevant objects
     m = MotorDriver()
-    narda = None
+    narda = NardaNavigator()
 
     # Visualization of robot progress will be done using python Turtle (temporary)
     # franklin = turtle.Turtle()
