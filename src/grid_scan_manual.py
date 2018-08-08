@@ -12,6 +12,7 @@ from pywinauto import application
 from matplotlib import mlab
 from src.data_entry_gui import DataEntryGUI
 import os
+import time
 from scipy import interpolate
 from src.timer_gui import TimerGUI
 # import turtle
@@ -112,17 +113,10 @@ def run_scan(args):
     move_to_pos_one(m, int(num_steps), x_points, y_points)
     # TODO: MEASURE HERE
     if args.measure:
-        #if args.dwell_time is not 0:
-        #    t = TimerGUI(args.dwell_time)
-        #    t.mainloop()
-        #man = DataEntryGUI(None)
-        #man.title('Data Entry')
-        #man.focus()
-        #man.mainloop()
-        #values[0][0] = man.getval()
+        print('Measuring...')
+        time.sleep(args.dwell_time)
         values[0][0] = 1
-        # loc = np.argwhere(grid == 1)[0]
-        # grid_points.append((loc * args.grid_step_dist, man.getval()))
+
     count = 1  # Tracks our current progress through the grid
 
     print(values)
@@ -169,7 +163,7 @@ def run_scan(args):
         # If counter is outside accepted bounds, exit
         if count > x_points * y_points:
             count -= 1  # Reset count to end of grid
-            loc = np.argwhere(grid == count)[0]
+            loc = np.argwhere(grid == count)[0]  # TODO: Do we need this?
             print("Warning: Counter outside accepted bounds.")
             break
         m.forward_motor_two(num_steps + int(y_error))
@@ -196,20 +190,20 @@ def run_scan(args):
         # First need to move to correct position (find max and move to it)
         max_val = values.max()
         grid_move = (np.argwhere(values == max_val) - np.argwhere(grid == count))[0]
-        print("Need to move", grid_move)
+        print("Need to move", grid_move[1], grid_move[0])
         if grid_move[1] > 0:
             m.forward_motor_one(num_steps * grid_move[1])
         else:
-            m.reverse_motor_one(num_steps * grid_move[1])
+            m.reverse_motor_one(-1 * num_steps * grid_move[1])
         if grid_move[0] > 0:
             m.forward_motor_two(num_steps * grid_move[0])
         else:
-            m.reverse_motor_two(num_steps * grid_move[0])
+            m.reverse_motor_two(-1 * num_steps * grid_move[0])
 
-        count = grid[np.argwhere(values == max_val)[0][1], np.argwhere(values == max_val)[0][0]]
+        count = grid[np.argwhere(values == max_val)[0][0], np.argwhere(values == max_val)[0][1]]
         zoomed = auto_zoom(args, m)
-        zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
-        print("Henlo")
+        zoomed_points = zoomed
+        #zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
         print(zoomed_points)
 
     while True:
@@ -295,9 +289,6 @@ def run_scan(args):
         elif choice == 'Zoom Scan':
             # First need to move to correct position (find max and move to it)
             max_val = values.max()
-            # print location
-            # corrected_place = (place[0], y_points - place[1])
-            # count = grid[location[0]][location[1]]
             grid_move = (np.argwhere(values == max_val) - np.argwhere(grid == count))[0]
             print("Need to move", grid_move)
             if grid_move[1] > 0:
@@ -310,16 +301,12 @@ def run_scan(args):
                 m.reverse_motor_two(-1 * num_steps * grid_move[0])
 
             plt.close()
-            print("np.argwhere(values == max_val): ")
-            print(np.argwhere(values == max_val))
-            print("grid: ")
-            print(grid)
             count = grid[np.argwhere(values == max_val)[0][0], np.argwhere(values == max_val)[0][1]]
             zoomed = auto_zoom(args, m)
             # zoomed = np.tri(5)        # Uncomment to debug plotting
             print(zoomed)
-            zoomed_points = zoomed
             #zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
+            zoomed_points = zoomed
         elif choice == 'Correct Previous Value':
             plt.close()
             print("Please select location.")

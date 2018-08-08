@@ -65,6 +65,9 @@ class NardaNavigator:
         else:
             print("Argument must be one of either 'elec', 'mag_a', or 'mag_b'")
 
+    def takeMeasurement(self):
+        
+
     def saveCurrentLocation(self):
         return pgui.position()
 
