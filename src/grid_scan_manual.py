@@ -106,12 +106,6 @@ def run_scan(args):
     m = MotorDriver()
     narda = NardaNavigator()
 
-    # Visualization of robot progress will be done using python Turtle (temporary)
-    # franklin = turtle.Turtle()
-    # franklin.penup()
-    # franklin.setposition(-100, 100)
-    # franklin.pendown()
-
     # Calculate number of motor steps necessary to move one grid space
     num_steps = args.grid_step_dist / m.step_unit
     # Move to the initial position (top left) of grid scan and measure once
