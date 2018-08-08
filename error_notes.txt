@@ -1,3 +1,4 @@
+FIXED:
 Traceback (most recent call last):
   File "C:/Users/changhwan.choi/PycharmProjects/XY_Positioner_GUI/basic_xy_positioner_gui.py", line 111, in <module>
     run_gui()
