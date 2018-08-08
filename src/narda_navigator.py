@@ -6,27 +6,7 @@ import time
 import os
 import subprocess
 
-#print(pgui.size())
-#print("location: ")
-#print(pgui.locateOnScreen(refpics_path + '/search_bar.PNG'))
-#print()
-# pgui.click(pgui.center(pgui.locateOnScreen(refpics_path + '/stop_button.PNG')))  # Dumb line that stops script
-#while True:
-#    try:
-#        x, y, w, h = pgui.locateOnScreen(refpics_path + '/search_bar.PNG')
-#    except TypeError:
-#        print('Reference image not found on screen...')
-#        time.sleep(2)
-#    try:
-#        ctrx, ctry = pgui.center((x, y, w, h))
-#        print(ctrx, ctry)
-#        pgui.click((ctrx, ctry))
-#        pgui.typewrite('Hello World!')
-#        pgui.press('enter')
-#        time.sleep(2)
-#    except:
-#        print('Reference img. not found on screen')
-#        time.sleep(1)
+
 class NardaNavigator():
 
     def __init__(self):
@@ -40,7 +20,7 @@ class NardaNavigator():
         WMI = GetObject('winmgmts:')
         processes = WMI.InstancesOf('Win32_Process')
         p_list = [p.Properties_('Name').Value for p in processes]
-        print(p_list)
+        # print(p_list)
         # ehp200_app = pwin.Application()
         if self.ehp200_path.split('\\')[-1] not in p_list:
             print("Starting EHP200 program - Connecting...")
@@ -56,26 +36,12 @@ class NardaNavigator():
     def closeNarda(self):
         self.ehp200_app.kill()
 
-    def selectModeTab(self):
-        try:
-            if not pgui.locateOnScreen(self.refpics_path + '/mode_tab_selected.PNG'):
-                x, y, w, h = pgui.locateOnScreen(self.refpics_path + '/mode_tab_deselected.PNG')
-                print(x, y, w, h)
-                # x_save, y_save = saveCurrentLocation()
-                pgui.click(pgui.center((x, y, w, h)))
-                # loadSavedLocation(x_save, y_save)
-            else:
-                print("Already in the 'Mode' tab")
-        except TypeError:
-            print('Reference image not found on screen...')
-            exit(1)
-
     def selectTab(self, tabName):
         tabName = tabName.lower()
-        print(tabName)
+        # print(tabName)
         selectedName = '/' + tabName + '_tab_selected.PNG'
         deselectedName = '/' + tabName + '_tab_deselected.PNG'
-        print(selectedName, deselectedName)
+        # print(selectedName, deselectedName)
         try:
             if not pgui.locateOnScreen(self.refpics_path + selectedName):
                 print("Not located - clicking the position: " + self.refpics_path + deselectedName)
@@ -112,6 +78,7 @@ class NardaNavigator():
         self.selectTab('Span')
         time.sleep(0.5)
         self.selectTab('Mode')
+
 
 if __name__ == '__main__':
     ehp200 = NardaNavigator()

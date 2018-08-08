@@ -301,8 +301,6 @@ def run_scan(args):
         if choice == 'Exit':
             print("Exiting program...")
             m.destroy()
-            if narda is not None:
-                narda.destroy()
             exit(0)
         elif choice == 'Save Data':
             # TODO: Save file method that creates place for files
@@ -401,8 +399,6 @@ def run_scan(args):
         else:
             print("Invalid choice")
             m.destroy()
-            if narda is not None:
-                narda.destroy()
             exit(1)
 
 
