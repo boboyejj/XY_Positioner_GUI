@@ -10,7 +10,7 @@ import subprocess
 class NardaNavigator:
 
     def __init__(self):
-        pgui.PAUSE = 1
+        pgui.PAUSE = 0.5
         self.refpics_path = 'narda_navigator_referencepics'
         self.ehp200_path = "C:\\Program Files (x86)\\NardaSafety\\EHP-TS\\EHP200-TS\\EHP200.exe"
         self.snip_path = "C:\\Windows\\System32\\SnippingTool.exe"
@@ -101,6 +101,7 @@ class NardaNavigator:
 
         # Input comment
         pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/comment.PNG')))
+        time.sleep(0.5)
         pgui.typewrite("Hello world!")
         pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/ok.PNG')))
 
@@ -110,12 +111,28 @@ class NardaNavigator:
 
     def saveBitmap(self):
         self.bringToFront()
+        # Open Data Tab
+        if not pgui.locateOnScreen(self.refpics_path + '/data_tab_selected.PNG'):
+            pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + 'data_tab_deselected.PNG')))
+
+
         # Input comment
-        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/comment.PNG')))
-        pgui.typewrite("Hello world!")
-        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/ok.PNG')))
+        # pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/comment.PNG')))
+        # pgui.typewrite("Hello world!")
+        # pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/ok.PNG')))
 
         # Save file
+
+    def getMaxValue(self, filepath):
+        with open(filepath, 'r') as f:
+            maxValLine = f.readlines()[8]
+            for string in maxValLine.split(' '):
+                try:
+                    maxVal = float(string)
+                    break  # Breaks if we find the first numeric value
+                except:
+                    continue
+            print(maxVal)
 
     def saveCurrentLocation(self):
         return pgui.position()
@@ -130,22 +147,13 @@ class NardaNavigator:
         self.snip_tool.SNIP.set_focus()
 
     def main(self):
-        self.startNarda()
-        self.bringToFront()
-        python3 = application.Application()
-        python3.connect(path="C:\\Users\\changhwan.choi\\AppData\\Local\\Continuum\\anaconda3\\Python.exe")
-        python3.p3.set_focus()
-        self.selectTab('Mode')
-        time.sleep(0.5)
-        self.selectTab('Data')
-        time.sleep(0.5)
-        self.selectTab('Data')
-        time.sleep(0.5)
-        self.selectTab('Span')
-        time.sleep(0.5)
-        self.selectTab('Span')
-        time.sleep(0.5)
-        self.selectTab('Mode')
+        #self.startNarda()
+        #self.bringToFront()
+        name = "C:\\Users\changhwan.choi\Desktop\L_Efront"
+        for i in range(1, 17):
+            fname = name + str(i) + ".txt"
+            self.getMaxValue(fname)
+
 
 
 if __name__ == '__main__':
