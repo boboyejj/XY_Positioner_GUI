@@ -112,15 +112,13 @@ def run_scan(args):
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
 
-    count = 0
+    count = 0  # Tracks our current progress through the grid
     # TODO: MEASURE HERE
     if args.measure:
-        fname = build_filename(args.type, args.field, args.side, count + 1)
+        count += 1
+        fname = build_filename(args.type, args.field, args.side, count)
         narda.takeMeasurement(args.dwell_time, fname)
         values[0][0] = 1
-        count += 1
-
-    count = 1  # Tracks our current progress through the grid
 
     print(values)
     # print np.argwhere(grid == count)[0], count
@@ -143,7 +141,7 @@ def run_scan(args):
                 print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
-                    fname = build_filename(args.type, args.field, args.side, count + 1)
+                    fname = build_filename(args.type, args.field, args.side, count)
                     narda.takeMeasurement(args.dwell_time, fname)
                     values[loc[0]][loc[1]] = 2
                 x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
@@ -156,7 +154,7 @@ def run_scan(args):
                 print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
-                    fname = build_filename(args.type, args.field, args.side, count + 1)
+                    fname = build_filename(args.type, args.field, args.side, count)
                     narda.takeMeasurement(args.dwell_time, fname)
                     values[loc[0]][loc[1]] = 3
                 x_error = x_error - int(x_error)
@@ -178,7 +176,7 @@ def run_scan(args):
         print("------------")
         # TODO: MEASURE HERE
         if args.measure:
-            fname = build_filename(args.type, args.field, args.side, count + 1)
+            fname = build_filename(args.type, args.field, args.side, count)
             narda.takeMeasurement(args.dwell_time, fname)
             values[loc[0]][loc[1]] = 4
         print(values)
@@ -338,7 +336,7 @@ def run_scan(args):
             # print grid_loc
             # TODO: MEASURE HERE
             if args.measure:
-                fname = build_filename(args.type, args.field, args.side, count + 1)
+                fname = build_filename(args.type, args.field, args.side, count)
                 narda.takeMeasurement(args.dwell_time, fname)
                 values[grid_loc[0]][grid_loc[1]] = 5
         else:
@@ -367,7 +365,7 @@ def auto_zoom(args, m, narda):
     count = 0  # Tracks our current progress through the grid
     # TODO: MEASURE HERE
     if args.measure:
-        fname = build_filename(args.type, args.field, args.side, count + 1)
+        fname = build_filename(args.type, args.field, args.side, count)
         narda.takeMeasurement(args.dwell_time, fname)
         values[0][0] = 6
         loc = np.argwhere(grid == 1)[0]
@@ -393,7 +391,7 @@ def auto_zoom(args, m, narda):
                 print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
-                    fname = build_filename(args.type, args.field, args.side, count + 1)
+                    fname = build_filename(args.type, args.field, args.side, count)
                     narda.takeMeasurement(args.dwell_time, fname)
                     values[loc[0]][loc[1]] = 7
                 x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
@@ -406,7 +404,7 @@ def auto_zoom(args, m, narda):
                 print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
-                    fname = build_filename(args.type, args.field, args.side, count + 1)
+                    fname = build_filename(args.type, args.field, args.side, count)
                     narda.takeMeasurement(args.dwell_time, fname)
                     values[loc[0]][loc[1]] = 8
                 x_error = x_error - int(x_error)
@@ -428,7 +426,7 @@ def auto_zoom(args, m, narda):
         print("------------")
         # TODO: MEASURE HERE
         if args.measure:
-            fname = build_filename(args.type, args.field, args.side, count + 1)
+            fname = build_filename(args.type, args.field, args.side, count)
             narda.takeMeasurement(args.dwell_time, fname)
             values[loc[0]][loc[1]] = 9
         print(values)
