@@ -13,15 +13,31 @@ class NardaNavigator:
         pgui.PAUSE = 1
         self.refpics_path = 'narda_navigator_referencepics'
         self.ehp200_path = "C:\\Program Files (x86)\\NardaSafety\\EHP-TS\\EHP200-TS\\EHP200.exe"
+        self.snip_path = "C:\\Windows\\System32\\SnippingTool.exe"
         self.ehp200_app = application.Application()
+        self.snip_tool = application.Application()
+        self.startSnip()
         self.startNarda()
+
+    def startSnip(self):
+        WMI = GetObject('winmgmts:')
+        processes = WMI.InstancesOf('Win32_Process')
+        p_list = [p.Properties_('Name').Value for p in processes]
+        if self.snip_path.split('\\')[-1] not in p_list:
+            print("Starting Snipping Tool - Connecting...")
+            self.snip_tool.start(self.snip_path)
+            # Wait until the window has been opened
+            while not pgui.locateOnScreen(self.refpics_path + '/snip_window_title.PNG'):
+                pass
+            print("Snipping Tool Opened")
+        else:
+            print("Snipping Tool Opened")
+            self.snip_tool.connect(path=self.snip_path)
 
     def startNarda(self):
         WMI = GetObject('winmgmts:')
         processes = WMI.InstancesOf('Win32_Process')
         p_list = [p.Properties_('Name').Value for p in processes]
-        # print(p_list)
-        # ehp200_app = pwin.Application()
         if self.ehp200_path.split('\\')[-1] not in p_list:
             print("Starting EHP200 program - Connecting...")
             self.ehp200_app.start(self.ehp200_path)
@@ -66,6 +82,7 @@ class NardaNavigator:
             print("Argument must be one of either 'elec', 'mag_a', or 'mag_b'")
 
     def takeMeasurement(self, dwell_time, filename):
+        self.bringToFront()
         # If not on the data tab, switch to it
         if not pgui.locateOnScreen(self.refpics_path + '/data_tab_selected.PNG'):
             pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/data_tab_deselected.PNG')))
@@ -88,7 +105,17 @@ class NardaNavigator:
         pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/ok.PNG')))
 
         # Save file
+        pgui.typewrite(filename)
+        pgui.press('enter')
 
+    def saveBitmap(self):
+        self.bringToFront()
+        # Input comment
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/comment.PNG')))
+        pgui.typewrite("Hello world!")
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/ok.PNG')))
+
+        # Save file
 
     def saveCurrentLocation(self):
         return pgui.position()
@@ -98,6 +125,9 @@ class NardaNavigator:
 
     def bringToFront(self):
         self.ehp200_app.EHP200.set_focus()
+
+    def bringSnipToFront(self):
+        self.snip_tool.SNIP.set_focus()
 
     def main(self):
         self.startNarda()

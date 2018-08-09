@@ -115,10 +115,8 @@ def run_scan(args):
     count = 0
     # TODO: MEASURE HERE
     if args.measure:
-        print('Measuring...')
-        build_filename(args.type, args.field, args.side, count)
-        # time.sleep(args.dwell_time)
-        narda.takeMeasurement(args.dwell_time, 'asdf')
+        fname = build_filename(args.type, args.field, args.side, count + 1)
+        narda.takeMeasurement(args.dwell_time, fname)
         values[0][0] = 1
         count += 1
 
@@ -131,7 +129,6 @@ def run_scan(args):
     frac_step = num_steps - int(num_steps)
     num_steps = int(num_steps)
     x_error, y_error = 0, 0  # Accumulator for x and y directions
-
 
     # Main loop
     going_forward = True  # Start by moving forward
@@ -146,6 +143,8 @@ def run_scan(args):
                 print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
+                    fname = build_filename(args.type, args.field, args.side, count + 1)
+                    narda.takeMeasurement(args.dwell_time, fname)
                     values[loc[0]][loc[1]] = 2
                 x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
             # Do the same for when the robot is moving backwards as well
@@ -157,6 +156,8 @@ def run_scan(args):
                 print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
+                    fname = build_filename(args.type, args.field, args.side, count + 1)
+                    narda.takeMeasurement(args.dwell_time, fname)
                     values[loc[0]][loc[1]] = 3
                 x_error = x_error - int(x_error)
             # Increment our progress counter and print out current set of values
@@ -177,6 +178,8 @@ def run_scan(args):
         print("------------")
         # TODO: MEASURE HERE
         if args.measure:
+            fname = build_filename(args.type, args.field, args.side, count + 1)
+            narda.takeMeasurement(args.dwell_time, fname)
             values[loc[0]][loc[1]] = 4
         print(values)
         y_error = y_error - int(y_error)
@@ -206,7 +209,7 @@ def run_scan(args):
             m.reverse_motor_two(-1 * num_steps * grid_move[0])
 
         count = grid[np.argwhere(values == max_val)[0][0], np.argwhere(values == max_val)[0][1]]
-        zoomed = auto_zoom(args, m)
+        zoomed = auto_zoom(args, m, narda)
         zoomed_points = zoomed
         #zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
         print(zoomed_points)
@@ -307,7 +310,7 @@ def run_scan(args):
 
             plt.close()
             count = grid[np.argwhere(values == max_val)[0][0], np.argwhere(values == max_val)[0][1]]
-            zoomed = auto_zoom(args, m)
+            zoomed = auto_zoom(args, m, narda)
             # zoomed = np.tri(5)        # Uncomment to debug plotting
             print(zoomed)
             #zoomed_points = combine_matrices(grid_points, convert_to_point_list(zoomed), np.argwhere(values == max_val)[0])
@@ -335,22 +338,16 @@ def run_scan(args):
             # print grid_loc
             # TODO: MEASURE HERE
             if args.measure:
-                #if args.dwell_time is not 0:
-                #    t = TimerGUI(args.dwell_time)
-                #    t.mainloop()
-                #man = DataEntryGUI(None)
-                #man.title('Data Entry')
-                #man.mainloop()
-                #values[grid_loc[0]][grid_loc[1]] = man.getval()
+                fname = build_filename(args.type, args.field, args.side, count + 1)
+                narda.takeMeasurement(args.dwell_time, fname)
                 values[grid_loc[0]][grid_loc[1]] = 5
-                #man.quit()
         else:
             print("Invalid choice")
             m.destroy()
             exit(1)
 
 
-def auto_zoom(args, m):
+def auto_zoom(args, m, narda):
     x_points = 5
     y_points = 5
     grid = generate_grid(x_points, y_points)
@@ -367,19 +364,14 @@ def auto_zoom(args, m):
     num_steps = args.grid_step_dist / (4.0 * m.step_unit)
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, num_steps, x_points, y_points)
+    count = 0  # Tracks our current progress through the grid
     # TODO: MEASURE HERE
     if args.measure:
-        #if args.dwell_time is not 0:
-        #    t = TimerGUI(args.dwell_time)
-        #    t.mainloop()
-        #man = DataEntryGUI(None)
-        #man.title('Data Entry')
-        #man.mainloop()
-        #values[0][0] = man.getval()
+        fname = build_filename(args.type, args.field, args.side, count + 1)
+        narda.takeMeasurement(args.dwell_time, fname)
         values[0][0] = 6
         loc = np.argwhere(grid == 1)[0]
-        # zoom_points.append((loc * args.grid_step_dist, man.getval()))
-    count = 1  # Tracks our current progress through the grid
+    count += 1
 
     print(values)
 
@@ -401,15 +393,9 @@ def auto_zoom(args, m):
                 print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
-                    #if args.dwell_time is not 0:
-                    #    t = TimerGUI(args.dwell_time)
-                    #    t.mainloop()
-                    #man = DataEntryGUI(None)
-                    #man.title('Data Entry')
-                    #man.mainloop()
-                    #values[loc[0]][loc[1]] = man.getval()
+                    fname = build_filename(args.type, args.field, args.side, count + 1)
+                    narda.takeMeasurement(args.dwell_time, fname)
                     values[loc[0]][loc[1]] = 7
-                    # zoom_points.append((loc * args.grid_step_dist, man.getval()))
                 x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
             # Do the same for when the robot is moving backwards as well
             else:
@@ -420,15 +406,9 @@ def auto_zoom(args, m):
                 print("------------")
                 # TODO: MEASURE HERE
                 if args.measure:
-                    #if args.dwell_time is not 0:
-                    #    t = TimerGUI(args.dwell_time)
-                    #    t.mainloop()
-                    #man = DataEntryGUI(None)
-                    #man.title('Data Entry')
-                    #man.mainloop()
-                    #values[loc[0]][loc[1]] = man.getval()
+                    fname = build_filename(args.type, args.field, args.side, count + 1)
+                    narda.takeMeasurement(args.dwell_time, fname)
                     values[loc[0]][loc[1]] = 8
-                    # zoom_points.append((loc * args.grid_step_dist, man.getval()))
                 x_error = x_error - int(x_error)
             # Increment our progress counter and print out current set of values
             j += 1
@@ -448,15 +428,9 @@ def auto_zoom(args, m):
         print("------------")
         # TODO: MEASURE HERE
         if args.measure:
-            #if args.dwell_time is not 0:
-            #    t = TimerGUI(args.dwell_time)
-            #    t.mainloop()
-            #man = DataEntryGUI(None)
-            #man.title('Data Entry')
-            #man.mainloop()
-            #values[loc[0]][loc[1]] = man.getval()
+            fname = build_filename(args.type, args.field, args.side, count + 1)
+            narda.takeMeasurement(args.dwell_time, fname)
             values[loc[0]][loc[1]] = 9
-            # zoom_points.append((loc * args.grid_step_dist, man.getval()))
         print(values)
         y_error = y_error - int(y_error)
         going_forward = not going_forward
@@ -523,7 +497,8 @@ def build_filename(type, field, side, number):
     else:
         filename += 'H'
     # Adding side marker
-
+    filename += side
+    filename += str(int(number))
     return filename
     pass
 
