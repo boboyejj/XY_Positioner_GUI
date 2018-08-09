@@ -48,8 +48,8 @@ class MainFrame(wx.Frame):
         self.griddesc_text = wx.StaticText(self, label="Distance between measurement points (in cm")
         self.grid_tctrl = wx.TextCtrl(self)
 
-        self.measurement_settings_text = wx.StaticText(self, label="Measurement Settings")
-        self.measurement_settings_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
+        self.measurement_specs_text = wx.StaticText(self, label="Measurement Specifications")
+        self.measurement_specs_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.type_rbox = wx.RadioBox(self, label="Type", choices=['Limb', 'Body'],
                                      style=wx.RA_SPECIFY_COLS, majorDimension=1)
         self.field_rbox = wx.RadioBox(self, label="Field",
@@ -103,7 +103,7 @@ class MainFrame(wx.Frame):
         self.saveline_sizer.Add(self.save_btn, proportion=0, flag=wx.ALIGN_RIGHT | wx.LEFT, border=5)
         self.text_input_sizer.Add(self.saveline_sizer, proportion=0, flag=wx.LEFT | wx.EXPAND)
 
-        self.radio_input_sizer.Add(self.measurement_settings_text, proportion=0, flag=wx.LEFT)
+        self.radio_input_sizer.Add(self.measurement_specs_text, proportion=0, flag=wx.LEFT)
         self.radio_input_sizer.Add(self.type_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
         self.radio_input_sizer.Add(self.field_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
         self.radio_input_sizer.Add(self.side_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
@@ -113,8 +113,10 @@ class MainFrame(wx.Frame):
 
         self.btn_sizer.Add(self.run_btn, proportion=1, border=5, flag=wx.ALIGN_RIGHT | wx.ALL)
 
-        self.mainv_sizer.Add(self.mainh_sizer, proportion=5, border=0, flag=wx.ALL | wx.EXPAND)
-        self.mainv_sizer.Add(self.btn_sizer, proportion=1, border=5, flag=wx.ALIGN_RIGHT)
+        self.mainv_sizer.Add(self.mainh_sizer, proportion=1, border=0, flag=wx.ALL | wx.EXPAND)
+        self.mainv_sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), proportion=0, border=0,
+                             flag=wx.ALL | wx.EXPAND)
+        self.mainv_sizer.Add(self.btn_sizer, proportion=0, border=5, flag=wx.ALIGN_RIGHT)
 
         self.Refresh()
         self.SetSizer(self.mainv_sizer)
