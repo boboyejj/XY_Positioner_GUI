@@ -133,6 +133,7 @@ class NardaNavigator:
                 except:
                     continue
             print(maxVal)
+        return maxVal
 
     def saveCurrentLocation(self):
         return pgui.position()

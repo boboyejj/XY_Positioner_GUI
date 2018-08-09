@@ -5,7 +5,7 @@
     ganesh.arvapalli@pctest.com
 """
 
-from gooey import Gooey
+from gooey import Gooey, GooeyParser
 import numpy as np
 import argparse
 from src.grid_scan_manual import run_scan, generate_grid, move_to_pos_one
@@ -16,10 +16,9 @@ from src.manual_gui_grid import ManualGridGUI
 
 @Gooey(program_name='NARDA Grid Scan', monospace_display=True, default_size=(800, 600), advanced=True)
 def run_gui():
-    parser = argparse.ArgumentParser(description='Scan over basic grid area. Built for C4 Motor Controller.')
+    parser = GooeyParser(description='Scan over basic grid area. Built for C4 Motor Controller.')
 
-    sub = parser.add_subparsers(title='Choose which command to run.', help='Subparser help goes here.',
-                                dest='subparser_name')
+    sub = parser.add_subparsers(help='Subparser help goes here.', dest='subparser_name')
 
     # Arguments for conducting a general area scan
     area_scan = sub.add_parser('area_scan', help='Run a standard grid scan or specified size.')
@@ -35,6 +34,8 @@ def run_gui():
     area_scan.add_argument('dwell_time', type=float, default=1, help='dwell time at single measurement point (in s)')
     area_scan.add_argument('zoom_scan_dwell_time', type=float, default=1.5,
                            help='dwell time at single measurement point (in s) for zoom scan measurements')
+    area_scan.add_argument('save_directory', help='directory to save txt files and GUI images',
+                           type=argparse.FileType('w'), widget='DirChooser')
     area_scan.add_argument('--measure', action='store_true', default=True, help='perform measurement '
                                                                                 '(can be disabled to test motors)')
     area_scan.add_argument('--auto_zoom_scan', action='store_true', default=False,
