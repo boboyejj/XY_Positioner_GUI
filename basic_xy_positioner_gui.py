@@ -35,7 +35,8 @@ def run_gui():
     area_scan.add_argument('zoom_scan_dwell_time', type=float, default=1.5,
                            help='dwell time at single measurement point (in s) for zoom scan measurements')
     area_scan.add_argument('save_directory', help='directory to save txt files and GUI images',
-                           type=argparse.FileType('w'), widget='DirChooser')
+                           type=argparse.FileType('r'), widget='DirChooser',
+                           default='C:\\Users\changhwan.choi\PycharmProjects\XY_Positioner_GUI\\temp')
     area_scan.add_argument('--measure', action='store_true', default=True, help='perform measurement '
                                                                                 '(can be disabled to test motors)')
     area_scan.add_argument('--auto_zoom_scan', action='store_true', default=False,
