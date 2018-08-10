@@ -24,17 +24,7 @@ class MainFrame(wx.Frame):
         #wx.Window.SetMinSize(self, self.GetSize())
 
         # Variables
-        # Instantiating variables with default parameters
-        self.x_distance = 3 * 2.8  # Horizontal length of measurement region
-        self.y_distance = 3 * 2.8  # Vertical length of measurement region
-        self.grid_step_dist = 2.8  # Steps between each measurement point
-        self.type = 'Limb'  # Type of measurement (Limb or Body)
-        self.field = 'Electric'  # Type of field to measure (Electric, Magnetic A/B)
-        self.side = 'Front'  # Side of phone being measured
-        self.dwell_time = 1  # Time before measurement is taken (area scan)
-        self.zoom_scan_dwell_time = 1.5  # Time before measurement is taken (zoom scan)
-        self.save_dir = ''  # Where t
-        self.auto_zoom = False
+        self.run_thread = None
 
         # Accelerator Table/Shortcut Keys
         save_id = 115
@@ -169,7 +159,14 @@ class MainFrame(wx.Frame):
         dwell = float(self.dwell_tctrl.GetValue())
         zdwell = float(self.zdwell_tctrl.GetValue())
         savedir = self.save_tctrl.GetValue()
-        self.run_thread = AreaScanThread(self, x, y, step, dwell, zdwell, savedir, False)  # TODO: Change False to val
+        # Finding the measurement type
+        meas_type = self.type_rbox.GetString(self.type_rbox.GetSelection())
+        # Finding the measurement field
+        meas_field = self.field_rbox.GetString(self.field_rbox.GetSelection())
+        # Finding the measurement side
+        meas_side = self.side_rbox.GetString(self.side_rbox.GetSelection())
+        self.run_thread = AreaScanThread(self, x, y, step, dwell, zdwell, savedir, False,
+                                         meas_type, meas_field, meas_side)  # TODO: Change False to val
         print("Running thread...")
         self.disablegui()
         self.run_thread.start()

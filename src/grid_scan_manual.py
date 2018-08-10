@@ -31,7 +31,7 @@ class Args:
 
 class AreaScanThread(threading.Thread):
     def __init__(self, parent, x_distance, y_distance, grid_step_dist,
-                 dwell_time, zdwell_time, save_dir, auto_zoom_scan):
+                 dwell_time, zdwell_time, save_dir, auto_zoom_scan, meas_type, meas_field, meas_side):
         self.parent = parent
         self.x_distance = x_distance
         self.y_distance = y_distance
@@ -40,11 +40,15 @@ class AreaScanThread(threading.Thread):
         self.zdwell_time = zdwell_time
         self.save_dir = save_dir
         self.auto_zoom_scan = auto_zoom_scan
+        self.meas_type = meas_type
+        self.meas_field = meas_field
+        self.meas_side = meas_side
         self.callback = parent.enablegui
         super(AreaScanThread, self).__init__()
 
     def run(self):
         time.sleep(4)
+        print(self.meas_type, self.meas_field, self.meas_side)
         self.callback()
         pass
 
@@ -113,15 +117,15 @@ def convert_to_pts(arr, dist, x_off=0, y_off=0):
     print(xpts, ypts, zpts)
     return xpts, ypts, zpts
 
-def run_scan(args):
+def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, savedir, auto_zoom_scan):
     """Conduct grid search by moving motors to correct positions and measuring
-
-    :param args: Arguments passed in from GUI (see GUI driver file for details)
+    TODO: ADD PARAMS
+    :param args:
     :return: None
     """
     # Calculate dimensions of grid and generate it
-    x_points = int(np.ceil(np.around(args.x_distance / args.grid_step_dist, decimals=3))) + 1
-    y_points = int(np.ceil(np.around(args.y_distance / args.grid_step_dist, decimals=3))) + 1
+    x_points = int(np.ceil(np.around(x_distance / grid_step_dist, decimals=3))) + 1
+    y_points = int(np.ceil(np.around(y_distance / grid_step_dist, decimals=3))) + 1
     grid = generate_grid(y_points, x_points)
     print("Path: ")
     print(grid)
@@ -138,20 +142,15 @@ def run_scan(args):
     narda = NardaNavigator()
 
     # Calculate number of motor steps necessary to move one grid space
-    num_steps = args.grid_step_dist / m.step_unit
+    num_steps = grid_step_dist / m.step_unit
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
 
-    count = 0  # Tracks our current progress through the grid
-    # TODO: MEASURE HERE
-    if args.measure:
-        count += 1
-        fname = build_filename(args.type, args.field, args.side, count)
-        narda.takeMeasurement(args.dwell_time, fname)
-        values[0][0] = 1
-
+    count = 1  # Tracks our current progress through the grid
+    fname = build_filename(args.type, args.field, args.side, count)
+    narda.takeMeasurement(args.dwell_time, fname)
+    values[0][0] = 1
     print(values)
-    # print np.argwhere(grid == count)[0], count
 
     # Create an accumulator for the fraction of a step lost each time a grid space is moved
     frac_step = num_steps - int(num_steps)
@@ -525,10 +524,12 @@ def build_filename(type, field, side, number):
     else:
         filename += 'H'
     # Adding side marker
-    filename += side
+    if field == 'Back':
+        filename += 'S'
+    else:
+        filename += side.lower()
     filename += str(int(number))
     return filename
-    pass
 
 
 def main():
