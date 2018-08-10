@@ -151,6 +151,7 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
     move_to_pos_one(m, int(num_steps), x_points, y_points)
 
     count = 1  # Tracks our current progress through the grid
+    # First measurement
     fname = build_filename(meas_type, meas_field, meas_side, count)
     narda.takeMeasurement(dwell_time, fname)
     values[0][0] = 1
@@ -205,7 +206,7 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
         # Else update counter, measure, and move down. Reverse direction
         loc = np.argwhere(grid == count)[0]
         print("------------")
-        # TODO: MEASURE HERE
+        # Taking measurement
         fname = build_filename(meas_type, meas_field, meas_side, count)
         narda.takeMeasurement(dwell_time, fname)
         values[loc[0]][loc[1]] = 4

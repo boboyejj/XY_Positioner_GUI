@@ -30,6 +30,7 @@ class ConsoleGUI(wx.Frame):
         self.SetAutoLayout(True)
         self.mainsizer.Fit(self)
 
+
 if __name__ == '__main__':
     consolegui = wx.App()
     fr = ConsoleGUI(None, "Console")
