@@ -4,7 +4,7 @@
 """
 import os
 import threading
-from src.grid_scan_manual import run_scan, generate_grid, move_to_pos_one
+from src.grid_scan_manual import run_scan, generate_grid, move_to_pos_one, AreaScanThread
 from src.motor_driver import MotorDriver
 from src.location_select_gui import LocationSelectGUI
 from src.manual_gui_grid import ManualGridGUI
@@ -15,6 +15,7 @@ from wx.lib.agw import multidirdialog as mdd
 
 class AreaScanPanel(wx.Panel):
     pass
+
 
 
 class MainFrame(wx.Frame):
@@ -84,7 +85,7 @@ class MainFrame(wx.Frame):
                                      style=wx.RA_SPECIFY_COLS, majorDimension=1)
 
         self.run_btn = wx.Button(self, run_id, "Run")
-        self.Bind(wx.EVT_BUTTON, self.run, self.run_btn)
+        self.Bind(wx.EVT_BUTTON, self.run_area_scan, self.run_btn)
 
         # Menu Bar
 
@@ -161,9 +162,16 @@ class MainFrame(wx.Frame):
             #if os.path.exists(parentpath):
         pass
 
-    def run(self, e):
+    def run_area_scan(self, e):
+        self.run_thread = AreaScanThread(self)
+        self.run_thread.start()
         pass
 
+    def enablegui(self, e):
+        pass
+
+    def disablegui(self, e):
+        pass
 
 if __name__ == "__main__":
     xy_positioner_gui = wx.App()

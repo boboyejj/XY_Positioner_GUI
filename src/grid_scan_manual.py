@@ -12,10 +12,38 @@ from pywinauto import application
 from matplotlib import mlab
 from src.data_entry_gui import DataEntryGUI
 import os
+import threading
 import time
 from scipy import interpolate
 from src.timer_gui import TimerGUI
 # import turtle
+
+class Args:
+    def __init__(self):
+        self.x_distance = 3
+        self.y_distance = 3
+        self.grid_step_dist = 1
+        self.filename = 'raw_values'
+        self.measure = True
+        self.auto_zoom_scan = False
+        self.dwell_time = 0
+
+
+class AreaScanThread(threading.Thread):
+    def __init__(self, parent, x_distance, y_distance, grid_step_dist,
+                 dwell_time, zdwell_time, save_dir, auto_zoom_scan=False):
+        self.parent = parent
+        self.x_distance = x_distance
+        self.y_distance = y_distance
+        self.grid_step_dist = grid_step_dist
+        self.dwell_time = dwell_time
+        self.zdwell_time = zdwell_time
+        self.save_dir = save_dir
+        self.auto_zoom_scan = auto_zoom_scan
+        super(AreaScanThread, self).__init__()
+
+    def run(self):
+        pass
 
 
 def move_to_pos_one(moto, num_steps, x, y):
@@ -81,7 +109,6 @@ def convert_to_pts(arr, dist, x_off=0, y_off=0):
             zpts.append(arr[i][j])
     print(xpts, ypts, zpts)
     return xpts, ypts, zpts
-
 
 def run_scan(args):
     """Conduct grid search by moving motors to correct positions and measuring
@@ -528,17 +555,6 @@ def main():
     # print X
     # print Y
     # print Z
-
-
-class Args:
-    def __init__(self):
-        self.x_distance = 3
-        self.y_distance = 3
-        self.grid_step_dist = 1
-        self.filename = 'raw_values'
-        self.measure = True
-        self.auto_zoom_scan = False
-        self.dwell_time = 0
 
 
 if __name__ == '__main__':
