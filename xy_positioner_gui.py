@@ -19,7 +19,6 @@ class AreaScanPanel(wx.Panel):
     pass
 
 
-
 class MainFrame(wx.Frame):
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title, size=(800, 700))
@@ -32,6 +31,7 @@ class MainFrame(wx.Frame):
         # Accelerator Table/Shortcut Keys
         save_id = 115
         run_id = 116
+        manual_id =117
 
         # UI Elements
         self.x_distance_text = wx.StaticText(self, label="X Distance")
@@ -77,6 +77,8 @@ class MainFrame(wx.Frame):
                                      choices=['Front', 'Back', 'Top', 'Bottom', 'Left', 'Right'],
                                      style=wx.RA_SPECIFY_COLS, majorDimension=1)
 
+        self.manual_btn = wx.Button(self, manual_id, "Manual Movement")
+        self.Bind(wx.EVT_BUTTON, self.manual_move, self.manual_btn)
         self.run_btn = wx.Button(self, run_id, "Run")
         self.Bind(wx.EVT_BUTTON, self.run_area_scan, self.run_btn)
 
@@ -119,6 +121,8 @@ class MainFrame(wx.Frame):
                              flag=wx.TOP | wx.BOTTOM | wx.EXPAND)
         self.mainh_sizer.Add(self.radio_input_sizer, proportion=1, border=5, flag=wx.ALL | wx.EXPAND)
 
+        self.btn_sizer.Add(self.manual_btn, proportion=1, border=5,
+                           flag=wx.ALIGN_RIGHT | wx. LEFT | wx. TOP | wx.BOTTOM)
         self.btn_sizer.Add(self.run_btn, proportion=1, border=5, flag=wx.ALIGN_RIGHT | wx.ALL)
 
         self.mainv_sizer.Add(self.mainh_sizer, proportion=1, border=0, flag=wx.ALL | wx.EXPAND)
@@ -173,6 +177,16 @@ class MainFrame(wx.Frame):
         print("Running thread...")
         print("hoi hoi hoi hoi")
         self.run_thread.start()
+
+    def manual_move(self, e):
+        if not self.console_frame:
+            self.console_frame = ConsoleGUI(self, "Console")
+        self.console_frame.Show(True)
+        sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        man = ManualGridGUI(None, float(self.x_tctrl.GetValue()), float(self.y_tctrl.GetValue()))
+        man.title('Manual Control')
+        man.mainloop()
+        pass
 
     def enablegui(self):
         self.x_tctrl.Enable(True)

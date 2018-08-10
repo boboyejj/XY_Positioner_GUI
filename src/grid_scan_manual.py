@@ -49,7 +49,7 @@ class AreaScanThread(threading.Thread):
     def run(self):
         time.sleep(4)
         print(self.meas_type, self.meas_field, self.meas_side)
-
+        run_scan()
         self.callback()
         print("Area Scan Complete.")
         pass
@@ -119,7 +119,8 @@ def convert_to_pts(arr, dist, x_off=0, y_off=0):
     print(xpts, ypts, zpts)
     return xpts, ypts, zpts
 
-def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, savedir, auto_zoom_scan):
+def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, savedir, auto_zoom_scan,
+             meas_type, meas_field, meas_side):
     """Conduct grid search by moving motors to correct positions and measuring
     TODO: ADD PARAMS
     :param args:
@@ -149,8 +150,8 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
     move_to_pos_one(m, int(num_steps), x_points, y_points)
 
     count = 1  # Tracks our current progress through the grid
-    fname = build_filename(args.type, args.field, args.side, count)
-    narda.takeMeasurement(args.dwell_time, fname)
+    fname = build_filename(meas_type, meas_field, meas_side, count)
+    narda.takeMeasurement(dwell_time, fname)
     values[0][0] = 1
     print(values)
 
@@ -171,10 +172,9 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
                 loc = np.argwhere(grid == count)[0]
                 print("------------")
                 # TODO: MEASURE HERE
-                if args.measure:
-                    fname = build_filename(args.type, args.field, args.side, count)
-                    narda.takeMeasurement(args.dwell_time, fname)
-                    values[loc[0]][loc[1]] = 2
+                fname = build_filename(args.type, args.field, args.side, count)
+                narda.takeMeasurement(args.dwell_time, fname)
+                values[loc[0]][loc[1]] = 2
                 x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
             # Do the same for when the robot is moving backwards as well
             else:
@@ -184,10 +184,9 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
                 loc = np.argwhere(grid == count)[0]
                 print("------------")
                 # TODO: MEASURE HERE
-                if args.measure:
-                    fname = build_filename(args.type, args.field, args.side, count)
-                    narda.takeMeasurement(args.dwell_time, fname)
-                    values[loc[0]][loc[1]] = 3
+                fname = build_filename(meas_type, meas_field, meas_side, count)
+                narda.takeMeasurement(dwell_time, fname)
+                values[loc[0]][loc[1]] = 3
                 x_error = x_error - int(x_error)
             # Increment our progress counter and print out current set of values
             j += 1
@@ -206,10 +205,9 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
         loc = np.argwhere(grid == count)[0]
         print("------------")
         # TODO: MEASURE HERE
-        if args.measure:
-            fname = build_filename(args.type, args.field, args.side, count)
-            narda.takeMeasurement(args.dwell_time, fname)
-            values[loc[0]][loc[1]] = 4
+        fname = build_filename(meas_type, meas_field, meas_side, count)
+        narda.takeMeasurement(dwell_time, fname)
+        values[loc[0]][loc[1]] = 4
         print(values)
         y_error = y_error - int(y_error)
         going_forward = not going_forward  # Reverse the direction of the horizontal motor movement
@@ -247,37 +245,36 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
         grid_points = convert_to_point_list(np.flipud(values))
 
         # Plot results
-        if args.measure:
-            if max_val != -1:
-                # TODO: This is the original plotting script - meshes the zoom scan into the entire area scan
-                #x, y, z = split_into_three(zoomed_points)
-                # Plotting
-                # Generate meshgrid first
-                #xi, yi = np.linspace(x.min(), x.max(), 300), np.linspace(y.min(), y.max(), 300)
-                #xi, yi = np.meshgrid(xi, yi, indexing='ij')
+        if max_val != -1:
+            # TODO: This is the original plotting script - meshes the zoom scan into the entire area scan
+            #x, y, z = split_into_three(zoomed_points)
+            # Plotting
+            # Generate meshgrid first
+            #xi, yi = np.linspace(x.min(), x.max(), 300), np.linspace(y.min(), y.max(), 300)
+            #xi, yi = np.meshgrid(xi, yi, indexing='ij')
 
-                # Interpolate (linear)
-                #zi = interpolate.griddata((x, y), z, (xi, yi), method='linear')
-                #print('ZI')  # TODO: Debugging
-                #print(zi)
-                #plt.clf()
-                #plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower', extent=[x.min(), x.max(), y.min(), y.max()])
-                #cbar = plt.colorbar()
-                #cbar.set_label('Signal Level')
-                #plt.show(block=False)
-                plt.clf()
-                plt.imshow(zoomed_points, interpolation='bilinear')
-                plt.title('Zoomed Points Heat Map')
-                cbar = plt.colorbar()
-                cbar.set_label('Signal Level')
-                plt.show(block=False)
-            else:
-                plt.clf()
-                plt.imshow(values, interpolation='bilinear')
-                plt.title('Area Scan Heat Map')
-                cbar = plt.colorbar()
-                cbar.set_label('Signal Level')
-                plt.show(block=False)
+            # Interpolate (linear)
+            #zi = interpolate.griddata((x, y), z, (xi, yi), method='linear')
+            #print('ZI')  # TODO: Debugging
+            #print(zi)
+            #plt.clf()
+            #plt.imshow(zi, vmin=z.min(), vmax=z.max(), origin='lower', extent=[x.min(), x.max(), y.min(), y.max()])
+            #cbar = plt.colorbar()
+            #cbar.set_label('Signal Level')
+            #plt.show(block=False)
+            plt.clf()
+            plt.imshow(zoomed_points, interpolation='bilinear')
+            plt.title('Zoomed Points Heat Map')
+            cbar = plt.colorbar()
+            cbar.set_label('Signal Level')
+            plt.show(block=False)
+        else:
+            plt.clf()
+            plt.imshow(values, interpolation='bilinear')
+            plt.title('Area Scan Heat Map')
+            cbar = plt.colorbar()
+            cbar.set_label('Signal Level')
+            plt.show(block=False)
 
         post_gui = PostScanGUI(None)
         post_gui.title('Post Scan Options')
