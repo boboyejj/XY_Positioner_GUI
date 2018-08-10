@@ -110,38 +110,92 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
     # Calculate dimensions of grid and generate it
     x_points = int(np.ceil(np.around(x_distance / grid_step_dist, decimals=3))) + 1
     y_points = int(np.ceil(np.around(y_distance / grid_step_dist, decimals=3))) + 1
-    grid = generate_grid(y_points, x_points)
-    print("Path: ")
-    print(grid)
-
-    # For storing values of highest peak/wide-band
-    values = np.zeros(grid.shape)
-    print("Current values: ")
-    print(values)
-    print("------------")
 
     # Check ports and instantiate relevant objects
     m = MotorDriver()
     #narda = NardaNavigator()
+    narda = None  # TODO: Debugging
 
     # Calculate number of motor steps necessary to move one grid space
     num_steps = grid_step_dist / m.step_unit
+
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
+
+    values, grid = area_scan(x_points, y_points, m, narda, num_steps, dwell_time)
+
+    while True:
+        # Plotting Results
+        plt.clf()
+        plt.imshow(values, interpolation='bilinear')
+        plt.title('Area Scan Heat Map')
+        cbar = plt.colorbar()
+        cbar.set_label('Signal Level')
+        plt.show(block=False)
+
+        # Post Scan GUI - User selects which option to proceed with
+        post_gui = PostScanGUI(None)
+        post_gui.title('Post Scan Options')
+        post_gui.mainloop()
+        choice = post_gui.get_gui_value()
+        print(choice)
+
+        if choice == 'Exit':
+            print("Exiting program...")
+            m.destroy()
+            exit(0)
+        elif choice == 'Save Data':
+            print("Saving data...")
+        elif choice == 'Zoom Scan':
+            # Move to coordinate with maximum value
+            max_val = values.max()
+            print(max_val)
+            # Prepare zoom scan
+            zx_points = 5
+            zy_points = 5
+            # Calculate number of motor steps necessary to move one grid space
+            znum_steps = grid_step_dist / (4.0 * m.step_unit)
+            # Move to the initial position (top left) of grid scan and measure once
+            move_to_pos_one(m, znum_steps, zx_points, zy_points)
+            # Perform zoom scan
+            values, grid = area_scan(zx_points, zy_points, m, narda, znum_steps,
+                                     zdwell_time, meas_type, meas_field, meas_side)
+            # Move back to original position
+
+        elif choice == 'Correct Previous Value':
+            plt.close()
+            print("Select location to correct.")
+            loc_gui = LocationSelectGUI(None, grid)
+            loc_gui.title('Location Selection')
+            loc_gui.mainloop()
+            location = loc_gui.get_gui_value()
+            print(location)
+            #fname = build_filename(meas_type, meas_field, meas_side, count)
+            #narda.takeMeasurement(dwell_time, fname)
+            #values[grid_loc[0]][grid_loc[1]] = 5
+
+    pass
+
+
+def area_scan(x_points, y_points, m, narda, num_steps, dwell_time, meas_type, meas_field, meas_side):
+    grid = generate_grid(x_points, y_points)
+    values = np.zeros(grid.shape)
+
+    print("Scan path:")
+    print(grid)
+    print("Current Values:")
+    print(values)
 
     # Create an accumulator for the fraction of a step lost each time a grid space is moved
     frac_step = num_steps - int(num_steps)
     num_steps = int(num_steps)
     x_error, y_error = 0, 0  # Accumulator for x and y directions
-
-    count = 1  # Tracks our current progress through the grid
     curr_row, curr_col = 0, 0
     max_row, max_col = -1, -1  # Placeholders for the max value's coordinates
     # Take first measurement
-    fname = build_filename(meas_type, meas_field, meas_side, count)
-    #narda.takeMeasurement(dwell_time, fname)
+    fname = build_filename(meas_type, meas_field, meas_side, 1)
+    # narda.takeMeasurement(dwell_time, fname)
     values[0][0] = 1
-    print(values)
 
     # General Area Scan
     for i in range(2, grid.size + 1):
@@ -166,53 +220,12 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
             x_error -= int(x_error)
             curr_col = next_col
             values[curr_row][curr_col] = 2
-        count += 1
-        fname = build_filename(meas_type, meas_field, meas_side, count)
+        fname = build_filename(meas_type, meas_field, meas_side, i)
         # narda.takeMeasurement(dwell_time, fname)
-        print(values)
         print("---------")
-    while True:
-        # Plotting Results
-        plt.clf()
-        plt.imshow(values, interpolation='bilinear')
-        plt.title('Area Scan Heat Map')
-        cbar = plt.colorbar()
-        cbar.set_label('Signal Level')
-        plt.show(block=False)
+        print(values)
 
-        # Post Scan GUI - User selects which option to proceed with
-        post_gui = PostScanGUI(None)
-        post_gui.title('Post Scan Options')
-        post_gui.mainloop()
-        choice = post_gui.get_gui_value()
-        print(choice)
-
-        if choice == 'Exit':
-            print("Exiting program...")
-            m.destroy()
-            exit(0)
-        elif choice == 'Save Data':
-            print("Saving data...")
-        elif choice == 'Zoom Scan':
-            max_val = values.max()
-            print(max_val)
-        elif choice == 'Correct Previous Value':
-            plt.close()
-            print("Select location to correct.")
-            loc_gui = LocationSelectGUI(None, grid)
-            loc_gui.title('Location Selection')
-            loc_gui.mainloop()
-            location = loc_gui.get_gui_value()
-            print(location)
-            #fname = build_filename(meas_type, meas_field, meas_side, count)
-            #narda.takeMeasurement(dwell_time, fname)
-            #values[grid_loc[0]][grid_loc[1]] = 5
-
-    pass
-
-
-def zoom_scan(m, narda):
-    pass
+    return values, grid
 
 
 def build_filename(type, field, side, number):
