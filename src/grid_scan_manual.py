@@ -31,7 +31,7 @@ class Args:
 
 class AreaScanThread(threading.Thread):
     def __init__(self, parent, x_distance, y_distance, grid_step_dist,
-                 dwell_time, zdwell_time, save_dir, auto_zoom_scan=False):
+                 dwell_time, zdwell_time, save_dir, auto_zoom_scan):
         self.parent = parent
         self.x_distance = x_distance
         self.y_distance = y_distance
@@ -40,9 +40,12 @@ class AreaScanThread(threading.Thread):
         self.zdwell_time = zdwell_time
         self.save_dir = save_dir
         self.auto_zoom_scan = auto_zoom_scan
+        self.callback = parent.enablegui
         super(AreaScanThread, self).__init__()
 
     def run(self):
+        time.sleep(4)
+        self.callback()
         pass
 
 

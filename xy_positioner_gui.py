@@ -163,15 +163,42 @@ class MainFrame(wx.Frame):
         pass
 
     def run_area_scan(self, e):
-        self.run_thread = AreaScanThread(self)
+        x = float(self.x_tctrl.GetValue())
+        y = float(self.y_tctrl.GetValue())
+        step = float(self.grid_tctrl.GetValue())
+        dwell = float(self.dwell_tctrl.GetValue())
+        zdwell = float(self.zdwell_tctrl.GetValue())
+        savedir = self.save_tctrl.GetValue()
+        self.run_thread = AreaScanThread(self, x, y, step, dwell, zdwell, savedir, False)  # TODO: Change False to val
+        print("Running thread...")
+        self.disablegui()
         self.run_thread.start()
-        pass
 
-    def enablegui(self, e):
-        pass
+    def enablegui(self):
+        self.x_tctrl.Enable(True)
+        self.y_tctrl.Enable(True)
+        self.grid_tctrl.Enable(True)
+        self.dwell_tctrl.Enable(True)
+        self.zdwell_tctrl.Enable(True)
+        self.save_tctrl.Enable(True)
+        self.save_btn.Enable(True)
+        self.type_rbox.Enable(True)
+        self.field_rbox.Enable(True)
+        self.side_rbox.Enable(True)
+        self.run_btn.Enable(True)
 
-    def disablegui(self, e):
-        pass
+    def disablegui(self):
+        self.x_tctrl.Enable(False)
+        self.y_tctrl.Enable(False)
+        self.grid_tctrl.Enable(False)
+        self.dwell_tctrl.Enable(False)
+        self.zdwell_tctrl.Enable(False)
+        self.save_tctrl.Enable(False)
+        self.save_btn.Enable(False)
+        self.type_rbox.Enable(False)
+        self.field_rbox.Enable(False)
+        self.side_rbox.Enable(False)
+        self.run_btn.Enable(False)
 
 if __name__ == "__main__":
     xy_positioner_gui = wx.App()
