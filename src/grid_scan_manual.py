@@ -49,6 +49,7 @@ class AreaScanThread(threading.Thread):
     def run(self):
         time.sleep(4)
         print(self.meas_type, self.meas_field, self.meas_side)
+        
         self.callback()
         pass
 

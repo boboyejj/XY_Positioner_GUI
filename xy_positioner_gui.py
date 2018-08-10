@@ -8,6 +8,7 @@ from src.grid_scan_manual import run_scan, generate_grid, move_to_pos_one, AreaS
 from src.motor_driver import MotorDriver
 from src.location_select_gui import LocationSelectGUI
 from src.manual_gui_grid import ManualGridGUI
+from src.console_gui import ConsoleGUI
 import numpy as np
 import wx
 from wx.lib.agw import multidirdialog as mdd
@@ -25,6 +26,7 @@ class MainFrame(wx.Frame):
 
         # Variables
         self.run_thread = None
+        self.console_frame = ConsoleGUI(self, "Console")
 
         # Accelerator Table/Shortcut Keys
         save_id = 115
@@ -123,15 +125,10 @@ class MainFrame(wx.Frame):
                              flag=wx.ALL | wx.EXPAND)
         self.mainv_sizer.Add(self.btn_sizer, proportion=0, border=5, flag=wx.ALIGN_RIGHT)
 
-        self.Refresh()
         self.SetSizer(self.mainv_sizer)
-        self.Refresh()
         self.SetAutoLayout(True)
-        self.Refresh()
         self.mainv_sizer.Fit(self)
-        self.Refresh()
         self.Show(True)
-        self.Refresh()
 
     def select_save_dir(self, e):
         # TODO: Currently, there is a problem with wx.DirDialog, so I have resorted to using multidirdialog
@@ -170,6 +167,7 @@ class MainFrame(wx.Frame):
         print("Running thread...")
         self.disablegui()
         self.run_thread.start()
+        self.console_frame.Show(True)
 
     def enablegui(self):
         self.x_tctrl.Enable(True)
