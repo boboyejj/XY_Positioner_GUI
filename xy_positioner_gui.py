@@ -64,6 +64,7 @@ class MainFrame(wx.Frame):
         self.save_dir_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.savedesc_text = wx.StaticText(self, label="Directory to save measurement text and image files")
         self.save_tctrl = wx.TextCtrl(self)
+        self.save_tctrl.SetValue("C:\\Users\changhwan.choi\Desktop")  # TODO :Debugging
         self.save_btn = wx.Button(self, save_id, "Browse")
         self.Bind(wx.EVT_BUTTON, self.select_save_dir, self.save_btn)
 

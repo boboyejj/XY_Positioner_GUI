@@ -122,7 +122,10 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
 
-    values, grid = area_scan(x_points, y_points, m, narda, num_steps, dwell_time)
+    values, grid, curr_row, curr_col, max_row, max_col = area_scan(x_points, y_points, m, narda, num_steps,
+                                                                   dwell_time, meas_type, meas_field, meas_side)
+
+    zoom_values = None
 
     while True:
         # Plotting Results
@@ -132,6 +135,13 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
         cbar = plt.colorbar()
         cbar.set_label('Signal Level')
         plt.show(block=False)
+        #if zoom_values != None:
+        #    plt.figure()
+        #    plt.imshow(zoom_values, interpolation='bilinear')
+        #    plt.title('Area Scan Heat Map')
+        #    cbar = plt.colorbar()
+        #    cbar.set_label('Signal Level')
+        #    plt.show(block=False)
 
         # Post Scan GUI - User selects which option to proceed with
         post_gui = PostScanGUI(None)
@@ -149,7 +159,19 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
         elif choice == 'Zoom Scan':
             # Move to coordinate with maximum value
             max_val = values.max()
-            print(max_val)
+            print("Max_val: %d" % max_val)
+            max_row, max_col = np.where(values == int(max_val))  # TODO: can remove after we implement selective screenshotting of max vals
+            row_steps = max_row - curr_row
+            col_steps = max_col - curr_col
+            print("R steps: %d   -   C steps %d" % (row_steps, col_steps))
+            if row_steps > 0:
+                m.forward_motor_two(int(num_steps * row_steps))
+            else:
+                m.reverse_motor_two(int(-1 * num_steps * row_steps))
+            if col_steps > 0:
+                m.forward_motor_one(int(num_steps * col_steps))
+            else:
+                m.reverse_motor_one(int(-1 * num_steps * col_steps))
             # Prepare zoom scan
             zx_points = 5
             zy_points = 5
@@ -158,10 +180,11 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
             # Move to the initial position (top left) of grid scan and measure once
             move_to_pos_one(m, znum_steps, zx_points, zy_points)
             # Perform zoom scan
-            values, grid = area_scan(zx_points, zy_points, m, narda, znum_steps,
-                                     zdwell_time, meas_type, meas_field, meas_side)
+            zoom_values = area_scan(zx_points, zy_points, m, narda, znum_steps,
+                                     zdwell_time, meas_type, meas_field, meas_side)[0]
             # Move back to original position
-
+            m.reverse_motor_one(int(2 * znum_steps))
+            m.reverse_motor_two(int(2 * znum_steps))
         elif choice == 'Correct Previous Value':
             plt.close()
             print("Select location to correct.")
@@ -170,6 +193,20 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
             loc_gui.mainloop()
             location = loc_gui.get_gui_value()
             print(location)
+            target_row, target_col = np.where(grid == int(location))
+            row_steps = target_row - curr_row
+            col_steps = target_col - curr_col
+            print("R steps: %d   -   C steps %d" % (row_steps, col_steps))
+            if row_steps > 0:
+                m.forward_motor_two(int(num_steps * row_steps))
+            else:
+                m.reverse_motor_two(int(-1 * num_steps * row_steps))
+            if col_steps > 0:
+                m.forward_motor_one(int(num_steps * col_steps))
+            else:
+                m.reverse_motor_one(int(-1 * num_steps * col_steps))
+            curr_row = target_row
+            curr_col = target_col
             #fname = build_filename(meas_type, meas_field, meas_side, count)
             #narda.takeMeasurement(dwell_time, fname)
             #values[grid_loc[0]][grid_loc[1]] = 5
@@ -195,7 +232,7 @@ def area_scan(x_points, y_points, m, narda, num_steps, dwell_time, meas_type, me
     # Take first measurement
     fname = build_filename(meas_type, meas_field, meas_side, 1)
     # narda.takeMeasurement(dwell_time, fname)
-    values[0][0] = 1
+    values[0][0] = 4
 
     # General Area Scan
     for i in range(2, grid.size + 1):
@@ -225,7 +262,7 @@ def area_scan(x_points, y_points, m, narda, num_steps, dwell_time, meas_type, me
         print("---------")
         print(values)
 
-    return values, grid
+    return values, grid, curr_row, curr_col, max_row, max_col
 
 
 def build_filename(type, field, side, number):
