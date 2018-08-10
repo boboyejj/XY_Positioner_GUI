@@ -5,7 +5,8 @@
 import os
 import sys
 import threading
-from src.grid_scan_manual import run_scan, generate_grid, move_to_pos_one, AreaScanThread
+from src.area_scan import AreaScanThread
+#from src.grid_scan_manual import AreaScanThread
 from src.motor_driver import MotorDriver
 from src.location_select_gui import LocationSelectGUI
 from src.manual_gui_grid import ManualGridGUI
@@ -179,7 +180,6 @@ class MainFrame(wx.Frame):
         self.console_frame.Show(True)
         sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
         print("Running thread...")
-        print("hoi hoi hoi hoi")
         self.run_thread.start()
 
     def manual_move(self, e):
@@ -190,7 +190,8 @@ class MainFrame(wx.Frame):
         man = ManualGridGUI(None, float(self.x_tctrl.GetValue()), float(self.y_tctrl.GetValue()))
         man.title('Manual Control')
         man.mainloop()
-        pass
+        man.motor.destroy()
+        man.quit()
 
     def enablegui(self):
         self.x_tctrl.Enable(True)

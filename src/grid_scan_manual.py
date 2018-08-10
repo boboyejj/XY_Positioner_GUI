@@ -53,7 +53,6 @@ class AreaScanThread(threading.Thread):
                  self.save_dir, self.auto_zoom_scan, self.meas_type, self.meas_field, self.meas_side)
         self.callback()
         print("Area Scan Complete.")
-        pass
 
 
 def move_to_pos_one(moto, num_steps, x, y):

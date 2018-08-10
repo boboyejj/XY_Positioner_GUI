@@ -276,6 +276,8 @@ def main():
     man = ManualGridGUI(None, float(2.8), float(2.8))
     man.title('Manual Control')
     man.mainloop()
+    man.motor.destroy()
+
 
 
 if __name__ == '__main__': main()
