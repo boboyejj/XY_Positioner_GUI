@@ -135,25 +135,61 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
     x_error, y_error = 0, 0  # Accumulator for x and y directions
 
     count = 1  # Tracks our current progress through the grid
-    curr_x, curr_y = 0, 0
+    curr_row, curr_col = 0, 0
+    max_row, max_col = -1, -1  # Placeholders for the max value's coordinates
     # Take first measurement
     fname = build_filename(meas_type, meas_field, meas_side, count)
     #narda.takeMeasurement(dwell_time, fname)
     values[0][0] = 1
     print(values)
 
-    for i in range(1, grid.size + 1):
-        next_x, next_y = np.where(grid == i)
-        next_x = next_x[0]
-        next_y = next_y[0]
+    # General Area Scan
+    for i in range(2, grid.size + 1):
+        next_row, next_col = np.where(grid == i)
+        next_row = next_row[0]
+        next_col = next_col[0]
         print("i: %d" % i)
-        print(next_x, next_y)
-        if next_y > curr_y:  # Move downwards
-            curr_y = next_y
-        elif next_x > curr_x:  # Move rightwards
-            curr_x = next_x
-        elif next_x < curr_x:  # Move leftwards
-            curr_x = next_x
+        print(next_row, next_col)
+        if next_row > curr_row:  # Move downwards
+            y_error += frac_step
+            m.forward_motor_two(num_steps + int(y_error))
+            y_error -= int(y_error)
+            curr_row = next_row
+            values[curr_row][curr_col] = 3
+        elif next_col > curr_col:  # Move rightwards
+            x_error += frac_step
+            m.forward_motor_one(num_steps + int(x_error))  # Adjust distance by error
+            x_error -= int(x_error)  # Subtract integer number of steps that were moved
+            curr_col = next_col
+            values[curr_row][curr_col] = 1
+        elif next_col < curr_col:  # Move leftwards
+            x_error -= frac_step
+            m.reverse_motor_one(num_steps + int(x_error))
+            x_error -= int(x_error)
+            curr_col = next_col
+            values[curr_row][curr_col] = 2
+        count += 1
+        fname = build_filename(meas_type, meas_field, meas_side, count)
+        # narda.takeMeasurement(dwell_time, fname)
+        print(values)
+        print("---------")
+
+    # Plotting Results
+    plt.clf()
+    plt.imshow(values, interpolation='bilinear')
+    plt.title('Area Scan Heat Map')
+    cbar = plt.colorbar()
+    cbar.set_label('Signal Level')
+    plt.show(block=False)
+
+    # Post Scan GUI - User selects which option to proceed with
+    post_gui = PostScanGUI(None)
+    post_gui.title('Post Scan Options')
+    post_gui.mainloop()
+    choice = post_gui.get_gui_value()
+    print(choice)
+
+
 
     pass
 
