@@ -10,6 +10,7 @@ from src.location_select_gui import LocationSelectGUI
 from src.manual_gui_grid import ManualGridGUI
 import numpy as np
 import wx
+from wx.lib.agw import multidirdialog as mdd
 
 
 class AreaScanPanel(wx.Panel):
@@ -142,12 +143,21 @@ class MainFrame(wx.Frame):
         self.Refresh()
 
     def select_save_dir(self, e):
-        with wx.DirDialog(self, "Select save directory for '.txt' and '.png' files.",
-                          style=wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST) as dlg:
+        # TODO: Currently, there is a problem with wx.DirDialog, so I have resorted to using multidirdialog
+        # TODO: When the bugs are fixed on their end, revert back to the nicer looking wx.DirDialog
+        with mdd.MultiDirDialog(None, "Select save directory for output files.", style=mdd.DD_DIR_MUST_EXIST) as dlg:
             if dlg.ShowModal() == wx.ID_CANCEL:
                 return
-            self.save_dir = dlg.GetPath()
-            self.save_tctrl.SetValue(self.save_dir)
+            # Correcting name format to fit future save functions
+            path = dlg.GetPaths()[0]
+            path = path.split(':')[0][-1] + ':' + path.split(':)')[1]
+            self.save_tctrl.SetValue(path)
+        #with wx.DirDialog(self, "Select save directory for '.txt' and '.png' files.",
+        #                  style=wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST) as dlg:
+        #    if dlg.ShowModal() == wx.ID_CANCEL:
+        #        return
+        #    self.save_dir = dlg.GetPath()
+        #    self.save_tctrl.SetValue(self.save_dir)
             #if os.path.exists(parentpath):
         pass
 
