@@ -2,7 +2,8 @@
     Created by Chang Hwan 'Oliver' Choi on 08/09/2018
     changhwan.choi@pctest.com
 """
-
+import os
+import threading
 from src.grid_scan_manual import run_scan, generate_grid, move_to_pos_one
 from src.motor_driver import MotorDriver
 from src.location_select_gui import LocationSelectGUI
@@ -11,9 +12,14 @@ import numpy as np
 import wx
 
 
+class AreaScanPanel(wx.Panel):
+    pass
+
+
 class MainFrame(wx.Frame):
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, size=(900, 800))
+        wx.Frame.__init__(self, parent, title=title, size=(800, 700))
+        #wx.Window.SetMinSize(self, self.GetSize())
 
         # Variables
         # Instantiating variables with default parameters
@@ -37,16 +43,33 @@ class MainFrame(wx.Frame):
         self.x_distance_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.xdesc_text = wx.StaticText(self, label="Horizontal length of measurement region (in cm)")
         self.x_tctrl = wx.TextCtrl(self)
+        self.x_tctrl.SetValue(str(2 * 2.8))
 
         self.y_distance_text = wx.StaticText(self, label="Y Distance")
         self.y_distance_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.ydesc_text = wx.StaticText(self, label="Vertical length of measurement region (in cm)")
         self.y_tctrl = wx.TextCtrl(self)
+        self.y_tctrl.SetValue(str(2 * 2.8))
 
         self.grid_step_dist_text = wx.StaticText(self, label="Grid Step Distance")
         self.grid_step_dist_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.griddesc_text = wx.StaticText(self, label="Distance between measurement points (in cm")
+        self.griddesc_text = wx.StaticText(self, label="Distance between measurement points (in cm)")
         self.grid_tctrl = wx.TextCtrl(self)
+        self.grid_tctrl.SetValue(str(2.8))
+
+        self.dwell_time_text = wx.StaticText(self, label="Pre-Measurement Dwell Time (in sec)")
+        self.dwell_tctrl = wx.TextCtrl(self)
+        self.dwell_tctrl.SetValue(str(1))
+        self.zoom_scan_dwell_time_text = wx.StaticText(self, label="Pre-Measurement Dwell Time (in sec)")
+        self.zdwell_tctrl = wx.TextCtrl(self)
+        self.zdwell_tctrl.SetValue(str(1.5))
+
+        self.save_dir_text = wx.StaticText(self, label="Save Directory")
+        self.save_dir_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
+        self.savedesc_text = wx.StaticText(self, label="Directory to save measurement text and image files")
+        self.save_tctrl = wx.TextCtrl(self)
+        self.save_btn = wx.Button(self, save_id, "Browse")
+        self.Bind(wx.EVT_BUTTON, self.select_save_dir, self.save_btn)
 
         self.measurement_specs_text = wx.StaticText(self, label="Measurement Specifications")
         self.measurement_specs_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
@@ -58,18 +81,6 @@ class MainFrame(wx.Frame):
         self.side_rbox = wx.RadioBox(self, label="Side",
                                      choices=['Front', 'Back', 'Top', 'Bottom', 'Left', 'Right'],
                                      style=wx.RA_SPECIFY_COLS, majorDimension=1)
-
-        self.dwell_time_text = wx.StaticText(self, label="Pre-Measurement Dwell Time (in sec)")
-        self.dwell_tctrl = wx.TextCtrl(self)
-        self.zoom_scan_dwell_time_text = wx.StaticText(self, label="Pre-Measurement Dwell Time (in sec)")
-        self.zdwell_tctrl = wx.TextCtrl(self)
-
-        self.save_dir_text = wx.StaticText(self, label="Save Directory")
-        self.save_dir_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.savedesc_text = wx.StaticText(self, label="Directory to save measurement text and image files")
-        self.save_tctrl = wx.TextCtrl(self)
-        self.save_btn = wx.Button(self, save_id, "Browse")
-        self.Bind(wx.EVT_BUTTON, self.select_save_dir, self.save_btn)
 
         self.run_btn = wx.Button(self, run_id, "Run")
         self.Bind(wx.EVT_BUTTON, self.run, self.run_btn)
@@ -109,6 +120,8 @@ class MainFrame(wx.Frame):
         self.radio_input_sizer.Add(self.side_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
 
         self.mainh_sizer.Add(self.text_input_sizer, proportion=2, border=5, flag=wx.ALL | wx.EXPAND)
+        self.mainh_sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_VERTICAL), proportion=0, border=5,
+                             flag=wx.TOP | wx.BOTTOM | wx.EXPAND)
         self.mainh_sizer.Add(self.radio_input_sizer, proportion=1, border=5, flag=wx.ALL | wx.EXPAND)
 
         self.btn_sizer.Add(self.run_btn, proportion=1, border=5, flag=wx.ALIGN_RIGHT | wx.ALL)
@@ -128,11 +141,19 @@ class MainFrame(wx.Frame):
         self.Show(True)
         self.Refresh()
 
-    def select_save_dir(self):
+    def select_save_dir(self, e):
+        with wx.DirDialog(self, "Select save directory for '.txt' and '.png' files.",
+                          style=wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST) as dlg:
+            if dlg.ShowModal() == wx.ID_CANCEL:
+                return
+            self.save_dir = dlg.GetPath()
+            self.save_tctrl.SetValue(self.save_dir)
+            #if os.path.exists(parentpath):
         pass
 
-    def run(self):
+    def run(self, e):
         pass
+
 
 if __name__ == "__main__":
     xy_positioner_gui = wx.App()
