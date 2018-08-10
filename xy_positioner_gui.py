@@ -3,12 +3,13 @@
     changhwan.choi@pctest.com
 """
 import os
+import sys
 import threading
 from src.grid_scan_manual import run_scan, generate_grid, move_to_pos_one, AreaScanThread
 from src.motor_driver import MotorDriver
 from src.location_select_gui import LocationSelectGUI
 from src.manual_gui_grid import ManualGridGUI
-from src.console_gui import ConsoleGUI
+from src.console_gui import TextRedirecter, ConsoleGUI
 import numpy as np
 import wx
 from wx.lib.agw import multidirdialog as mdd
@@ -26,7 +27,7 @@ class MainFrame(wx.Frame):
 
         # Variables
         self.run_thread = None
-        self.console_frame = ConsoleGUI(self, "Console")
+        self.console_frame = None
 
         # Accelerator Table/Shortcut Keys
         save_id = 115
@@ -164,10 +165,14 @@ class MainFrame(wx.Frame):
         meas_side = self.side_rbox.GetString(self.side_rbox.GetSelection())
         self.run_thread = AreaScanThread(self, x, y, step, dwell, zdwell, savedir, False,
                                          meas_type, meas_field, meas_side)  # TODO: Change False to val
-        print("Running thread...")
         self.disablegui()
-        self.run_thread.start()
+        if not self.console_frame:
+            self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
+        sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        print("Running thread...")
+        print("hoi hoi hoi hoi")
+        self.run_thread.start()
 
     def enablegui(self):
         self.x_tctrl.Enable(True)
