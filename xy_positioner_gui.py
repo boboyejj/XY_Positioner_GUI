@@ -138,7 +138,8 @@ class MainFrame(wx.Frame):
     def select_save_dir(self, e):
         # TODO: Currently, there is a problem with wx.DirDialog, so I have resorted to using multidirdialog
         # TODO: When the bugs are fixed on their end, revert back to the nicer looking wx.DirDialog
-        with mdd.MultiDirDialog(None, "Select save directory for output files.", style=mdd.DD_DIR_MUST_EXIST) as dlg:
+        with mdd.MultiDirDialog(None, "Select save directory for output files.",
+                                style=mdd.DD_DIR_MUST_EXIST | mdd.DD_NEW_DIR_BUTTON) as dlg:
             if dlg.ShowModal() == wx.ID_CANCEL:
                 return
             # Correcting name format to fit future save functions
@@ -155,6 +156,9 @@ class MainFrame(wx.Frame):
         pass
 
     def run_area_scan(self, e):
+        if self.save_tctrl.GetValue() is None or self.save_tctrl.GetValue() is '':
+            self.errormsg("Please select a save directory for the output files.")
+            return
         x = float(self.x_tctrl.GetValue())
         y = float(self.y_tctrl.GetValue())
         step = float(self.grid_tctrl.GetValue())
@@ -213,6 +217,16 @@ class MainFrame(wx.Frame):
         self.field_rbox.Enable(False)
         self.side_rbox.Enable(False)
         self.run_btn.Enable(False)
+
+    def errormsg(self, errmsg):
+        """
+        Shows an error message as a wx.Dialog.
+        :param errmsg: String error message to show in the message dialog.
+        :return: Nothing
+        """
+        with wx.MessageDialog(self, errmsg, style=wx.OK | wx.ICON_ERROR | wx.CENTER) as dlg:
+            dlg.ShowModal()
+
 
 if __name__ == "__main__":
     xy_positioner_gui = wx.App()

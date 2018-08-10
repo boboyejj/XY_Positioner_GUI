@@ -49,7 +49,8 @@ class AreaScanThread(threading.Thread):
     def run(self):
         time.sleep(4)
         print(self.meas_type, self.meas_field, self.meas_side)
-        run_scan()
+        run_scan(self.x_distance, self.y_distance, self.grid_step_dist, self.dwell_time, self.zdwell_time,
+                 self.save_dir, self.auto_zoom_scan, self.meas_type, self.meas_field, self.meas_side)
         self.callback()
         print("Area Scan Complete.")
         pass
@@ -172,8 +173,8 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
                 loc = np.argwhere(grid == count)[0]
                 print("------------")
                 # TODO: MEASURE HERE
-                fname = build_filename(args.type, args.field, args.side, count)
-                narda.takeMeasurement(args.dwell_time, fname)
+                fname = build_filename(meas_type, meas_field, meas_side, count)
+                narda.takeMeasurement(dwell_time, fname)
                 values[loc[0]][loc[1]] = 2
                 x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
             # Do the same for when the robot is moving backwards as well
@@ -221,7 +222,7 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
     zoom_grid = generate_grid(5, 5)
     # Automatic zoom scan if set, otherwise, post scan loop
     max_val = -1
-    if args.auto_zoom_scan:
+    if auto_zoom_scan:
         # First need to move to correct position (find max and move to it)
         max_val = values.max()
         grid_move = (np.argwhere(values == max_val) - np.argwhere(grid == count))[0]
@@ -288,38 +289,36 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
             exit(0)
         elif choice == 'Save Data':
             # TODO: Save file method that creates place for files
-            if args.measure:
-                if not os.path.exists('results'):
-                    os.makedirs('results')
-                my_path = os.path.join(os.getcwd(), 'results')
+            if not os.path.exists('results'):
+                os.makedirs('results')
+            my_path = os.path.join(os.getcwd(), 'results')
 
-                # Save figure as <filename>_contour_plot.png
-                plt.savefig(os.path.join(my_path, args.filename.replace('.txt', '') + '_area_contour_plot.png'), bbox_inches='tight')
-                plt.close()
+            # Save figure as <filename>_contour_plot.png
+            plt.savefig(os.path.join(my_path, args.filename.replace('.txt', '') + '_area_contour_plot.png'), bbox_inches='tight')
+            plt.close()
 
-                # Save area scan data in matrix format
-                np.savetxt(os.path.join(my_path, args.filename.replace('.txt', '') + '_area_matrix.txt'),
-                           np.asarray(values), fmt='%.4f', delimiter='\t')
+            # Save area scan data in matrix format
+            np.savetxt(os.path.join(my_path, args.filename.replace('.txt', '') + '_area_matrix.txt'),
+                       np.asarray(values), fmt='%.4f', delimiter='\t')
 
-                # Save area scan data in column format
-                file = open(os.path.join(my_path, args.filename.replace('.txt', '') + '_area_column.txt'), 'w+')
-                for i in range(x_points * y_points):
-                    pos = np.argwhere(grid == i + 1)[0]
-                    file.write(str(values[pos[0]][pos[1]]) + '\n')
-                file.close()
+            # Save area scan data in column format
+            file = open(os.path.join(my_path, args.filename.replace('.txt', '') + '_area_column.txt'), 'w+')
+            for i in range(x_points * y_points):
+                pos = np.argwhere(grid == i + 1)[0]
+                file.write(str(values[pos[0]][pos[1]]) + '\n')
+            file.close()
 
-                # Save zoom scan data in matrix format
-                np.savetxt(os.path.join(my_path, args.filename.replace('.txt', '') + '_zoom_matrix.txt'),
-                           np.asarray(zoomed), fmt='%.4f', delimiter='\t')
+            # Save zoom scan data in matrix format
+            np.savetxt(os.path.join(my_path, args.filename.replace('.txt', '') + '_zoom_matrix.txt'),
+                       np.asarray(zoomed), fmt='%.4f', delimiter='\t')
 
-                # Save zoom scan data in column format
-                file = open(os.path.join(my_path, args.filename.replace('.txt', '') + '_zoom_column.txt'), 'w+')
-                for i in range(zoomed.size):
-                    pos = np.argwhere(zoom_grid == i + 1)[0]
-                    file.write(str(zoomed[pos[0]][pos[1]]) + '\n')
-                file.close()
-            else:
-                print("No data to save.")
+            # Save zoom scan data in column format
+            file = open(os.path.join(my_path, args.filename.replace('.txt', '') + '_zoom_column.txt'), 'w+')
+            for i in range(zoomed.size):
+                pos = np.argwhere(zoom_grid == i + 1)[0]
+                file.write(str(zoomed[pos[0]][pos[1]]) + '\n')
+            file.close()
+
         elif choice == 'Zoom Scan':
             # First need to move to correct position (find max and move to it)
             max_val = values.max()
@@ -363,10 +362,9 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
             grid_loc = np.argwhere(grid == count)[0]
             # print grid_loc
             # TODO: MEASURE HERE
-            if args.measure:
-                fname = build_filename(args.type, args.field, args.side, count)
-                narda.takeMeasurement(args.dwell_time, fname)
-                values[grid_loc[0]][grid_loc[1]] = 5
+            fname = build_filename(meas_type, meas_field, meas_side, count)
+            narda.takeMeasurement(dwell_time, fname)
+            values[grid_loc[0]][grid_loc[1]] = 5
         else:
             print("Invalid choice")
             m.destroy()
@@ -387,17 +385,15 @@ def auto_zoom(args, m, narda):
     # zoom_points = []
 
     # Calculate number of motor steps necessary to move one grid space
-    num_steps = args.grid_step_dist / (4.0 * m.step_unit)
+    num_steps = grid_step_dist / (4.0 * m.step_unit)
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, num_steps, x_points, y_points)
-    count = 0  # Tracks our current progress through the grid
+    count = 1  # Tracks our current progress through the grid
     # TODO: MEASURE HERE
-    if args.measure:
-        fname = build_filename(args.type, args.field, args.side, count)
-        narda.takeMeasurement(args.dwell_time, fname)
-        values[0][0] = 6
-        loc = np.argwhere(grid == 1)[0]
-    count += 1
+    fname = build_filename(meas_type, meas_field, meas_side, count)
+    narda.takeMeasurement(dwell_time, fname)
+    values[0][0] = 6
+    loc = np.argwhere(grid == 1)[0]
 
     print(values)
 
@@ -418,10 +414,9 @@ def auto_zoom(args, m, narda):
                 loc = np.argwhere(grid == count)[0]
                 print("------------")
                 # TODO: MEASURE HERE
-                if args.measure:
-                    fname = build_filename(args.type, args.field, args.side, count)
-                    narda.takeMeasurement(args.dwell_time, fname)
-                    values[loc[0]][loc[1]] = 7
+                fname = build_filename(meas_type, meas_field, meas_side, count)
+                narda.takeMeasurement(dwell_time, fname)
+                values[loc[0]][loc[1]] = 7
                 x_error = x_error - int(x_error)  # Subtract integer number of steps that were moved
             # Do the same for when the robot is moving backwards as well
             else:
@@ -431,10 +426,9 @@ def auto_zoom(args, m, narda):
                 loc = np.argwhere(grid == count)[0]
                 print("------------")
                 # TODO: MEASURE HERE
-                if args.measure:
-                    fname = build_filename(args.type, args.field, args.side, count)
-                    narda.takeMeasurement(args.dwell_time, fname)
-                    values[loc[0]][loc[1]] = 8
+                fname = build_filename(meas_type, meas_field, meas_side, count)
+                narda.takeMeasurement(dwell_time, fname)
+                values[loc[0]][loc[1]] = 8
                 x_error = x_error - int(x_error)
             # Increment our progress counter and print out current set of values
             j += 1
@@ -452,11 +446,9 @@ def auto_zoom(args, m, narda):
         # Else update counter, measure, and move down. Reverse direction
         loc = np.argwhere(grid == count)[0]
         print("------------")
-        # TODO: MEASURE HERE
-        if args.measure:
-            fname = build_filename(args.type, args.field, args.side, count)
-            narda.takeMeasurement(args.dwell_time, fname)
-            values[loc[0]][loc[1]] = 9
+        fname = build_filename(meas_type, meas_field, meas_side, count)
+        narda.takeMeasurement(dwell_time, fname)
+        values[loc[0]][loc[1]] = 9
         print(values)
         y_error = y_error - int(y_error)
         going_forward = not going_forward
