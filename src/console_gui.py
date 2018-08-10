@@ -6,7 +6,7 @@ class TextRedirecter(object):
         self.out = aWxTextCtrl
 
     def write(self, string):
-        self.out.WriteText(string)
+        self.out.AppendText(string)
 
 
 class ConsoleGUI(wx.Frame):

@@ -148,8 +148,6 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
         next_row, next_col = np.where(grid == i)
         next_row = next_row[0]
         next_col = next_col[0]
-        print("i: %d" % i)
-        print(next_row, next_col)
         if next_row > curr_row:  # Move downwards
             y_error += frac_step
             m.forward_motor_two(num_steps + int(y_error))
@@ -173,23 +171,42 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
         # narda.takeMeasurement(dwell_time, fname)
         print(values)
         print("---------")
+    while True:
+        # Plotting Results
+        plt.clf()
+        plt.imshow(values, interpolation='bilinear')
+        plt.title('Area Scan Heat Map')
+        cbar = plt.colorbar()
+        cbar.set_label('Signal Level')
+        plt.show(block=False)
 
-    # Plotting Results
-    plt.clf()
-    plt.imshow(values, interpolation='bilinear')
-    plt.title('Area Scan Heat Map')
-    cbar = plt.colorbar()
-    cbar.set_label('Signal Level')
-    plt.show(block=False)
+        # Post Scan GUI - User selects which option to proceed with
+        post_gui = PostScanGUI(None)
+        post_gui.title('Post Scan Options')
+        post_gui.mainloop()
+        choice = post_gui.get_gui_value()
+        print(choice)
 
-    # Post Scan GUI - User selects which option to proceed with
-    post_gui = PostScanGUI(None)
-    post_gui.title('Post Scan Options')
-    post_gui.mainloop()
-    choice = post_gui.get_gui_value()
-    print(choice)
-
-
+        if choice == 'Exit':
+            print("Exiting program...")
+            m.destroy()
+            exit(0)
+        elif choice == 'Save Data':
+            print("Saving data...")
+        elif choice == 'Zoom Scan':
+            max_val = values.max()
+            print(max_val)
+        elif choice == 'Correct Previous Value':
+            plt.close()
+            print("Select location to correct.")
+            loc_gui = LocationSelectGUI(None, grid)
+            loc_gui.title('Location Selection')
+            loc_gui.mainloop()
+            location = loc_gui.get_gui_value()
+            print(location)
+            #fname = build_filename(meas_type, meas_field, meas_side, count)
+            #narda.takeMeasurement(dwell_time, fname)
+            #values[grid_loc[0]][grid_loc[1]] = 5
 
     pass
 
