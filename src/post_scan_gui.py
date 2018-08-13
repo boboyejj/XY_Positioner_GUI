@@ -1,66 +1,33 @@
-"""
-    Created by Ganesh Arvapalli on 1/15/18
-    ganesh.arvapalli@pctest.com
-"""
+import wx
 
-import tkinter as tk
-from tkinter import ttk
-
-
-class PostScanGUI(tk.Tk):
-    """Tkinter GUI that allows user to select post scan options.
-
-    Attributes:
-        choiceVar = Option that is selected by the user
-        combobox = Tkinter widget allowing for selection of different options
-    """
+class PostScanGUI(wx.Frame):
 
     def __init__(self, parent):
-        tk.Tk.__init__(self, parent)
+        wx.Panel.__init__(self, parent)
         self.parent = parent
-        self.setup()
 
-    def setup(self):
-        self.choiceVar = tk.StringVar()
-        self.choices = ('Correct Previous Value', 'Zoom Scan', 'Save Data', 'Exit')
-        self.choiceVar.set(self.choices[0])
+        # UI Elements
+        self.option_rbox = wx.RadioBox(self,
+                                       label="Options",
+                                       choices=['Zoom Scan', 'Correct Previous Value', 'Save Data', 'Exit'],
+                                       style=wx.RA_SPECIFY_COLS,
+                                       majorDimension=1)
+        self.select_btn = wx.Button(self, wx.ID_ANY, "Select")
+        self.Bind(wx.EVT_BUTTON, self.return_selection, self.select_btn)
+        # Sizers/Layout, Static Lines, & Static Boxes
+        #self.radio_sizer = wx.StaticBoxSizer(wx.Vertical, self, "Options")
+        self.mainh_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        label = tk.Label(self, text='What would you like to do next?')
-        self.combobox = ttk.Combobox(self, textvariable=self.choiceVar, values=self.choices)
-        btn = tk.Button(self, text='Select')
-        btn.bind('<Button-1>', self.selected)
-        btn.config(height=2, width=5)
+        self.mainh_sizer.Add(self.option_rbox, proportion=1, border=5, flag=wx.EXPAND | wx.ALL)
+        self.mainh_sizer.Add()
+        self.SetSizer(self.mainh_sizer)
+        self.SetAutoLayout(True)
+        self.mainh_sizer.Fit(self)
+        self.Show(True)
 
-        label.pack(side=tk.LEFT, pady=60, padx=5)
-        self.combobox.pack(side=tk.RIGHT, pady=60, padx=5)
-        btn.pack(side=tk.BOTTOM, pady=10)
-
-    def selected(self, event):
-        self.choiceVar = self.combobox.get()
-        #w = tk.Tk()
-        #w.withdraw()
-        # self.destroy()
-        try:
-            self.eval('::ttk::CancelRepeat')
-            self.destroy()
-            self.quit()
-        except:
-            print("")
-
-    def get_gui_value(self):
-        if isinstance(self.choiceVar, tk.StringVar):  # If X'ing out of the GUI
-            return 'Exit'
-        else:  # If a choice has been selected
-            return self.choiceVar
-
-
-def main():
-    post_gui = PostScanGUI(None)
-    post_gui.title('Post Scan Options')
-    post_gui.mainloop()
-
-    print(post_gui.get_gui_value())
 
 
 if __name__ == '__main__':
-    main()
+    post_scan_gui = wx.App()
+    panel = PostScanGUI(None)
+    post_scan_gui.MainLoop()

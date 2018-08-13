@@ -133,7 +133,6 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
 
     values, grid, curr_row, curr_col, max_row, max_col = area_scan(x_points, y_points, m, narda, num_steps,
                                                                    dwell_time, meas_type, meas_field, meas_side)
-
     zoom_values = None
 
     while True:
@@ -169,7 +168,7 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
             # Move to coordinate with maximum value
             max_val = values.max()
             print("Max_val: %d" % max_val)
-            max_row, max_col = np.where(values == int(max_val))  # TODO: can remove after we implement selective screenshotting of max vals
+            max_row, max_col = np.where(values == int(max_val))
             row_steps = max_row - curr_row
             col_steps = max_col - curr_col
             print("R steps: %d   -   C steps %d" % (row_steps, col_steps))
