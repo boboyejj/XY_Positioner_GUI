@@ -11,6 +11,7 @@ from src.location_select_gui import LocationSelectGUI
 from src.manual_move import ManualMoveGUI
 from src.console_gui import TextRedirecter, ConsoleGUI
 import numpy as np
+import matplotlib.pyplot as plt
 import wx
 from wx.lib.agw import multidirdialog as mdd
 
@@ -165,7 +166,6 @@ class MainFrame(wx.Frame):
             y = float(self.y_tctrl.GetValue())
             step = float(self.grid_tctrl.GetValue())
             dwell = float(self.dwell_tctrl.GetValue())
-            zdwell = float(self.zdwell_tctrl.GetValue())
         except ValueError:
             self.errormsg("Invalid scan parameters.\nPlease input numerical values only.")
             return
@@ -176,8 +176,7 @@ class MainFrame(wx.Frame):
         meas_field = self.field_rbox.GetString(self.field_rbox.GetSelection())
         # Finding the measurement side
         meas_side = self.side_rbox.GetString(self.side_rbox.GetSelection())
-        self.run_thread = AreaScanThread(self, x, y, step, dwell, zdwell, savedir, False,
-                                         meas_type, meas_field, meas_side)  # TODO: Change False to val
+        self.run_thread = AreaScanThread(self, x, y, step, dwell, savedir, meas_type, meas_field, meas_side)
         self.disablegui()
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
@@ -187,11 +186,39 @@ class MainFrame(wx.Frame):
         self.run_thread.start()
 
     def run_post_scan(self):
+        # Plot the scan
+        plt.clf()
+        plt.imshow(self.run_thread.values, interpolation='bilinear')
+        plt.title('Area Scan Heat Map')
+        cbar = plt.colorbar()
+        cbar.set_label('Signal Level')
+        plt.show(block=False)
+
+        #try:
+        #    x = float(self.x_tctrl.GetValue())
+        #    y = float(self.y_tctrl.GetValue())
+        #    step = float(self.grid_tctrl.GetValue())
+        #    dwell = float(self.dwell_tctrl.GetValue())
+        #    zdwell = float(self.zdwell_tctrl.GetValue())
+
+        # Post Scan GUI - User selects which option to proceed with
         with PostScanGUI(self, title="Post Scan Options", style=wx.DEFAULT_DIALOG_STYLE | wx.OK) as post_dlg:
             if post_dlg.ShowModal() == wx.ID_OK:
-                print("Henlo")
-                print(post_dlg.option_rbox.GetStringSelection())
-            # xprint(post_dlg.get_selection())
+                choice = post_dlg.option_rbox.GetStringSelection()
+                print("Choice: ", choice)
+            else:
+                print("No option selected - Area Scan Complete.")
+                self.enablegui()
+
+        if choice == 'Zoom Scan':
+            pass
+        elif choice == 'Correct Previous Value':
+            pass
+        elif choice == 'Save Data':
+            pass
+        elif choice == 'Exit':
+            print("Area Scan Complete. Exiting module.")
+            self.enablegui()
 
     def manual_move(self, e):
         if not self.console_frame:
@@ -218,7 +245,6 @@ class MainFrame(wx.Frame):
         self.field_rbox.Enable(True)
         self.side_rbox.Enable(True)
         self.run_btn.Enable(True)
-        print("XXXXX", self.run_thread.x_distance)
 
     def disablegui(self):
         self.x_tctrl.Enable(False)

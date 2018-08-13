@@ -15,127 +15,123 @@ from scipy import interpolate
 
 class AreaScanThread(threading.Thread):
     def __init__(self, parent, x_distance, y_distance, grid_step_dist,
-                 dwell_time, zdwell_time, save_dir, auto_zoom_scan, meas_type, meas_field, meas_side):
+                 dwell_time, save_dir, meas_type, meas_field, meas_side):
         self.parent = parent
         self.x_distance = x_distance
         self.y_distance = y_distance
         self.grid_step_dist = grid_step_dist
         self.dwell_time = dwell_time
-        self.zdwell_time = zdwell_time
         self.save_dir = save_dir
-        self.auto_zoom_scan = auto_zoom_scan
         self.meas_type = meas_type
         self.meas_field = meas_field
         self.meas_side = meas_side
-        self.callback = parent.enablegui
+
+        self.values = None  # Placeholder for the array of values
+        self.grid = None  # Placeholder for the coordinate grid array
+        self.curr_row = None  # Current position row
+        self.curr_col = None  # Current position col
         super(AreaScanThread, self).__init__()
 
     def run(self):
         print(self.meas_type, self.meas_field, self.meas_side)
 
-        val = run_scan(self.x_distance, self.y_distance, self.grid_step_dist, self.dwell_time, self.zdwell_time,
-                       self.save_dir, self.auto_zoom_scan, self.meas_type, self.meas_field, self.meas_side)
-        # self.callback()
-        if val == 0:
-            print("Area Scan complete.")
+        # Preparation
+        x_points = int(np.ceil(np.around(self.x_distance / self.grid_step_dist, decimals=3))) + 1
+        y_points = int(np.ceil(np.around(self.y_distance / self.grid_step_dist, decimals=3))) + 1
+        # Check ports and instantiate relevant objects
+        try:
+            m = MotorDriver()
+        except serial.SerialException:
+            print("Error: Connection to C4 controller was not found")
             wx.CallAfter(self.parent.enablegui)
-            wx.CallAfter(self.parent.run_post_scan)
+            return
+        # narda = NardaNavigator()
+        narda = None  # TODO: Debugging
+        # Calculate number of motor steps necessary to move one grid space
+        num_steps = self.grid_step_dist / m.step_unit
+
+        # Run scan
+        self.values, self.grid, self.curr_row, self.curr_col = run_scan(x_points, y_points, m, narda, num_steps,
+                                                                        self.dwell_time, self.save_dir, self.meas_type,
+                                                                        self.meas_field, self.meas_side)
+        print("General Area Scan Complete.")
+        wx.CallAfter(self.parent.run_post_scan)
+        m.destroy()
+
+
+class ZoomScanThread(threading.Thread):
+    def __init__(self, parent, num_steps, dwell_time,
+                 save_dir, meas_type, meas_field, meas_side, curr_row, curr_col):
+        self.parent = parent
+        self.num_steps = num_steps
+        self.dwell_time = dwell_time
+        self.save_dir = save_dir
+        self.meas_type = meas_type
+        self.meas_field = meas_field
+        self.meas_side = meas_side
+        self.curr_row = curr_row
+        self.curr_col = curr_col
+
+        self.values = None  # Placeholder for the array of values
+        self.grid = None  # Placeholder for the coordinate grid array
+        super(AreaScanThread, self).__init__()
+
+    def run(self):
+        print(self.meas_type, self.meas_field, self.meas_side)
+
+        # Preparation
+        x_points = 5
+        y_points = 5
+        # Check ports and instantiate relevant objects
+        try:
+            m = MotorDriver()
+        except serial.SerialException:
+            print("Error: Connection to C4 controller was not found")
+            return -1
+        # narda = NardaNavigator()
+        narda = None  # TODO: Debugging
+        # Calculate number of motor steps necessary to move one grid space
+        znum_steps = self.num_steps / 4.0  # Zoom scan steps are scaled down
+
+        # Move to coordinate with maximum value
+        max_val = self.values.max()
+        print("Max_val: %d" % max_val)
+        max_row, max_col = np.where(self.values == int(max_val))
+        row_steps = max_row - self.curr_row
+        col_steps = max_col - self.curr_col
+        print("R steps: %d   -   C steps %d" % (row_steps, col_steps))
+        if row_steps > 0:
+            m.forward_motor_two(int(self.num_steps * row_steps))
         else:
-            print("Area Scan terminated.")
+            m.reverse_motor_two(int(-1 * self.num_steps * row_steps))
+        if col_steps > 0:
+            m.forward_motor_one(int(self.num_steps * col_steps))
+        else:
+            m.reverse_motor_one(int(-1 * self.num_steps * col_steps))
+
+        # Run scan
+        self.values, self.grid, self.curr_row, self.curr_col = run_scan(x_points, y_points, m, narda, znum_steps,
+                                                                        self.dwell_time, self.save_dir, self.meas_type,
+                                                                        self.meas_field, self.meas_side)
+        if self.values == -1:
+            print("Area Scan Terminated.")
+        else:
+            print("General Area Scan Complete.")
+            wx.CallAfter(self.parent.run_post_scan)
+        m.destroy()
 
 
-def move_to_pos_one(moto, num_steps, x, y):
-    """Move motor to first position in grid.
-
-    :param moto: MotorDriver to control motion
-    :param num_steps: Number of motor steps between grid points
-    :param x: Number of grid columns
-    :param y: Number of grid rows
-    :return: None
-    """
-    moto.reverse_motor_one(int(num_steps * x / 2.0))
-    moto.reverse_motor_two(int(num_steps * y / 2.0))
-
-
-def generate_grid(rows, columns):
-    """Create grid traversal visual in format of numpy matrix.
-    Looks like a normal sequential matrix, but every other row is in reverse order.
-
-    :param rows: Number of rows in grid
-    :param columns: Number of columns in grid
-    :return: Numpy matrix of correct values
-    """
-    #g = np.zeros((rows, columns))
-    g = []
-    for i in range(rows):
-        row = list(range(i * columns + 1, (i + 1) * columns + 1))
-        if i % 2 != 0:
-            row = list(reversed(row))
-        g += row
-        #g[i] = row
-    print(g)
-    g = np.array(g).reshape(rows, columns)
-    return g
-
-
-def convert_to_pts(arr, dist, x_off=0, y_off=0):
-    """Convert matrix to set of points
-
-    :param arr: matrix to convert
-    :param dist: distance between points in matrix
-    :param x_off: offset to add in x direction (if not at (0,0))
-    :param y_off: offset to add in y direction (if not at (0,0))
-    :return: xpts, ypts, zpts: List of points on each axis
-    """
-    x_dim = arr.shape[1]
-    y_dim = arr.shape[0]
-    xpts = []
-    ypts = []
-    zpts = []
-    for j in range(x_dim):
-        for i in range(y_dim):
-            if j < x_dim / 2.0:
-                x_pt = -1.0 / 2 * i * dist + x_off
-            else:
-                x_pt = 1.0 / 2 * i * dist + x_off
-            if i < y_dim / 2.0:
-                y_pt = -1.0 / 2 * j * dist + y_off
-            else:
-                y_pt = 1.0 / 2 * j * dist + y_off
-            xpts.append(x_pt)
-            ypts.append(y_pt)
-            zpts.append(arr[i][j])
-    print(xpts, ypts, zpts)
-    return xpts, ypts, zpts
-
-
-def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, savedir, auto_zoom_scan,
-             meas_type, meas_field, meas_side):
-    # Calculate dimensions of grid and generate it
-    x_points = int(np.ceil(np.around(x_distance / grid_step_dist, decimals=3))) + 1
-    y_points = int(np.ceil(np.around(y_distance / grid_step_dist, decimals=3))) + 1
-
-    # Check ports and instantiate relevant objects
-    try:
-        m = MotorDriver()
-    except serial.SerialException:
-        print("Error: Connection to C4 controller was not found")
-        return 1
-    #narda = NardaNavigator()
-    narda = None  # TODO: Debugging
-
-    # Calculate number of motor steps necessary to move one grid space
-    num_steps = grid_step_dist / m.step_unit
-
+def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_type, meas_field, meas_side):
     # Set measurement params in the NARDA software
 
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
 
-    values, grid, curr_row, curr_col, max_row, max_col = area_scan(x_points, y_points, m, narda, num_steps,
-                                                                   dwell_time, meas_type, meas_field, meas_side)
+    values, grid, curr_row, curr_col = area_scan(x_points, y_points, m, narda, num_steps,
+                                                 dwell_time, meas_type, meas_field, meas_side)
     zoom_values = None
-    return 0
+
+    return values, grid, curr_row, curr_col
 
     while True:
         # Plotting Results
@@ -285,7 +281,7 @@ def area_scan(x_points, y_points, m, narda, num_steps, dwell_time, meas_type, me
         print("---------")
         print(values)
 
-    return values, grid, curr_row, curr_col, max_row, max_col
+    return values, grid, curr_row, curr_col
 
 
 def build_filename(type, field, side, number):
@@ -308,4 +304,69 @@ def build_filename(type, field, side, number):
         filename += side.lower()
     filename += str(int(number))
     return filename
+
+
+def move_to_pos_one(moto, num_steps, x, y):
+    """Move motor to first position in grid.
+
+    :param moto: MotorDriver to control motion
+    :param num_steps: Number of motor steps between grid points
+    :param x: Number of grid columns
+    :param y: Number of grid rows
+    :return: None
+    """
+    moto.reverse_motor_one(int(num_steps * x / 2.0))
+    moto.reverse_motor_two(int(num_steps * y / 2.0))
+
+
+def generate_grid(rows, columns):
+    """Create grid traversal visual in format of numpy matrix.
+    Looks like a normal sequential matrix, but every other row is in reverse order.
+
+    :param rows: Number of rows in grid
+    :param columns: Number of columns in grid
+    :return: Numpy matrix of correct values
+    """
+    #g = np.zeros((rows, columns))
+    g = []
+    for i in range(rows):
+        row = list(range(i * columns + 1, (i + 1) * columns + 1))
+        if i % 2 != 0:
+            row = list(reversed(row))
+        g += row
+        #g[i] = row
+    print(g)
+    g = np.array(g).reshape(rows, columns)
+    return g
+
+
+def convert_to_pts(arr, dist, x_off=0, y_off=0):
+    """Convert matrix to set of points
+
+    :param arr: matrix to convert
+    :param dist: distance between points in matrix
+    :param x_off: offset to add in x direction (if not at (0,0))
+    :param y_off: offset to add in y direction (if not at (0,0))
+    :return: xpts, ypts, zpts: List of points on each axis
+    """
+    x_dim = arr.shape[1]
+    y_dim = arr.shape[0]
+    xpts = []
+    ypts = []
+    zpts = []
+    for j in range(x_dim):
+        for i in range(y_dim):
+            if j < x_dim / 2.0:
+                x_pt = -1.0 / 2 * i * dist + x_off
+            else:
+                x_pt = 1.0 / 2 * i * dist + x_off
+            if i < y_dim / 2.0:
+                y_pt = -1.0 / 2 * j * dist + y_off
+            else:
+                y_pt = 1.0 / 2 * j * dist + y_off
+            xpts.append(x_pt)
+            ypts.append(y_pt)
+            zpts.append(arr[i][j])
+    print(xpts, ypts, zpts)
+    return xpts, ypts, zpts
 
