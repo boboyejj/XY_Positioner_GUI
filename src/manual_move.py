@@ -1,5 +1,6 @@
 
 import wx
+import serial
 from src.narda_navigator import NardaNavigator
 from src.motor_driver import MotorDriver
 
@@ -9,7 +10,13 @@ class ManualMoveGUI(wx.Frame):
         wx.Frame.__init__(self, parent, title=title, size=(400, 400))
 
         # Variables
-        #self.motor = MotorDriver()
+        try:
+            self.motor = MotorDriver()
+        except serial.SerialException:
+            print("Error: Connection to C4 controller was not found")
+            self.Close()
+            return
+
         # self.narda = NardaNavigator()
         self.currx = 0.0
         self.curry = 0.0
@@ -27,13 +34,7 @@ class ManualMoveGUI(wx.Frame):
         down_id = 302
         left_id = 303
         right_id = 304
-        #self.accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, wx.WXK_UP, up_id),
-        #                                      (wx.ACCEL_CTRL, wx.WXK_DOWN, down_id),
-        #                                      (wx.ACCEL_CTRL, wx.WXK_LEFT, left_id),
-        #                                      (wx.ACCEL_CTRL, wx.WXK_RIGHT, right_id)])
-        #self.SetAcceleratorTable(self.accel_tbl)
-        self.Bind(wx.EVT_KEY_UP, self.OnKey)
-        #self.Bind(wx.EVT_KEY_UP, self)
+        self.Bind(wx.EVT_KEY_UP, self.OnKey)  # Binding on "up" event to only register once
 
         # UI Elements
         self.up_btn = wx.Button(self, up_id, "Up")

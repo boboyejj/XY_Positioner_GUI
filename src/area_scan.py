@@ -1,4 +1,5 @@
 import numpy as np
+import serial
 from src.motor_driver import MotorDriver
 from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
@@ -35,10 +36,13 @@ class AreaScanThread(threading.Thread):
     def run(self):
         time.sleep(4)
         print(self.meas_type, self.meas_field, self.meas_side)
-        run_scan(self.x_distance, self.y_distance, self.grid_step_dist, self.dwell_time, self.zdwell_time,
+        val = run_scan(self.x_distance, self.y_distance, self.grid_step_dist, self.dwell_time, self.zdwell_time,
                  self.save_dir, self.auto_zoom_scan, self.meas_type, self.meas_field, self.meas_side)
         self.callback()
-        print("Area Scan Complete.")
+        if val == 0:
+            print("Area Scan complete.")
+        else:
+            print("Area Scan terminated.")
 
 
 def move_to_pos_one(moto, num_steps, x, y):
@@ -113,7 +117,11 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
     y_points = int(np.ceil(np.around(y_distance / grid_step_dist, decimals=3))) + 1
 
     # Check ports and instantiate relevant objects
-    m = MotorDriver()
+    try:
+        m = MotorDriver()
+    except serial.SerialException:
+        print("Error: Connection to C4 controller was not found")
+        return 1
     #narda = NardaNavigator()
     narda = None  # TODO: Debugging
 
@@ -211,8 +219,7 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
             #fname = build_filename(meas_type, meas_field, meas_side, count)
             #narda.takeMeasurement(dwell_time, fname)
             #values[grid_loc[0]][grid_loc[1]] = 5
-
-    pass
+    return 0  # Successful area scan
 
 
 def area_scan(x_points, y_points, m, narda, num_steps, dwell_time, meas_type, meas_field, meas_side):

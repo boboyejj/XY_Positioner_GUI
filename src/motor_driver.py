@@ -43,7 +43,6 @@ class MotorDriver:
                 # print e.message
         if not entered:
             raise serial.SerialException
-            print("Error: Connection to C4 controller was not found. Check cables.")
             exit(1)
 
     def forward_motor_one(self, steps):

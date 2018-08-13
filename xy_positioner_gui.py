@@ -10,6 +10,7 @@ from src.area_scan import AreaScanThread
 from src.motor_driver import MotorDriver
 from src.location_select_gui import LocationSelectGUI
 from src.manual_gui_grid import ManualGridGUI
+from src.manual_move import ManualMoveGUI
 from src.console_gui import TextRedirecter, ConsoleGUI
 import numpy as np
 import wx
@@ -161,11 +162,15 @@ class MainFrame(wx.Frame):
         if self.save_tctrl.GetValue() is None or self.save_tctrl.GetValue() is '':
             self.errormsg("Please select a save directory for the output files.")
             return
-        x = float(self.x_tctrl.GetValue())
-        y = float(self.y_tctrl.GetValue())
-        step = float(self.grid_tctrl.GetValue())
-        dwell = float(self.dwell_tctrl.GetValue())
-        zdwell = float(self.zdwell_tctrl.GetValue())
+        try:
+            x = float(self.x_tctrl.GetValue())
+            y = float(self.y_tctrl.GetValue())
+            step = float(self.grid_tctrl.GetValue())
+            dwell = float(self.dwell_tctrl.GetValue())
+            zdwell = float(self.zdwell_tctrl.GetValue())
+        except ValueError:
+            self.errormsg("Invalid scan parameters.\nPlease input numerical values only.")
+            return
         savedir = self.save_tctrl.GetValue()
         # Finding the measurement type
         meas_type = self.type_rbox.GetString(self.type_rbox.GetSelection())
@@ -188,11 +193,13 @@ class MainFrame(wx.Frame):
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
         sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
-        man = ManualGridGUI(None, float(self.x_tctrl.GetValue()), float(self.y_tctrl.GetValue()))
-        man.title('Manual Control')
-        man.mainloop()
-        man.motor.destroy()
-        man.quit()
+        manual = ManualMoveGUI(self, "Manual Movement")
+        manual.Show(True)
+        #man = ManualGridGUI(None, float(self.x_tctrl.GetValue()), float(self.y_tctrl.GetValue()))
+        #man.title('Manual Control')
+        #man.mainloop()
+        #man.motor.destroy()
+        #man.quit()
 
     def enablegui(self):
         self.x_tctrl.Enable(True)
