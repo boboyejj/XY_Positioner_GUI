@@ -86,7 +86,7 @@ class MainFrame(wx.Frame):
 
         # Menu Bar
 
-        # Sizers/Layout, Static Lines & Static Boxes
+        # Sizers/Layout, Static Lines, & Static Boxes
         self.saveline_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.text_input_sizer = wx.BoxSizer(wx.VERTICAL)
         self.radio_input_sizer = wx.BoxSizer(wx.VERTICAL)

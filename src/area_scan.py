@@ -14,6 +14,7 @@ from scipy import interpolate
 from src.timer_gui import TimerGUI
 # import turtle
 
+
 class AreaScanThread(threading.Thread):
     def __init__(self, parent, x_distance, y_distance, grid_step_dist,
                  dwell_time, zdwell_time, save_dir, auto_zoom_scan, meas_type, meas_field, meas_side):
