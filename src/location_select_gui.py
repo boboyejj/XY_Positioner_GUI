@@ -34,8 +34,8 @@ class LocationSelectGUI(wx.Frame):
         return self.choice
 
 
-
 if __name__ == '__main__':
+    # Generate Zig-zag grid
     rows = 4
     columns = 6
     g = []
@@ -44,9 +44,9 @@ if __name__ == '__main__':
         if i % 2 != 0:
             row = list(reversed(row))
         g += row
-        #g[i] = row
     print(g)
     g = np.array(g).reshape(rows, columns)
+    # Start GUI
     loc_gui = wx.App()
     fr = LocationSelectGUI(None, title='Location Selection', grid=g)
     loc_gui.MainLoop()

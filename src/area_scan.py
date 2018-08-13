@@ -6,14 +6,11 @@ from src.location_select_gui import LocationSelectGUI
 from src.narda_navigator import NardaNavigator
 from matplotlib import pyplot as plt
 from pywinauto import application
-from matplotlib import mlab
-from src.data_entry_gui import DataEntryGUI
 import os
 import threading
 import time
+import wx
 from scipy import interpolate
-from src.timer_gui import TimerGUI
-# import turtle
 
 
 class AreaScanThread(threading.Thread):
@@ -34,10 +31,10 @@ class AreaScanThread(threading.Thread):
         super(AreaScanThread, self).__init__()
 
     def run(self):
-        time.sleep(4)
         print(self.meas_type, self.meas_field, self.meas_side)
+
         val = run_scan(self.x_distance, self.y_distance, self.grid_step_dist, self.dwell_time, self.zdwell_time,
-                 self.save_dir, self.auto_zoom_scan, self.meas_type, self.meas_field, self.meas_side)
+                       self.save_dir, self.auto_zoom_scan, self.meas_type, self.meas_field, self.meas_side)
         self.callback()
         if val == 0:
             print("Area Scan complete.")
@@ -128,6 +125,8 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
     # Calculate number of motor steps necessary to move one grid space
     num_steps = grid_step_dist / m.step_unit
 
+    # Set measurement params in the NARDA software
+
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
 
@@ -152,8 +151,19 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
         #    plt.show(block=False)
 
         # Post Scan GUI - User selects which option to proceed with
-        post_gui = PostScanGUI(None, "Post Scan Options")
-        choice = post_gui.get_selection()
+        try:
+            app = wx.App()
+            frame = wx.Frame(None)
+            frame.Center()
+            frame.Show()
+            with PostScanGUI(None, title="Post Scan Options") as post_gui:
+                post_gui.ShowModal()
+                choice = post_gui.get_selection()
+            app.MainLoop()
+        except:
+            print("FAILED")
+        print("HUE")
+        #choice = post_gui.get_selection()
         print("Option selected: ", choice)
 
         #post_gui = PostScanGUI(None)
@@ -200,11 +210,10 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
         elif choice == 'Correct Previous Value':
             plt.close()
             print("Select location to correct.")
-            loc_gui = LocationSelectGUI(None, grid)
-            loc_gui.title('Location Selection')
-            loc_gui.mainloop()
-            location = loc_gui.get_gui_value()
-            print(location)
+            loc_gui = LocationSelectGUI(None, "Location Selection", grid)
+            location = loc_gui.get_location()
+            print("Location Selected: ", location)
+            loc_gui.Close()
             target_row, target_col = np.where(grid == int(location))
             row_steps = target_row - curr_row
             col_steps = target_col - curr_col

@@ -24,10 +24,10 @@ class ManualMoveGUI(wx.Frame):
         self.disty = 2.8
         self.errx = 0.0
         self.erry = 0.0
-        #self.stepx = int(self.distx / self.motor.step_unit)
-        #self.stepy = int(self.disty / self.motor.step_unit)
-        #self.fracx = self.distx / self.motor.step_unit - self.stepx
-        #self.fracy = self.disty / self.motor.step_unit - self.stepy
+        self.stepx = int(self.distx / self.motor.step_unit)
+        self.stepy = int(self.disty / self.motor.step_unit)
+        self.fracx = self.distx / self.motor.step_unit - self.stepx
+        self.fracy = self.disty / self.motor.step_unit - self.stepy
 
         # Accelerator Table/Shortcut Keys
         up_id = 301
@@ -75,40 +75,36 @@ class ManualMoveGUI(wx.Frame):
         self.Show(True)
 
     def move_up(self, e):
-        #self.curry -= self.stepy
-        #self.erry -= self.fracy
-        #self.motor.reverse_motor_two(self.stepy + int(self.erry))
-        #self.erry -= int(self.erry)
-        #self.coord_box.SetValue("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
-        #print(self.curry)
-        print("up")
+        self.curry -= self.stepy
+        self.erry -= self.fracy
+        self.motor.reverse_motor_two(self.stepy + int(self.erry))
+        self.erry -= int(self.erry)
+        self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
+        print(self.curry)
 
     def move_down(self, e):
-        #self.curry += self.stepy
-        #self.erry += self.fracy
-        #self.motor.forward_motor_two(self.stepy + int(self.erry))
-        #self.erry -= int(self.erry)
-        #self.coord_box.SetValue("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
-        #print(self.curry)
-        print("down")
+        self.curry += self.stepy
+        self.erry += self.fracy
+        self.motor.forward_motor_two(self.stepy + int(self.erry))
+        self.erry -= int(self.erry)
+        self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
+        print(self.curry)
 
     def move_left(self, e):
-        #self.currx -= self.stepx
-        #self.errx -= self.fracx
-        #self.motor.reverse_motor_one(self.stepx + int(self.errx))
-        #self.errx -= int(self.errx)
-        #self.coord_box.SetValue("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
-        #print(self.currx)
-        print("left")
+        self.currx -= self.stepx
+        self.errx -= self.fracx
+        self.motor.reverse_motor_one(self.stepx + int(self.errx))
+        self.errx -= int(self.errx)
+        self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
+        print(self.currx)
 
     def move_right(self, e):
-        #self.currx += self.stepx
-        #self.errx += self.fracx
-        #self.motor.forward_motor_one(self.stepx + int(self.errx))
-        #self.errx -= int(self.errx)
-        #self.coord_box.SetValue("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
-        #print(self.currx)
-        print("right")
+        self.currx += self.stepx
+        self.errx += self.fracx
+        self.motor.forward_motor_one(self.stepx + int(self.errx))
+        self.errx -= int(self.errx)
+        self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
+        print(self.currx)
 
     def OnKey(self, e):
         if e.GetKeyCode() == wx.WXK_UP:
@@ -124,7 +120,7 @@ class ManualMoveGUI(wx.Frame):
 
     def OnClose(self, e):
         print("Closing")
-        #self.motor.destroy()
+        self.motor.destroy()
         self.Destroy()
 
 

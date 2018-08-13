@@ -6,10 +6,7 @@ import os
 import sys
 import threading
 from src.area_scan import AreaScanThread
-#from src.grid_scan_manual import AreaScanThread
-from src.motor_driver import MotorDriver
 from src.location_select_gui import LocationSelectGUI
-from src.manual_gui_grid import ManualGridGUI
 from src.manual_move import ManualMoveGUI
 from src.console_gui import TextRedirecter, ConsoleGUI
 import numpy as np
