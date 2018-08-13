@@ -8,14 +8,16 @@ class PostScanGUI(wx.Dialog):
         #wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title=title, pos=wx.DefaultPosition,
         #                   size=wx.Size(400, 300), style=wx.DEFAULT_DIALOG_STYLE)
 
+        self.choice = 'Zoom Scan'  # Default value
+
         # UI Elements
         self.option_rbox = wx.RadioBox(self,
                                        label="Options",
                                        choices=['Zoom Scan', 'Correct Previous Value', 'Save Data', 'Exit'],
                                        style=wx.RA_SPECIFY_COLS,
                                        majorDimension=1)
-        self.select_btn = wx.Button(self, wx.ID_ANY, "Select")
-        self.Bind(wx.EVT_BUTTON, self.get_selection, self.select_btn)
+        self.select_btn = wx.Button(self, wx.ID_OK, "Select")
+        #self.Bind(wx.EVT_BUTTON, self.set_selection, self.select_btn)
 
         # Sizers/Layout, Static Lines, & Static Boxes
         self.mainv_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -26,8 +28,11 @@ class PostScanGUI(wx.Dialog):
         self.SetAutoLayout(True)
         self.mainv_sizer.Fit(self)
 
-    def get_selection(self, e):
-        return self.option_rbox.GetStringSelection()
+    #def set_selection(self, e):
+    #    self.Close()
+
+    #def get_selection(self):
+    #    return self.choice
 
 
 if __name__ == '__main__':

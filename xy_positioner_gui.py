@@ -6,6 +6,7 @@ import os
 import sys
 import threading
 from src.area_scan import AreaScanThread
+from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
 from src.manual_move import ManualMoveGUI
 from src.console_gui import TextRedirecter, ConsoleGUI
@@ -37,13 +38,13 @@ class MainFrame(wx.Frame):
         self.x_distance_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.xdesc_text = wx.StaticText(self, label="Horizontal length of measurement region (in cm)")
         self.x_tctrl = wx.TextCtrl(self)
-        self.x_tctrl.SetValue(str(2 * 2.8))
+        self.x_tctrl.SetValue(str(1 * 2.8))
 
         self.y_distance_text = wx.StaticText(self, label="Y Distance")
         self.y_distance_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.ydesc_text = wx.StaticText(self, label="Vertical length of measurement region (in cm)")
         self.y_tctrl = wx.TextCtrl(self)
-        self.y_tctrl.SetValue(str(2 * 2.8))
+        self.y_tctrl.SetValue(str(1 * 2.8))
 
         self.grid_step_dist_text = wx.StaticText(self, label="Grid Step Distance")
         self.grid_step_dist_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
@@ -185,6 +186,13 @@ class MainFrame(wx.Frame):
         print("Running thread...")
         self.run_thread.start()
 
+    def run_post_scan(self):
+        with PostScanGUI(self, title="Post Scan Options", style=wx.DEFAULT_DIALOG_STYLE | wx.OK) as post_dlg:
+            if post_dlg.ShowModal() == wx.ID_OK:
+                print("Henlo")
+                print(post_dlg.option_rbox.GetStringSelection())
+            # xprint(post_dlg.get_selection())
+
     def manual_move(self, e):
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
@@ -210,6 +218,7 @@ class MainFrame(wx.Frame):
         self.field_rbox.Enable(True)
         self.side_rbox.Enable(True)
         self.run_btn.Enable(True)
+        print("XXXXX", self.run_thread.x_distance)
 
     def disablegui(self):
         self.x_tctrl.Enable(False)

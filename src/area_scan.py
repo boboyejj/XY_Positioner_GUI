@@ -35,9 +35,11 @@ class AreaScanThread(threading.Thread):
 
         val = run_scan(self.x_distance, self.y_distance, self.grid_step_dist, self.dwell_time, self.zdwell_time,
                        self.save_dir, self.auto_zoom_scan, self.meas_type, self.meas_field, self.meas_side)
-        self.callback()
+        # self.callback()
         if val == 0:
             print("Area Scan complete.")
+            wx.CallAfter(self.parent.enablegui)
+            wx.CallAfter(self.parent.run_post_scan)
         else:
             print("Area Scan terminated.")
 
@@ -133,6 +135,7 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
     values, grid, curr_row, curr_col, max_row, max_col = area_scan(x_points, y_points, m, narda, num_steps,
                                                                    dwell_time, meas_type, meas_field, meas_side)
     zoom_values = None
+    return 0
 
     while True:
         # Plotting Results

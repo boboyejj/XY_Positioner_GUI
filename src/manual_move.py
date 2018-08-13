@@ -48,6 +48,7 @@ class ManualMoveGUI(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.move_down, self.down_btn)
         self.Bind(wx.EVT_BUTTON, self.move_left, self.left_btn)
         self.Bind(wx.EVT_BUTTON, self.move_right, self.right_btn)
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
 
         # Sizers/Layout, Static Lines, & Static Boxes
         self.mainh_sizer = wx.BoxSizer(wx.HORIZONTAL)
