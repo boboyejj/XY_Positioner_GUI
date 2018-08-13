@@ -152,11 +152,15 @@ def run_scan(x_distance, y_distance, grid_step_dist, dwell_time, zdwell_time, sa
         #    plt.show(block=False)
 
         # Post Scan GUI - User selects which option to proceed with
-        post_gui = PostScanGUI(None)
-        post_gui.title('Post Scan Options')
-        post_gui.mainloop()
-        choice = post_gui.get_gui_value()
-        print(choice)
+        post_gui = PostScanGUI(None, "Post Scan Options")
+        choice = post_gui.get_selection()
+        print("Option selected: ", choice)
+
+        #post_gui = PostScanGUI(None)
+        #post_gui.title('Post Scan Options')
+        #post_gui.mainloop()
+        #choice = post_gui.get_gui_value()
+        #print(choice)
 
         if choice == 'Exit':
             print("Exiting program...")

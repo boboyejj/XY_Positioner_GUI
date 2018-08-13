@@ -1,9 +1,10 @@
 import wx
 
+
 class PostScanGUI(wx.Frame):
 
-    def __init__(self, parent):
-        wx.Panel.__init__(self, parent)
+    def __init__(self, parent, title):
+        wx.Panel.__init__(self, parent, title=title)
         self.parent = parent
 
         # UI Elements
@@ -13,18 +14,20 @@ class PostScanGUI(wx.Frame):
                                        style=wx.RA_SPECIFY_COLS,
                                        majorDimension=1)
         self.select_btn = wx.Button(self, wx.ID_ANY, "Select")
-        self.Bind(wx.EVT_BUTTON, self.return_selection, self.select_btn)
-        # Sizers/Layout, Static Lines, & Static Boxes
-        #self.radio_sizer = wx.StaticBoxSizer(wx.Vertical, self, "Options")
-        self.mainh_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.Bind(wx.EVT_BUTTON, self.get_selection, self.select_btn)
 
-        self.mainh_sizer.Add(self.option_rbox, proportion=1, border=5, flag=wx.EXPAND | wx.ALL)
-        self.mainh_sizer.Add()
-        self.SetSizer(self.mainh_sizer)
+        # Sizers/Layout, Static Lines, & Static Boxes
+        self.mainv_sizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.mainv_sizer.Add(self.option_rbox, proportion=1, border=5, flag=wx.EXPAND | wx.ALL)
+        self.mainv_sizer.Add(self.select_btn, proportion=0, border=5, flag=wx.EXPAND | wx.RIGHT | wx.TOP | wx.BOTTOM)
+        self.SetSizer(self.mainv_sizer)
         self.SetAutoLayout(True)
-        self.mainh_sizer.Fit(self)
+        self.mainv_sizer.Fit(self)
         self.Show(True)
 
+    def get_selection(self, e):
+        return self.option_rbox.GetStringSelection()
 
 
 if __name__ == '__main__':
