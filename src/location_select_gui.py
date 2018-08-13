@@ -1,69 +1,52 @@
-"""
-    Created by Ganesh Arvapalli on 1/15/18
-    ganesh.arvapalli@pctest.com
-"""
+import wx
+import numpy as np
 
-import tkinter as tk
-
-
-class LocationSelectGUI(tk.Tk):
-    """Tkinter GUI that allows user to select specific location along scan path.
-
-    Attributes:
-        grid = Grid of buttons showing arrangement of scan path
-        choiceVar = Desired location within grid
-    """
-
-    def __init__(self, parent, grid):
-        tk.Tk.__init__(self, parent)
+class LocationSelectGUI(wx.Frame):
+    def __init__(self, parent, title, grid):
+        wx.Frame.__init__(self, parent, title=title)
         self.parent = parent
         self.grid = grid
-        self.setup()
+        self.choice = None
 
-    def setup(self):
-        """Set up GUI and instantiate relevant variables
+        numrows = self.grid.shape[0]
+        numcols = self.grid.shape[1]
 
-        :return:
-        """
-        self.title('Please select a location on the grid')
-        self.choiceVar = tk.IntVar()
-        self.choiceVar = 0
+        # Sizers
+        self.coord_sizer = wx.GridSizer(rows=numrows, cols=numcols, hgap=0, vgap=0)
+        for val in np.nditer(self.grid):
+            btn = wx.Button(self, val, str(val))
+            self.Bind(wx.EVT_BUTTON, lambda e, x=btn.Id: self.selected(x), btn)
+            self.coord_sizer.Add(btn, proportion=1)
+            self.coord_sizer.Layout()
+            print("Button:", val)
 
-        # Instructions
-        label = tk.Label(self, text='Please select a location to move to.', background='lightgreen', padx=20, pady=10)
-        label.grid(row=0, column=0)
+        self.SetSizer(self.coord_sizer)
+        self.SetAutoLayout(True)
+        self.coord_sizer.Fit(self)
+        self.Show(True)
 
-        # Set up button grid (value of button = value at grid point) Extra comment
-        innerFrame = tk.Frame(self, background='orange')
-        for i in range(len(self.grid)):
-            for j in range(len(self.grid[0])):
-                btn = tk.Button(innerFrame, text=str(int(self.grid[i][j])),
-                                command=lambda row=i, col=j: self.selected(row, col), padx=10, pady=10)
-                btn.config(background='lightblue')
-                btn.grid(row=i, column=j, sticky="nsew")
+    def selected(self, valid):
+        self.choice = valid
+        print(valid)
+        #print(self.choice)
 
-        innerFrame.grid_rowconfigure(len(self.grid), weight=1)
-        innerFrame.grid_columnconfigure(len(self.grid[0]), weight=1)
-        innerFrame.grid(row=1, column=0)
+    def get_location(self):
+        return self.choice
 
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_columnconfigure(1, weight=1)
-        self.config(background='lightgreen')
 
-    def selected(self, row, col):
-        """Set selected value to be value of grid where button was pressed
 
-        :param row: button row position
-        :param col: button col position
-        :return:
-        """
-        self.choiceVar = self.grid[row][col]
-        self.destroy()
-        self.quit()
-
-    def get_gui_value(self):
-        """Make selected value available outside of GUI by storing at as part of GUI
-
-        :return: Grid value where button was pressed
-        """
-        return self.choiceVar
+if __name__ == '__main__':
+    rows = 4
+    columns = 6
+    g = []
+    for i in range(rows):
+        row = list(range(i * columns + 1, (i + 1) * columns + 1))
+        if i % 2 != 0:
+            row = list(reversed(row))
+        g += row
+        #g[i] = row
+    print(g)
+    g = np.array(g).reshape(rows, columns)
+    loc_gui = wx.App()
+    fr = LocationSelectGUI(None, title='Location Selection', grid=g)
+    loc_gui.MainLoop()
