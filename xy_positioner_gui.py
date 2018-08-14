@@ -9,6 +9,7 @@ from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
 from src.manual_move import ManualMoveGUI
 from src.console_gui import TextRedirecter, ConsoleGUI
+from src.reset_motors import ResetThread
 import numpy as np
 import matplotlib.pyplot as plt
 import wx
@@ -40,6 +41,7 @@ class MainFrame(wx.Frame):
         save_id = 115
         run_id = 116
         manual_id = 117
+        reset_id = 118
 
         # UI Elements
         self.x_distance_text = wx.StaticText(self, label="X Distance")
@@ -86,6 +88,8 @@ class MainFrame(wx.Frame):
                                      choices=['Front', 'Back', 'Top', 'Bottom', 'Left', 'Right'],
                                      style=wx.RA_SPECIFY_COLS, majorDimension=1)
 
+        self.reset_btn = wx.Button(self, reset_id, "Reset Motors")
+        self.Bind(wx.EVT_BUTTON, self.reset_motors, self.reset_btn)
         self.manual_btn = wx.Button(self, manual_id, "Manual Movement")
         self.Bind(wx.EVT_BUTTON, self.manual_move, self.manual_btn)
         self.run_btn = wx.Button(self, run_id, "Run")
@@ -130,8 +134,10 @@ class MainFrame(wx.Frame):
                              flag=wx.TOP | wx.BOTTOM | wx.EXPAND)
         self.mainh_sizer.Add(self.radio_input_sizer, proportion=1, border=5, flag=wx.ALL | wx.EXPAND)
 
+        self.btn_sizer.Add(self.reset_btn, proportion=1, border=5,
+                           flag=wx.ALIGN_RIGHT | wx.LEFT | wx.TOP | wx.BOTTOM)
         self.btn_sizer.Add(self.manual_btn, proportion=1, border=5,
-                           flag=wx.ALIGN_RIGHT | wx. LEFT | wx. TOP | wx.BOTTOM)
+                           flag=wx.ALIGN_RIGHT | wx.LEFT | wx. TOP | wx.BOTTOM)
         self.btn_sizer.Add(self.run_btn, proportion=1, border=5, flag=wx.ALIGN_RIGHT | wx.ALL)
 
         self.mainv_sizer.Add(self.mainh_sizer, proportion=1, border=0, flag=wx.ALL | wx.EXPAND)
@@ -270,8 +276,21 @@ class MainFrame(wx.Frame):
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
         sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
-        manual = ManualMoveGUI(self, "Manual Movement")
+        try:
+            step = float(self.grid_tctrl.GetValue())
+        except ValueError:
+            self.errormsg("Invalid scan parameters.\nPlease input numerical values only.")
+            return
+        manual = ManualMoveGUI(self, "Manual Movement", step)
         manual.Show(True)
+
+    def reset_motors(self, e):
+        self.disablegui()
+        if not self.console_frame:
+            self.console_frame = ConsoleGUI(self, "Console")
+        self.console_frame.Show(True)
+        sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        ResetThread(self).start()
 
     def enablegui(self):
         self.x_tctrl.Enable(True)
@@ -284,6 +303,7 @@ class MainFrame(wx.Frame):
         self.type_rbox.Enable(True)
         self.field_rbox.Enable(True)
         self.side_rbox.Enable(True)
+        self.reset_btn.Enable(True)
         self.manual_btn.Enable(True)
         self.run_btn.Enable(True)
 
@@ -298,6 +318,7 @@ class MainFrame(wx.Frame):
         self.type_rbox.Enable(False)
         self.field_rbox.Enable(False)
         self.side_rbox.Enable(False)
+        self.reset_btn.Enable(False)
         self.manual_btn.Enable(False)
         self.run_btn.Enable(False)
 

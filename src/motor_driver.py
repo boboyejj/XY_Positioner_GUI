@@ -26,12 +26,8 @@ class MotorDriver:
                 self.port = serial.Serial('COM'+str(i), timeout=1.5)
                 self.port.write('!1fp\r'.encode())  # Check if we have connected to the right COM Port/machine
                 received_str = self.port.read(2)
-                try:
-                    print("Code received from the COM PORT: " + received_str.decode())
-                except UnicodeDecodeError:
-                    print("Could not decode return message from COM port. Moving onto next COM port...")
-                    continue
                 if received_str.decode() == "C4":
+                    print("Established connection with motor controller (PORT %d)" % i)
                     self.port.flushOutput()
                     self.port.flushInput()
                     self.port.flush()
@@ -91,19 +87,29 @@ class MotorDriver:
         # Set home of motor 1 to be 6000 steps away, home of motor 2 to be 13000 steps away
         self.port.write(str.encode('!1wh1,r,'+str(self.home[0])+'\r'))
         self.port.readline()
+        #while self.port.read().decode() != 'o':
+        #    pass
         self.port.write(str.encode('!1wh2,r,'+str(self.home[1])+'\r'))
         self.port.readline()
+        #while self.port.read().decode() != 'o':
+        #    pass
         # print 'Home settings written (a if yes), ', port.readline()
         self.port.flush()
 
         # Home both motors
         motor_home = str.encode('!1h12\r')
         self.port.write(motor_home)
+        while self.port.read().decode() != 'o':
+            pass
+        print("Motor 1 reset.")
+        while self.port.read().decode() != 'o':
+            pass
+        print("Motor 2 reset.")
         # time.sleep(60)
-        output = self.port.read(1000)
-        while self.port.in_waiting:
-            time.sleep(1)
-            output += self.port.read(1000)
+        #output = self.port.read(1000)
+        #while self.port.in_waiting:
+        #    time.sleep(1)
+        #    output += self.port.read(1000)
         # print 'Moving home: ', port.readline()
         self.port.flush()
 
