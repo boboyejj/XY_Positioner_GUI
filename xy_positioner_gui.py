@@ -4,7 +4,6 @@
 """
 import os
 import sys
-import threading
 from src.area_scan import AreaScanThread, ZoomScanThread
 from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
@@ -262,11 +261,6 @@ class MainFrame(wx.Frame):
         sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
         manual = ManualMoveGUI(self, "Manual Movement")
         manual.Show(True)
-        #man = ManualGridGUI(None, float(self.x_tctrl.GetValue()), float(self.y_tctrl.GetValue()))
-        #man.title('Manual Control')
-        #man.mainloop()
-        #man.motor.destroy()
-        #man.quit()
 
     def enablegui(self):
         self.x_tctrl.Enable(True)
