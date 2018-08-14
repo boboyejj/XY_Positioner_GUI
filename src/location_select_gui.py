@@ -1,6 +1,7 @@
 import wx
 import numpy as np
 
+
 class LocationSelectGUI(wx.Dialog):
     def __init__(self, parent, title, grid):
         wx.Frame.__init__(self, parent, title=title)
@@ -29,7 +30,7 @@ class LocationSelectGUI(wx.Dialog):
 
     def selected(self, valid):
         self.parent.run_correction(valid)
-        wx.PostEvent(self, wx.ID_OK)
+        #wx.PostEvent(self, wx.ID_OK)
         self.Destroy()
 
     def OnQuit(self, e):

@@ -4,7 +4,7 @@
 """
 import os
 import sys
-from src.area_scan import AreaScanThread, ZoomScanThread
+from src.area_scan import AreaScanThread, ZoomScanThread, CorrectionThread
 from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
 from src.manual_move import ManualMoveGUI
@@ -27,6 +27,7 @@ class MainFrame(wx.Frame):
         # Variables
         self.run_thread = None
         self.zoom_thread = None
+        self.corr_thread = None
         self.console_frame = None
 
         self.curr_row = 0  # Grid coordinate row
@@ -227,14 +228,13 @@ class MainFrame(wx.Frame):
             # Finding the measurement side
             meas_side = self.side_rbox.GetString(self.side_rbox.GetSelection())
             self.zoom_thread = ZoomScanThread(self, zdwell, savedir, meas_type, meas_field, meas_side,
-                                              self.run_thread.num_steps, self.run_thread.values, self.run_thread.grid,
+                                              self.run_thread.num_steps, self.values, self.grid,
                                               self.curr_row, self.curr_col)
-            self.disablegui()
             if not self.console_frame:
                 self.console_frame = ConsoleGUI(self, "Console")
             self.console_frame.Show(True)
             sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
-            print("Running thread...")
+            print("Running thread...")  # TODO: DEBUGGING
             self.zoom_thread.start()
 
         elif choice == 'Correct Previous Value':
@@ -257,8 +257,13 @@ class MainFrame(wx.Frame):
             self.zoom_values = call_thread.zoom_values
 
     def run_correction(self, val):
-        print("HENLO RUN CORRECTION", val)
-        self.run_post_scan()
+        self.corr_thread = CorrectionThread(self, val, self.run_thread.num_steps,
+                                            self.values, self.grid, self.curr_row, self.curr_col)
+        if not self.console_frame:
+            self.console_frame = ConsoleGUI(self, "Console")
+        self.console_frame.Show(True)
+        sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        self.corr_thread.start()
 
     def manual_move(self, e):
         if not self.console_frame:

@@ -56,7 +56,7 @@ class AreaScanThread(threading.Thread):
         self.values, self.grid, self.curr_row, self.curr_col = run_scan(x_points, y_points, m, narda, self.num_steps,
                                                                         self.dwell_time, self.save_dir, self.meas_type,
                                                                         self.meas_field, self.meas_side)
-        print("General Area Scan Complete.")
+        print("General area scan complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
         m.destroy()
@@ -124,7 +124,51 @@ class ZoomScanThread(threading.Thread):
         m.reverse_motor_one(int(2 * znum_steps))
         m.reverse_motor_two(int(2 * znum_steps))
 
-        print("Zoom Scan complete.")
+        print("Zoom scan complete.")
+        self.callback(self)
+        wx.CallAfter(self.parent.run_post_scan)
+        m.destroy()
+
+
+class CorrectionThread(threading.Thread):
+    def __init__(self, parent, target, num_steps, values, grid, curr_row, curr_col):
+        self.parent = parent
+        self.callback = self.parent.update_values
+        self.target = target
+        self.num_steps = num_steps
+        self.values = values
+        self.grid = grid
+        self.curr_row = curr_row
+        self.curr_col = curr_col
+        super(CorrectionThread, self).__init__()
+
+    def run(self):
+        # Prepare motors
+        # Check ports and instantiate relevant objects
+        try:
+            m = MotorDriver()
+        except serial.SerialException:
+            print("Error: Connection to C4 controller was not found")
+            return -1
+
+        # Find the target location
+        target_row, target_col = np.where(self.grid == int(self.target))
+        row_steps = target_row - self.curr_row
+        col_steps = target_col - self.curr_col
+
+        # Move to target location
+        print("R steps: %d   -   C steps %d" % (row_steps, col_steps))
+        if row_steps > 0:
+            m.forward_motor_two(int(self.num_steps * row_steps))
+        else:
+            m.reverse_motor_two(int(-1 * self.num_steps * row_steps))
+        if col_steps > 0:
+            m.forward_motor_one(int(self.num_steps * col_steps))
+        else:
+            m.reverse_motor_one(int(-1 * self.num_steps * col_steps))
+        self.curr_row = target_row
+        self.curr_col = target_col
+        print("Correction of previous value complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
         m.destroy()

@@ -2,7 +2,6 @@ import wx
 
 
 class PostScanGUI(wx.Dialog):
-
     def __init__(self, *args, **kw):
         super(PostScanGUI, self).__init__(*args, **kw)
 
@@ -26,6 +25,7 @@ class PostScanGUI(wx.Dialog):
 
     def OnQuit(self, e):
         self.Destroy()
+
 
 if __name__ == '__main__':
     post_scan_gui = wx.App()
