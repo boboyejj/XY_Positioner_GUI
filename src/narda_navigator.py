@@ -81,14 +81,14 @@ class NardaNavigator:
         else:
             print("Argument must be one of either 'elec', 'mag_a', or 'mag_b'")
 
-    def takeMeasurement(self, dwell_time, filename):
+    def takeMeasurement(self, dwell_time, filename, pathname):
         self.bringToFront()
         # If not on the data tab, switch to it
         if not pgui.locateOnScreen(self.refpics_path + '/data_tab_selected.PNG'):
             pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/data_tab_deselected.PNG')))
 
         # Reset measurement by clicking on 'Free Scan' radio button
-        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/free_scan.PNG')))
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/free_scan.PNG', grayscale=True)))
 
         # Todo: figure out if we need to check max hold here too..
 
@@ -96,18 +96,42 @@ class NardaNavigator:
         time.sleep(dwell_time)
 
         # Take the actual measurement after marking the highest peak
-        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/highest_peak.PNG')))
-        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/save_as_text.PNG')))
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/highest_peak.PNG', grayscale=True)))
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/save_as_text.PNG', grayscale=True)))
 
         # Input comment
-        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/comment.PNG')))
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/comment.PNG', grayscale=True)))
         time.sleep(0.5)
         pgui.typewrite("Hello world!")
-        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/ok.PNG')))
+        pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/ok.PNG', grayscale=True)))
 
         # Save file
         pgui.typewrite(filename)
-        pgui.press('enter')
+        # Change to directory of choice
+        # pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/save_search_bar.PNG', grayscale=True)))
+        pgui.hotkey('ctrl', 'l')
+        pgui.typewrite(pathname)
+        pgui.press(['enter'])
+        try:
+            pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/save.PNG', grayscale=True)))
+        except TypeError:
+            pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/save_underscore.PNG', grayscale=True)))
+
+        # Overwrite if file already exists
+        try:
+            pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/yes.PNG', grayscale=True)))
+            print("File already exists - overwriting file.")
+        except TypeError:
+            print("New file has been saved.")
+
+        # Wait for file to have saved properly
+        while not os.path.isfile(pathname + '/' + filename + '.txt'):
+            print(pathname + '/' + filename + '.txt')
+            pass
+
+        # Return max recorded value
+        return self.getMaxValue(filename, pathname)
+
 
     def saveBitmap(self):
         self.bringToFront()
@@ -123,14 +147,14 @@ class NardaNavigator:
 
         # Save file
 
-    def getMaxValue(self, filepath):
-        with open(filepath, 'r') as f:
+    def getMaxValue(self, filepath, pathname):
+        with open(pathname + '/' + filepath + '.txt', 'r') as f:
             maxValLine = f.readlines()[8]
             for string in maxValLine.split(' '):
                 try:
                     maxVal = float(string)
                     break  # Breaks if we find the first numeric value
-                except:
+                except ValueError:
                     continue
             print(maxVal)
         return maxVal
@@ -142,6 +166,8 @@ class NardaNavigator:
         pgui.moveTo(x, y)
 
     def bringToFront(self):
+        #self.ehp200_app.EHP200.Minimize()
+        #self.ehp200_app.EHP200.Restore()
         self.ehp200_app.EHP200.set_focus()
 
     def bringSnipToFront(self):

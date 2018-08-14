@@ -47,8 +47,8 @@ class AreaScanThread(threading.Thread):
             print("Error: Connection to C4 controller was not found")
             wx.CallAfter(self.parent.enablegui)
             return
-        # narda = NardaNavigator()
-        narda = None  # TODO: Debugging
+        narda = NardaNavigator()
+        #narda = None  # TODO: Debugging
         # Calculate number of motor steps necessary to move one grid space
         self.num_steps = self.grid_step_dist / m.step_unit
 
@@ -93,15 +93,16 @@ class ZoomScanThread(threading.Thread):
         except serial.SerialException:
             print("Error: Connection to C4 controller was not found")
             return -1
-        # narda = NardaNavigator()
-        narda = None  # TODO: Debugging
+        narda = NardaNavigator()
+        # narda = None  # TODO: Debugging
         # Calculate number of motor steps necessary to move one grid space
         znum_steps = self.num_steps / 4.0  # Zoom scan steps are scaled down
 
         # Move to coordinate with maximum value
         max_val = self.values.max()
-        max_row, max_col = np.where(self.values == int(max_val))
-        print("Max value: %d" % max_val)
+        max_row, max_col = np.where(self.values == float(max_val))
+        print("Max value: %f" % max_val)
+        print(max_row, max_col)
         print("Max value coordinates: Row - %d / Col - %d" % (max_row, max_col))
         row_steps = max_row - self.curr_row
         col_steps = max_col - self.curr_col
@@ -119,7 +120,7 @@ class ZoomScanThread(threading.Thread):
         # Run scan
         self.zoom_values, _, _, _ = run_scan(x_points, y_points, m, narda, znum_steps,
                                              self.dwell_time, self.save_dir, self.meas_type,
-                                             self.meas_field, self.meas_side)
+                                             self.meas_field, 'z')
         # Move back to original position
         m.reverse_motor_one(int(2 * znum_steps))
         m.reverse_motor_two(int(2 * znum_steps))
@@ -202,8 +203,8 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
     max_row, max_col = -1, -1  # Placeholders for the max value's coordinates
     # Take first measurement
     fname = build_filename(meas_type, meas_field, meas_side, 1)
-    # narda.takeMeasurement(dwell_time, fname)
-    values[0][0] = 4
+    value = narda.takeMeasurement(dwell_time, fname, savedir)
+    values[0][0] = value
 
     # General Area Scan
     for i in range(2, grid.size + 1):
@@ -215,21 +216,22 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
             m.forward_motor_two(num_steps + int(y_error))
             y_error -= int(y_error)
             curr_row = next_row
-            values[curr_row][curr_col] = 3
+            #values[curr_row][curr_col] = 3
         elif next_col > curr_col:  # Move rightwards
             x_error += frac_step
             m.forward_motor_one(num_steps + int(x_error))  # Adjust distance by error
             x_error -= int(x_error)  # Subtract integer number of steps that were moved
             curr_col = next_col
-            values[curr_row][curr_col] = 1
+            #values[curr_row][curr_col] = 1
         elif next_col < curr_col:  # Move leftwards
             x_error -= frac_step
             m.reverse_motor_one(num_steps + int(x_error))
             x_error -= int(x_error)
             curr_col = next_col
-            values[curr_row][curr_col] = 2
+            #values[curr_row][curr_col] = 2
         fname = build_filename(meas_type, meas_field, meas_side, i)
-        # narda.takeMeasurement(dwell_time, fname)
+        value = narda.takeMeasurement(dwell_time, fname, savedir)
+        values[curr_row, curr_col] = value
         print("---------")
         print(values)
 
