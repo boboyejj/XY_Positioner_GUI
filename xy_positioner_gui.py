@@ -194,6 +194,7 @@ class MainFrame(wx.Frame):
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
         sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        sys.stderr = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
         print("Running thread...")
         self.run_thread.start()
 
@@ -236,6 +237,7 @@ class MainFrame(wx.Frame):
                 self.console_frame = ConsoleGUI(self, "Console")
             self.console_frame.Show(True)
             sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+            sys.stderr = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
             self.zoom_thread.start()
 
         elif choice == 'Correct Previous Value':
@@ -265,6 +267,7 @@ class MainFrame(wx.Frame):
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
         sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        sys.stderr = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
         self.corr_thread.start()
 
     def manual_move(self, e):
@@ -272,6 +275,7 @@ class MainFrame(wx.Frame):
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
         sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        sys.stderr = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
         try:
             step = float(self.grid_tctrl.GetValue())
         except ValueError:
@@ -286,6 +290,7 @@ class MainFrame(wx.Frame):
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
         sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        sys.stderr = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
         ResetThread(self).start()
 
     def enablegui(self):

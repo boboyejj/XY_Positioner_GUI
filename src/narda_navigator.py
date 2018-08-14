@@ -108,7 +108,6 @@ class NardaNavigator:
         # Save file
         pgui.typewrite(filename)
         # Change to directory of choice
-        # pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/save_search_bar.PNG', grayscale=True)))
         pgui.hotkey('ctrl', 'l')
         pgui.typewrite(pathname)
         pgui.press(['enter'])
