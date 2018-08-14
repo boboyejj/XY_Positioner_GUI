@@ -100,13 +100,13 @@ class ZoomScanThread(threading.Thread):
 
         # Move to coordinate with maximum value
         max_val = self.values.max()
-        print("Max_val: %d" % max_val)
         max_row, max_col = np.where(self.values == int(max_val))
+        print("Max value: %d" % max_val)
+        print("Max value coordinates: Row - %d / Col - %d" % (max_row, max_col))
         row_steps = max_row - self.curr_row
         col_steps = max_col - self.curr_col
         self.curr_row = max_row
         self.curr_col = max_col
-        print("R steps: %d   -   C steps %d" % (row_steps, col_steps))
         if row_steps > 0:
             m.forward_motor_two(int(self.num_steps * row_steps))
         else:
@@ -168,6 +168,10 @@ class CorrectionThread(threading.Thread):
             m.reverse_motor_one(int(-1 * self.num_steps * col_steps))
         self.curr_row = target_row
         self.curr_col = target_col
+        print(self.values)
+        print("row:", self.curr_row, "col:", self.curr_col)
+        self.values[self.curr_row, self.curr_col] = 5
+        print(self.values)
         print("Correction of previous value complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
@@ -187,58 +191,7 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
 
     print("Scan path:")
     print(grid)
-    print("Current Values:")
-    print(values)
-
-    # Create an accumulator for the fraction of a step lost each time a grid space is moved
-    frac_step = num_steps - int(num_steps)
-    num_steps = int(num_steps)
-    x_error, y_error = 0, 0  # Accumulator for x and y directions
-    curr_row, curr_col = 0, 0
-    max_row, max_col = -1, -1  # Placeholders for the max value's coordinates
-    # Take first measurement
-    fname = build_filename(meas_type, meas_field, meas_side, 1)
-    # narda.takeMeasurement(dwell_time, fname)
-    values[0][0] = 4
-
-    # General Area Scan
-    for i in range(2, grid.size + 1):
-        next_row, next_col = np.where(grid == i)
-        next_row = next_row[0]
-        next_col = next_col[0]
-        if next_row > curr_row:  # Move downwards
-            y_error += frac_step
-            m.forward_motor_two(num_steps + int(y_error))
-            y_error -= int(y_error)
-            curr_row = next_row
-            values[curr_row][curr_col] = 3
-        elif next_col > curr_col:  # Move rightwards
-            x_error += frac_step
-            m.forward_motor_one(num_steps + int(x_error))  # Adjust distance by error
-            x_error -= int(x_error)  # Subtract integer number of steps that were moved
-            curr_col = next_col
-            values[curr_row][curr_col] = 1
-        elif next_col < curr_col:  # Move leftwards
-            x_error -= frac_step
-            m.reverse_motor_one(num_steps + int(x_error))
-            x_error -= int(x_error)
-            curr_col = next_col
-            values[curr_row][curr_col] = 2
-        fname = build_filename(meas_type, meas_field, meas_side, i)
-        # narda.takeMeasurement(dwell_time, fname)
-        print("---------")
-        print(values)
-
-    return values, grid, curr_row, curr_col
-
-
-def area_scan(x_points, y_points, m, narda, num_steps, dwell_time, meas_type, meas_field, meas_side):
-    grid = generate_grid(x_points, y_points)
-    values = np.zeros(grid.shape)
-
-    print("Scan path:")
-    print(grid)
-    print("Current Values:")
+    print("Values:")
     print(values)
 
     # Create an accumulator for the fraction of a step lost each time a grid space is moved
@@ -326,15 +279,12 @@ def generate_grid(rows, columns):
     :param columns: Number of columns in grid
     :return: Numpy matrix of correct values
     """
-    #g = np.zeros((rows, columns))
     g = []
     for i in range(rows):
         row = list(range(i * columns + 1, (i + 1) * columns + 1))
         if i % 2 != 0:
             row = list(reversed(row))
         g += row
-        #g[i] = row
-    print(g)
     g = np.array(g).reshape(rows, columns)
     return g
 

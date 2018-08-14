@@ -168,7 +168,6 @@ class MainFrame(wx.Frame):
         #    self.save_dir = dlg.GetPath()
         #    self.save_tctrl.SetValue(self.save_dir)
             #if os.path.exists(parentpath):
-        pass
 
     def run_area_scan(self, e):
         if self.save_tctrl.GetValue() is None or self.save_tctrl.GetValue() is '':
@@ -199,11 +198,8 @@ class MainFrame(wx.Frame):
         self.run_thread.start()
 
     def run_post_scan(self):
-        # Current Coordinates
-        print(self.curr_row)
-        print(self.curr_col)
         # Plot the scan
-        plt.clf()
+        plt.close()
         plt.imshow(self.values, interpolation='bilinear')
         plt.title('Area Scan Heat Map')
         cbar = plt.colorbar()
@@ -240,13 +236,11 @@ class MainFrame(wx.Frame):
                 self.console_frame = ConsoleGUI(self, "Console")
             self.console_frame.Show(True)
             sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
-            print("Running thread...")  # TODO: DEBUGGING
             self.zoom_thread.start()
 
         elif choice == 'Correct Previous Value':
             loc_gui = LocationSelectGUI(self, "Location Selection", self.grid)
             loc_gui.Show(True)
-            print("BUIBUI")
         elif choice == 'Save Data':
             pass
         elif choice == 'Exit':
@@ -259,6 +253,8 @@ class MainFrame(wx.Frame):
         if type(call_thread) is AreaScanThread:
             self.values = call_thread.values
             self.grid = call_thread.grid
+        elif type(call_thread) is CorrectionThread:
+            self.values = call_thread.values
         elif type(call_thread) is ZoomScanThread:
             self.zoom_values = call_thread.zoom_values
 

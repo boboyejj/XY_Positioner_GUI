@@ -21,7 +21,6 @@ class LocationSelectGUI(wx.Dialog):
             self.Bind(wx.EVT_BUTTON, lambda e, x=btn.Id: self.selected(x), btn)
             self.coord_sizer.Add(btn, proportion=1)
             self.coord_sizer.Layout()
-            print("Button:", val)
 
         self.SetSizer(self.coord_sizer)
         self.SetAutoLayout(True)
@@ -30,7 +29,6 @@ class LocationSelectGUI(wx.Dialog):
 
     def selected(self, valid):
         self.parent.run_correction(valid)
-        #wx.PostEvent(self, wx.ID_OK)
         self.Destroy()
 
     def OnQuit(self, e):
