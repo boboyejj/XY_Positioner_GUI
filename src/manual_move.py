@@ -120,7 +120,7 @@ class ManualMoveGUI(wx.Frame):
             e.Skip()
 
     def OnClose(self, e):
-        print("Closing")
+        print("Exiting Manual Movement module.")
         self.motor.destroy()
         self.Destroy()
 

@@ -5,7 +5,7 @@
 import os
 import sys
 import threading
-from src.area_scan import AreaScanThread
+from src.area_scan import AreaScanThread, ZoomScanThread
 from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
 from src.manual_move import ManualMoveGUI
@@ -27,12 +27,19 @@ class MainFrame(wx.Frame):
 
         # Variables
         self.run_thread = None
+        self.zoom_thread = None
         self.console_frame = None
+
+        self.curr_row = 0  # Grid coordinate row
+        self.curr_col = 0  # Grid coordinate col
+        self.values = None  # np.array storing area scan values
+        self.zoom_values = None  # np.array storing zoom scan values
+        self.grid = None  # np.array storing 'trajectory' of scans
 
         # Accelerator Table/Shortcut Keys
         save_id = 115
         run_id = 116
-        manual_id =117
+        manual_id = 117
 
         # UI Elements
         self.x_distance_text = wx.StaticText(self, label="X Distance")
@@ -186,20 +193,16 @@ class MainFrame(wx.Frame):
         self.run_thread.start()
 
     def run_post_scan(self):
+        # Current Coordinates
+        print(self.curr_row)
+        print(self.curr_col)
         # Plot the scan
         plt.clf()
-        plt.imshow(self.run_thread.values, interpolation='bilinear')
+        plt.imshow(self.values, interpolation='bilinear')
         plt.title('Area Scan Heat Map')
         cbar = plt.colorbar()
         cbar.set_label('Signal Level')
         plt.show(block=False)
-
-        #try:
-        #    x = float(self.x_tctrl.GetValue())
-        #    y = float(self.y_tctrl.GetValue())
-        #    step = float(self.grid_tctrl.GetValue())
-        #    dwell = float(self.dwell_tctrl.GetValue())
-        #    zdwell = float(self.zdwell_tctrl.GetValue())
 
         # Post Scan GUI - User selects which option to proceed with
         with PostScanGUI(self, title="Post Scan Options", style=wx.DEFAULT_DIALOG_STYLE | wx.OK) as post_dlg:
@@ -209,9 +212,32 @@ class MainFrame(wx.Frame):
             else:
                 print("No option selected - Area Scan Complete.")
                 self.enablegui()
+                return
 
         if choice == 'Zoom Scan':
-            pass
+            try:
+                zdwell = float(self.zdwell_tctrl.GetValue())
+            except ValueError:
+                self.errormsg("Invalid scan parameters.\nPlease input numerical values only.")
+                return
+            savedir = self.save_tctrl.GetValue()
+            # Finding the measurement type
+            meas_type = self.type_rbox.GetString(self.type_rbox.GetSelection())
+            # Finding the measurement field
+            meas_field = self.field_rbox.GetString(self.field_rbox.GetSelection())
+            # Finding the measurement side
+            meas_side = self.side_rbox.GetString(self.side_rbox.GetSelection())
+            self.zoom_thread = ZoomScanThread(self, zdwell, savedir, meas_type, meas_field, meas_side,
+                                              self.run_thread.num_steps, self.run_thread.values, self.run_thread.grid,
+                                              self.curr_row, self.curr_col)
+            self.disablegui()
+            if not self.console_frame:
+                self.console_frame = ConsoleGUI(self, "Console")
+            self.console_frame.Show(True)
+            sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+            print("Running thread...")
+            self.zoom_thread.start()
+
         elif choice == 'Correct Previous Value':
             pass
         elif choice == 'Save Data':
@@ -219,6 +245,15 @@ class MainFrame(wx.Frame):
         elif choice == 'Exit':
             print("Area Scan Complete. Exiting module.")
             self.enablegui()
+
+    def update_values(self, call_thread):
+        self.curr_row = call_thread.curr_row
+        self.curr_col = call_thread.curr_col
+        if type(call_thread) is AreaScanThread:
+            self.values = call_thread.values
+            self.grid = call_thread.grid
+        elif type(call_thread) is ZoomScanThread:
+            self.zoom_values = call_thread.zoom_values
 
     def manual_move(self, e):
         if not self.console_frame:
@@ -244,6 +279,7 @@ class MainFrame(wx.Frame):
         self.type_rbox.Enable(True)
         self.field_rbox.Enable(True)
         self.side_rbox.Enable(True)
+        self.manual_btn.Enable(True)
         self.run_btn.Enable(True)
 
     def disablegui(self):
@@ -257,6 +293,7 @@ class MainFrame(wx.Frame):
         self.type_rbox.Enable(False)
         self.field_rbox.Enable(False)
         self.side_rbox.Enable(False)
+        self.manual_btn.Enable(False)
         self.run_btn.Enable(False)
 
     def errormsg(self, errmsg):

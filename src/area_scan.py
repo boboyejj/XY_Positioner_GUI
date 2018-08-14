@@ -17,6 +17,7 @@ class AreaScanThread(threading.Thread):
     def __init__(self, parent, x_distance, y_distance, grid_step_dist,
                  dwell_time, save_dir, meas_type, meas_field, meas_side):
         self.parent = parent
+        self.callback = parent.update_values
         self.x_distance = x_distance
         self.y_distance = y_distance
         self.grid_step_dist = grid_step_dist
@@ -26,6 +27,7 @@ class AreaScanThread(threading.Thread):
         self.meas_field = meas_field
         self.meas_side = meas_side
 
+        self.num_steps = None  # Placeholder for number of motor steps needed to move one grid space
         self.values = None  # Placeholder for the array of values
         self.grid = None  # Placeholder for the coordinate grid array
         self.curr_row = None  # Current position row
@@ -48,21 +50,23 @@ class AreaScanThread(threading.Thread):
         # narda = NardaNavigator()
         narda = None  # TODO: Debugging
         # Calculate number of motor steps necessary to move one grid space
-        num_steps = self.grid_step_dist / m.step_unit
+        self.num_steps = self.grid_step_dist / m.step_unit
 
         # Run scan
-        self.values, self.grid, self.curr_row, self.curr_col = run_scan(x_points, y_points, m, narda, num_steps,
+        self.values, self.grid, self.curr_row, self.curr_col = run_scan(x_points, y_points, m, narda, self.num_steps,
                                                                         self.dwell_time, self.save_dir, self.meas_type,
                                                                         self.meas_field, self.meas_side)
         print("General Area Scan Complete.")
+        self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
         m.destroy()
 
 
 class ZoomScanThread(threading.Thread):
-    def __init__(self, parent, num_steps, dwell_time,
-                 save_dir, meas_type, meas_field, meas_side, curr_row, curr_col):
+    def __init__(self, parent, dwell_time, save_dir, meas_type, meas_field,
+                 meas_side, num_steps, values, grid, curr_row, curr_col):
         self.parent = parent
+        self.callback = parent.update_values
         self.num_steps = num_steps
         self.dwell_time = dwell_time
         self.save_dir = save_dir
@@ -72,9 +76,10 @@ class ZoomScanThread(threading.Thread):
         self.curr_row = curr_row
         self.curr_col = curr_col
 
-        self.values = None  # Placeholder for the array of values
-        self.grid = None  # Placeholder for the coordinate grid array
-        super(AreaScanThread, self).__init__()
+        self.values = values  # original array of values
+        self.zoom_values = None  # Placeholder for zoom coordinates
+        self.grid = grid  # Placeholder for the coordinate grid array
+        super(ZoomScanThread, self).__init__()
 
     def run(self):
         print(self.meas_type, self.meas_field, self.meas_side)
@@ -99,6 +104,8 @@ class ZoomScanThread(threading.Thread):
         max_row, max_col = np.where(self.values == int(max_val))
         row_steps = max_row - self.curr_row
         col_steps = max_col - self.curr_col
+        self.curr_row = max_row
+        self.curr_col = max_col
         print("R steps: %d   -   C steps %d" % (row_steps, col_steps))
         if row_steps > 0:
             m.forward_motor_two(int(self.num_steps * row_steps))
@@ -110,14 +117,16 @@ class ZoomScanThread(threading.Thread):
             m.reverse_motor_one(int(-1 * self.num_steps * col_steps))
 
         # Run scan
-        self.values, self.grid, self.curr_row, self.curr_col = run_scan(x_points, y_points, m, narda, znum_steps,
-                                                                        self.dwell_time, self.save_dir, self.meas_type,
-                                                                        self.meas_field, self.meas_side)
-        if self.values == -1:
-            print("Area Scan Terminated.")
-        else:
-            print("General Area Scan Complete.")
-            wx.CallAfter(self.parent.run_post_scan)
+        self.zoom_values, _, _, _ = run_scan(x_points, y_points, m, narda, znum_steps,
+                                             self.dwell_time, self.save_dir, self.meas_type,
+                                             self.meas_field, self.meas_side)
+        # Move back to original position
+        m.reverse_motor_one(int(2 * znum_steps))
+        m.reverse_motor_two(int(2 * znum_steps))
+
+        print("Zoom Scan complete.")
+        self.callback(self)
+        wx.CallAfter(self.parent.run_post_scan)
         m.destroy()
 
 
