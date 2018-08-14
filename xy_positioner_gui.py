@@ -238,7 +238,9 @@ class MainFrame(wx.Frame):
             self.zoom_thread.start()
 
         elif choice == 'Correct Previous Value':
-            pass
+            loc_gui = LocationSelectGUI(self, "Location Selection", self.grid)
+            loc_gui.Show(True)
+            print("BUIBUI")
         elif choice == 'Save Data':
             pass
         elif choice == 'Exit':
@@ -253,6 +255,10 @@ class MainFrame(wx.Frame):
             self.grid = call_thread.grid
         elif type(call_thread) is ZoomScanThread:
             self.zoom_values = call_thread.zoom_values
+
+    def run_correction(self, val):
+        print("HENLO RUN CORRECTION", val)
+        self.run_post_scan()
 
     def manual_move(self, e):
         if not self.console_frame:
