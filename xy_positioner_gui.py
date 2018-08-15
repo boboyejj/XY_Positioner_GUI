@@ -77,6 +77,9 @@ class MainFrame(wx.Frame):
         self.save_btn = wx.Button(self, save_id, "Browse")
         self.Bind(wx.EVT_BUTTON, self.select_save_dir, self.save_btn)
 
+        self.auto_checkbox = wx.CheckBox(self, label="Automatic Measurements")  # TODO: may not use
+        self.auto_checkbox.SetValue(True)
+
         self.measurement_specs_text = wx.StaticText(self, label="Measurement Specifications")
         self.measurement_specs_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.type_rbox = wx.RadioBox(self, label="Type", choices=['Limb', 'Body'],
@@ -99,6 +102,7 @@ class MainFrame(wx.Frame):
 
         # Sizers/Layout, Static Lines, & Static Boxes
         self.saveline_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.checkbox_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.text_input_sizer = wx.BoxSizer(wx.VERTICAL)
         self.radio_input_sizer = wx.BoxSizer(wx.VERTICAL)
         self.btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -122,7 +126,9 @@ class MainFrame(wx.Frame):
         self.text_input_sizer.Add(self.savedesc_text, proportion=0, flag=wx.LEFT)
         self.saveline_sizer.Add(self.save_tctrl, proportion=1, flag=wx.LEFT | wx.EXPAND)
         self.saveline_sizer.Add(self.save_btn, proportion=0, flag=wx.ALIGN_RIGHT | wx.LEFT, border=5)
+        self.checkbox_sizer.Add(self.auto_checkbox, proportion=0, flag=wx.ALIGN_LEFT | wx.ALL, border=5)
         self.text_input_sizer.Add(self.saveline_sizer, proportion=0, flag=wx.LEFT | wx.EXPAND)
+        self.text_input_sizer.Add(self.checkbox_sizer, proportion=0, flag=wx.LEFT | wx.EXPAND)
 
         self.radio_input_sizer.Add(self.measurement_specs_text, proportion=0, flag=wx.LEFT)
         self.radio_input_sizer.Add(self.type_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
@@ -188,7 +194,8 @@ class MainFrame(wx.Frame):
         meas_field = self.field_rbox.GetString(self.field_rbox.GetSelection())
         # Finding the measurement side
         meas_side = self.side_rbox.GetString(self.side_rbox.GetSelection())
-        self.run_thread = AreaScanThread(self, x, y, step, dwell, savedir, meas_type, meas_field, meas_side)
+        self.run_thread = AreaScanThread(self, x, y, step, dwell, savedir,
+                                         meas_type, meas_field, meas_side)
         self.disablegui()
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")

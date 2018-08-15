@@ -62,13 +62,12 @@ class NardaNavigator:
         # print(selectedName, deselectedName)
         try:
             if not pgui.locateOnScreen(self.refpics_path + selectedName):
-                print("Not located - clicking the position: " + self.refpics_path + deselectedName)
+                # print("Not located - clicking the position: " + self.refpics_path + deselectedName)
                 x, y, w, h = pgui.locateOnScreen(self.refpics_path + '/' + tabName + '_tab_deselected.PNG',
                                                  grayscale=True)
-                print(x, y, w, h)
                 pgui.click(pgui.center((x, y, w, h)))
-            else:
-                print("Already in the '" + tabName + "' tab")
+            # else:
+            #     print("Already in the '" + tabName + "' tab")
         except TypeError:
             print('Error: Reference images not found on screen...')
             exit(1)
@@ -126,7 +125,7 @@ class NardaNavigator:
 
         # Input comment
         pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/comment.PNG', grayscale=True)))
-        time.sleep(0.5)
+        #time.sleep(0.3)
         pgui.typewrite("Hello world!")
         pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/ok.PNG', grayscale=True)))
 

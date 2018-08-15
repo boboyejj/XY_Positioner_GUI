@@ -26,6 +26,7 @@ class AreaScanThread(threading.Thread):
         self.meas_type = meas_type
         self.meas_field = meas_field
         self.meas_side = meas_side
+        self.auto_meas = auto_meas
 
         self.num_steps = None  # Placeholder for number of motor steps needed to move one grid space
         self.values = None  # Placeholder for the array of values
@@ -48,8 +49,7 @@ class AreaScanThread(threading.Thread):
             wx.CallAfter(self.parent.enablegui)
             return
         narda = NardaNavigator()
-        #narda = None  # TODO: Debugging
-        # Set proper settings
+        # Set measurement settings
         narda.selectTab('mode')
         narda.selectInputType(self.meas_field)
         narda.selectTab('span')
