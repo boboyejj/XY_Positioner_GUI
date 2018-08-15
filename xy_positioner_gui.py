@@ -36,6 +36,7 @@ class MainFrame(wx.Frame):
         self.values = None  # np.array storing area scan values
         self.zoom_values = None  # np.array storing zoom scan values
         self.grid = None  # np.array storing 'trajectory' of scans
+        self.max_fname = ''  # Name of the image file for the max measurement
 
         # Accelerator Table/Shortcut Keys
         save_id = 115
@@ -262,14 +263,23 @@ class MainFrame(wx.Frame):
         if type(call_thread) is AreaScanThread:
             self.values = call_thread.values
             self.grid = call_thread.grid
+            self.max_fname = call_thread.max_fname
         elif type(call_thread) is CorrectionThread:
             self.values = call_thread.values
         elif type(call_thread) is ZoomScanThread:
             self.zoom_values = call_thread.zoom_values
 
     def run_correction(self, val):
+        savedir = self.save_tctrl.GetValue()
+        # Finding the measurement type
+        meas_type = self.type_rbox.GetString(self.type_rbox.GetSelection())
+        # Finding the measurement field
+        meas_field = self.field_rbox.GetString(self.field_rbox.GetSelection())
+        # Finding the measurement side
+        meas_side = self.side_rbox.GetString(self.side_rbox.GetSelection())
         self.corr_thread = CorrectionThread(self, val, self.run_thread.num_steps, float(self.dwell_tctrl.GetValue()),
-                                            self.values, self.grid, self.curr_row, self.curr_col)
+                                            self.values, self.grid, self.curr_row, self.curr_col,
+                                            savedir, meas_type, meas_field, meas_side, self.max_fname)
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)

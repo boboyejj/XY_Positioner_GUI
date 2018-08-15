@@ -105,15 +105,9 @@ class MotorDriver:
         while self.port.read().decode() != 'o':
             pass
         print("Motor 2 reset.")
-        # time.sleep(60)
-        #output = self.port.read(1000)
-        #while self.port.in_waiting:
-        #    time.sleep(1)
-        #    output += self.port.read(1000)
-        # print 'Moving home: ', port.readline()
         self.port.flush()
 
-        print("Motors reset. Exit program and run again.")
+        print("Motors reset successfully.")
 
     def destroy(self):
         """Flush remaining data and close port."""

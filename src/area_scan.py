@@ -32,7 +32,7 @@ class AreaScanThread(threading.Thread):
         self.grid = None  # Placeholder for the coordinate grid array
         self.curr_row = None  # Current position row
         self.curr_col = None  # Current position col
-        self.maxfname = None  # The filename of the screenshot for the maximum measurement
+        self.max_fname = None  # The filename of the screenshot for the maximum measurement
         super(AreaScanThread, self).__init__()
 
     def run(self):
@@ -63,9 +63,9 @@ class AreaScanThread(threading.Thread):
 
         # Run scan
         self.values, self.grid, self.curr_row,\
-        self.curr_col, self.maxfname = run_scan(x_points, y_points, m, narda, self.num_steps,
-                                                self.dwell_time, self.save_dir, self.meas_type,
-                                                self.meas_field, self.meas_side)
+        self.curr_col, self.max_fname = run_scan(x_points, y_points, m, narda, self.num_steps,
+                                                 self.dwell_time, self.save_dir, self.meas_type,
+                                                 self.meas_field, self.meas_side)
         print("General area scan complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
@@ -151,7 +151,7 @@ class ZoomScanThread(threading.Thread):
 
 class CorrectionThread(threading.Thread):
     def __init__(self, parent, target, num_steps, dwell_time, values, grid, curr_row, curr_col,
-                 save_dir, meas_type, meas_field, meas_side):
+                 save_dir, meas_type, meas_field, meas_side, max_fname):
         self.parent = parent
         self.callback = self.parent.update_values
         self.target = target
@@ -165,6 +165,7 @@ class CorrectionThread(threading.Thread):
         self.meas_type = meas_type
         self.meas_field = meas_field
         self.meas_side = meas_side
+        self.max_fname = max_fname
         super(CorrectionThread, self).__init__()
 
     def run(self):
@@ -217,6 +218,7 @@ class CorrectionThread(threading.Thread):
             # Switch to Snipping Tool in front of the NARDA program
             narda.saveBitmap(fname, self.save_dir)
             narda.bringToFront()  # Once bitmap is saved, return focus to NARDA
+            os.rename(self.save_dir + '/' + self.max_fname + '.PNG', self.save_dir + '/' + fname + '.PNG')
         print("Correction of previous value complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
@@ -227,8 +229,6 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
 
-    #values, grid, curr_row, curr_col = area_scan(x_points, y_points, m, narda, num_steps,
-    #                                             dwell_time, meas_type, meas_field, meas_side)
     grid = generate_grid(x_points, y_points)
     values = np.zeros(grid.shape)
 
@@ -255,19 +255,16 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
             m.forward_motor_two(num_steps + int(y_error))
             y_error -= int(y_error)
             curr_row = next_row
-            #values[curr_row][curr_col] = 3
         elif next_col > curr_col:  # Move rightwards
             x_error += frac_step
             m.forward_motor_one(num_steps + int(x_error))  # Adjust distance by error
             x_error -= int(x_error)  # Subtract integer number of steps that were moved
             curr_col = next_col
-            #values[curr_row][curr_col] = 1
         elif next_col < curr_col:  # Move leftwards
             x_error -= frac_step
             m.reverse_motor_one(num_steps + int(x_error))
             x_error -= int(x_error)
             curr_col = next_col
-            #values[curr_row][curr_col] = 2
         fname = build_filename(meas_type, meas_field, meas_side, i)
         value = narda.takeMeasurement(dwell_time, fname, savedir)
         values[curr_row, curr_col] = value

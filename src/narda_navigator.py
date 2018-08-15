@@ -25,22 +25,14 @@ class NardaNavigator:
         WMI = GetObject('winmgmts:')
         processes = WMI.InstancesOf('Win32_Process')
         p_list = [p.Properties_('Name').Value for p in processes]
-        #if self.snip_path.split('\\')[-1] not in p_list:
-        #    print("Starting Snipping Tool - Connecting...")
-        #    self.snip_tool.start(self.snip_path)
-        #    # Wait until the window has been opened
-        #    while not pgui.locateOnScreen(self.refpics_path + '/snip_window_title.PNG'):
-        #        pass
-        #    print("Snipping Tool opened successfully.")
-        #else:
-        #    print("Snipping Tool already open - Connecting...")
-        #    self.snip_tool.connect(path=self.snip_path)
         # If program already open, close and restart
         # Found that this was necessary for a bug-less run
         if self.snip_path.split('\\')[-1] in p_list:
             self.snip_tool.connect(path=self.snip_path)
             self.snip_tool.kill()
         print("Starting Snipping Tool - Connecting...")
+        print("NOTE: The program window, once open, must be ACTIVE (i.e. the front-most window) for the NS Scan"
+              "Program to connect to the program.")
         self.snip_tool.start(self.snip_path)
         # Wait until the window has been opened
         while not pgui.locateOnScreen(self.refpics_path + '/snip_window_title.PNG'):
@@ -51,20 +43,14 @@ class NardaNavigator:
         WMI = GetObject('winmgmts:')
         processes = WMI.InstancesOf('Win32_Process')
         p_list = [p.Properties_('Name').Value for p in processes]
-        #if self.ehp200_path.split('\\')[-1] not in p_list:
-        #    print("Starting EHP200 program - Connecting...")
-        #    self.ehp200_app.start(self.ehp200_path)
-        #    # Wait until the window has been opened
-        #    while not pgui.locateOnScreen(self.refpics_path + '/window_title.PNG'):
-        #        pass
-        #    print("EHP200 opened successfully.")
-        #else:
-        #    print("EHP200 already open - Connecting...")
-        #    self.ehp200_app.connect(path=self.ehp200_path)
+        # If program already open, close and restart
+        # Found that this was necessary for a bug-less run
         if self.ehp200_path.split('\\')[-1] in p_list:
             self.ehp200_app.connect(path=self.ehp200_path)
             self.ehp200_app.kill()
         print("Starting EHP200 program - Connecting...")
+        print("NOTE: The program window, once open, must be ACTIVE (i.e. the front-most window) for the NS Scan"
+              "Program to connect to the program.")
         self.ehp200_app.start(self.ehp200_path)
         # Wait until the window has been opened
         while not pgui.locateOnScreen(self.refpics_path + '/window_title.PNG'):
@@ -207,9 +193,10 @@ class NardaNavigator:
         # Overwrite if file already exists
         try:
             pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/yes.PNG', grayscale=True)))
-            print("File '" + filename + ".PNG'" + " already exists - overwriting file.")
+            # print("File '" + filename + ".PNG'" + " already exists - overwriting file.")
         except TypeError:
-            print("New file '" + filename + ".PNG'" + " has been saved.")
+            pass
+            # print("New file '" + filename + ".PNG'" + " has been saved.")
         # self.minimizeSnip()
 
     def getMaxValue(self, filepath, pathname):
