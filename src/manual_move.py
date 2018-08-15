@@ -95,7 +95,6 @@ class ManualMoveGUI(wx.Frame):
         self.motor.reverse_motor_two(self.stepy + int(self.erry))
         self.erry -= int(self.erry)
         self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
-        print(self.curry)
 
     def move_down(self, e):
         self.curry += self.disty
@@ -103,7 +102,6 @@ class ManualMoveGUI(wx.Frame):
         self.motor.forward_motor_two(self.stepy + int(self.erry))
         self.erry -= int(self.erry)
         self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
-        print(self.curry)
 
     def move_left(self, e):
         self.currx -= self.distx
@@ -111,7 +109,6 @@ class ManualMoveGUI(wx.Frame):
         self.motor.reverse_motor_one(self.stepx + int(self.errx))
         self.errx -= int(self.errx)
         self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
-        print(self.currx)
 
     def move_right(self, e):
         self.currx += self.distx
@@ -119,7 +116,6 @@ class ManualMoveGUI(wx.Frame):
         self.motor.forward_motor_one(self.stepx + int(self.errx))
         self.errx -= int(self.errx)
         self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
-        print(self.currx)
 
     def OnKey(self, e):
         if e.GetKeyCode() == wx.WXK_UP:
@@ -135,8 +131,12 @@ class ManualMoveGUI(wx.Frame):
 
     def update_settings(self, e):
         try:
-            self.distx = float(self.x_tctrl.GetValue())
-            self.disty = float(self.y_tctrl.GetValue())
+            xval = float(self.x_tctrl.GetValue())
+            yval = float(self.y_tctrl.GetValue())
+            if self.distx == xval and self.disty == yval:
+                return
+            self.distx = xval
+            self.disty = yval
         except ValueError:
             print("Invalid distance values.\nPlease input numeric values.")
             self.x_tctrl = float(self.distx)

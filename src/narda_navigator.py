@@ -25,31 +25,51 @@ class NardaNavigator:
         WMI = GetObject('winmgmts:')
         processes = WMI.InstancesOf('Win32_Process')
         p_list = [p.Properties_('Name').Value for p in processes]
-        if self.snip_path.split('\\')[-1] not in p_list:
-            print("Starting Snipping Tool - Connecting...")
-            self.snip_tool.start(self.snip_path)
-            # Wait until the window has been opened
-            while not pgui.locateOnScreen(self.refpics_path + '/snip_window_title.PNG'):
-                pass
-            print("Snipping Tool opened successfully.")
-        else:
-            print("Snipping Tool already open - Connecting...")
+        #if self.snip_path.split('\\')[-1] not in p_list:
+        #    print("Starting Snipping Tool - Connecting...")
+        #    self.snip_tool.start(self.snip_path)
+        #    # Wait until the window has been opened
+        #    while not pgui.locateOnScreen(self.refpics_path + '/snip_window_title.PNG'):
+        #        pass
+        #    print("Snipping Tool opened successfully.")
+        #else:
+        #    print("Snipping Tool already open - Connecting...")
+        #    self.snip_tool.connect(path=self.snip_path)
+        # If program already open, close and restart
+        # Found that this was necessary for a bug-less run
+        if self.snip_path.split('\\')[-1] in p_list:
             self.snip_tool.connect(path=self.snip_path)
+            self.snip_tool.kill()
+        print("Starting Snipping Tool - Connecting...")
+        self.snip_tool.start(self.snip_path)
+        # Wait until the window has been opened
+        while not pgui.locateOnScreen(self.refpics_path + '/snip_window_title.PNG'):
+            pass
+        print("Snipping Tool opened successfully.")
 
     def startNarda(self):
         WMI = GetObject('winmgmts:')
         processes = WMI.InstancesOf('Win32_Process')
         p_list = [p.Properties_('Name').Value for p in processes]
-        if self.ehp200_path.split('\\')[-1] not in p_list:
-            print("Starting EHP200 program - Connecting...")
-            self.ehp200_app.start(self.ehp200_path)
-            # Wait until the window has been opened
-            while not pgui.locateOnScreen(self.refpics_path + '/window_title.PNG'):
-                pass
-            print("EHP200 opened successfully.")
-        else:
-            print("EHP200 already open - Connecting...")
+        #if self.ehp200_path.split('\\')[-1] not in p_list:
+        #    print("Starting EHP200 program - Connecting...")
+        #    self.ehp200_app.start(self.ehp200_path)
+        #    # Wait until the window has been opened
+        #    while not pgui.locateOnScreen(self.refpics_path + '/window_title.PNG'):
+        #        pass
+        #    print("EHP200 opened successfully.")
+        #else:
+        #    print("EHP200 already open - Connecting...")
+        #    self.ehp200_app.connect(path=self.ehp200_path)
+        if self.ehp200_path.split('\\')[-1] in p_list:
             self.ehp200_app.connect(path=self.ehp200_path)
+            self.ehp200_app.kill()
+        print("Starting EHP200 program - Connecting...")
+        self.ehp200_app.start(self.ehp200_path)
+        # Wait until the window has been opened
+        while not pgui.locateOnScreen(self.refpics_path + '/window_title.PNG'):
+            pass
+        print("EHP200 opened successfully.")
 
     def closeNarda(self):
         self.ehp200_app.kill()
@@ -143,32 +163,54 @@ class NardaNavigator:
         # Overwrite if file already exists
         try:
             pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/yes.PNG', grayscale=True)))
-            print("File already exists - overwriting file.")
+            print("File '" + filename + ".txt'" + " already exists - overwriting file.")
         except TypeError:
-            print("New file has been saved.")
+            print("New file '" + filename + ".txt'" + " has been saved.")
 
         # Wait for file to have saved properly
         while not os.path.isfile(pathname + '/' + filename + '.txt'):
-            print(pathname + '/' + filename + '.txt')
             pass
 
         # Return max recorded value
         return self.getMaxValue(filename, pathname)
 
-
-    def saveBitmap(self):
+    def saveBitmap(self, filename, pathname):
+        # Stack Snipping Tool in front of the NARDA program
         self.bringToFront()
         # Open Data Tab
-        if not pgui.locateOnScreen(self.refpics_path + '/data_tab_selected.PNG'):
-            pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + 'data_tab_deselected.PNG')))
-
-
-        # Input comment
-        # pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/comment.PNG')))
-        # pgui.typewrite("Hello world!")
-        # pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/ok.PNG')))
-
+        self.selectTab('data')
+        context = self.bringSnipToFront()
+        if context == 'snipping':
+            pgui.hotkey('alt', 'm')
+            pgui.press('w')
+        else:
+            pgui.hotkey('ctrl', 'n')
+        try:
+            pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/narda_triangle.PNG'))
+        except TypeError:
+            pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/window_title_not_focused.PNG'))
+            print("ERROR - ")  # TODO: Do we even need this? What would be a better way to implement this
+            return
+        pgui.hotkey('ctrl', 's')
         # Save file
+        pgui.typewrite('tmp')
+
+        # Change to directory of choice
+        pgui.hotkey('ctrl', 'l')
+        pgui.typewrite(pathname)
+        pgui.press(['enter'])
+        try:
+            pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/save.PNG', grayscale=True)))
+        except TypeError:
+            pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/save_underscore.PNG', grayscale=True)))
+
+        # Overwrite if file already exists
+        try:
+            pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/yes.PNG', grayscale=True)))
+            print("File '" + filename + ".PNG'" + " already exists - overwriting file.")
+        except TypeError:
+            print("New file '" + filename + ".PNG'" + " has been saved.")
+        # self.minimizeSnip()
 
     def getMaxValue(self, filepath, pathname):
         with open(pathname + '/' + filepath + '.txt', 'r') as f:
@@ -179,7 +221,6 @@ class NardaNavigator:
                     break  # Breaks if we find the first numeric value
                 except ValueError:
                     continue
-            print(maxVal)
         return maxVal
 
     def saveCurrentLocation(self):
@@ -189,12 +230,21 @@ class NardaNavigator:
         pgui.moveTo(x, y)
 
     def bringToFront(self):
-        #self.ehp200_app.EHP200.Minimize()
-        #self.ehp200_app.EHP200.Restore()
         self.ehp200_app.EHP200.set_focus()
 
     def bringSnipToFront(self):
-        self.snip_tool.SNIP.set_focus()
+        try:
+            self.snip_tool.Snipping.set_focus()
+            return 'snipping'
+        except pwin.findbestmatch.MatchError:  # If the snipping tool has already taken a snip, window is renamed 'edit'
+            self.snip_tool.Edit.set_focus()
+            return 'edit'
+
+    def minimizeSnip(self):
+        try:
+            self.snip_tool.Snipping.Minimize()
+        except pwin.findbestmatch.MatchError:  # If the snipping tool has already taken a snip, window is renamed 'edit'
+            self.snip_tool.Edit.set_focus()
 
     def main(self):
         #self.startNarda()

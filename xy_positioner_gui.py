@@ -202,7 +202,7 @@ class MainFrame(wx.Frame):
         self.console_frame.Show(True)
         sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
         sys.stderr = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
-        print("Running thread...")
+        print("Running general scan...")
         self.run_thread.start()
 
     def run_post_scan(self):
@@ -268,7 +268,7 @@ class MainFrame(wx.Frame):
             self.zoom_values = call_thread.zoom_values
 
     def run_correction(self, val):
-        self.corr_thread = CorrectionThread(self, val, self.run_thread.num_steps,
+        self.corr_thread = CorrectionThread(self, val, self.run_thread.num_steps, float(self.dwell_tctrl.GetValue()),
                                             self.values, self.grid, self.curr_row, self.curr_col)
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
