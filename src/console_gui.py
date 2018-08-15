@@ -11,7 +11,7 @@ class TextRedirecter(object):
 
 class ConsoleGUI(wx.Frame):
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, size=(800, 700))
+        wx.Frame.__init__(self, parent, title=title, size=(800, 700), style=wx.CAPTION)
 
         # UI Elements
         self.console_text = wx.StaticText(self, label="Console Output")

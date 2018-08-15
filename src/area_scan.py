@@ -49,6 +49,14 @@ class AreaScanThread(threading.Thread):
             return
         narda = NardaNavigator()
         #narda = None  # TODO: Debugging
+        # Set proper settings
+        narda.selectTab('mode')
+        narda.selectInputType(self.meas_field)
+        narda.selectTab('span')
+        narda.inputTextEntry('start', str(0.005))
+        narda.inputTextEntry('stop', str(5))
+        narda.selectTab('data')
+
         # Calculate number of motor steps necessary to move one grid space
         self.num_steps = self.grid_step_dist / m.step_unit
 

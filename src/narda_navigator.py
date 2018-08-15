@@ -7,10 +7,12 @@ import os
 import subprocess
 
 
+
 class NardaNavigator:
 
     def __init__(self):
         pgui.PAUSE = 0.5
+        pgui.FAILSAFE = True  # True - abort program mid-automation by moving mouse to upper left corner
         self.refpics_path = 'narda_navigator_referencepics'
         self.ehp200_path = "C:\\Program Files (x86)\\NardaSafety\\EHP-TS\\EHP200-TS\\EHP200.exe"
         self.snip_path = "C:\\Windows\\System32\\SnippingTool.exe"
@@ -29,9 +31,9 @@ class NardaNavigator:
             # Wait until the window has been opened
             while not pgui.locateOnScreen(self.refpics_path + '/snip_window_title.PNG'):
                 pass
-            print("Snipping Tool Opened")
+            print("Snipping Tool opened successfully.")
         else:
-            print("Snipping Tool Opened")
+            print("Snipping Tool already open - Connecting...")
             self.snip_tool.connect(path=self.snip_path)
 
     def startNarda(self):
@@ -44,9 +46,9 @@ class NardaNavigator:
             # Wait until the window has been opened
             while not pgui.locateOnScreen(self.refpics_path + '/window_title.PNG'):
                 pass
-            print("EHP200 Opened")
+            print("EHP200 opened successfully.")
         else:
-            print("EHP200 already opened - Connecting...")
+            print("EHP200 already open - Connecting...")
             self.ehp200_app.connect(path=self.ehp200_path)
 
     def closeNarda(self):
@@ -71,21 +73,44 @@ class NardaNavigator:
             print('Error: Reference images not found on screen...')
             exit(1)
 
-    def selectInputType(self, type):
-        if type.lower() == 'elec':
-            pass
-        elif type.lower() == 'mag_a':
-            pass
-        elif type.lower() == 'mag_b':
-            pass
+    def selectInputType(self, meas_type):
+        if meas_type == 'Electric':
+            pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/electric.PNG'))
+        elif meas_type == 'Magnetic (Mode A)':
+            pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/magnetic_modea.PNG'))
+        elif meas_type == 'Magnetic (Mode B)':
+            pgui.click((pgui.locateCenterOnScreen(self.refpics_path + '/magnetic_modeb.PNG')))
+        # TODO: Probably useless else statement here...
         else:
             print("Argument must be one of either 'elec', 'mag_a', or 'mag_b'")
+            raise ValueError
+
+    def inputTextEntry(self, ref_word, input, direction='right'):
+        # TODO: Probably not gonna use 'direction' param, since always to the right...
+        # Find coordinates of the reference word
+        x, y = pgui.locateCenterOnScreen(self.refpics_path + '/' + ref_word + '.PNG')
+        counter = 0  # counts how many continuous white spaces we find to determine if text entry
+        pgui.moveTo(x, y)
+        while pgui.position()[0] < pgui.size()[0]:
+            pgui.moveRel(15, 0)
+            im = pgui.screenshot()
+            color = im.getpixel(pgui.position())
+            if color == (255, 255, 255):
+                counter += 1
+            else:
+                counter = 0
+            # If whitespace identified (i.e. 3 contiguous white pixel measurements taken)
+            if counter == 3:
+                pgui.dragTo(x, y, duration=0.4)  # Select the value
+                pgui.typewrite(input)
+                return
+        # If the text entry location is not found, raise exception
+        raise Exception
 
     def takeMeasurement(self, dwell_time, filename, pathname):
         self.bringToFront()
         # If not on the data tab, switch to it
-        if not pgui.locateOnScreen(self.refpics_path + '/data_tab_selected.PNG'):
-            pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/data_tab_deselected.PNG')))
+        self.selectTab('data')
 
         # Reset measurement by clicking on 'Free Scan' radio button
         pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/free_scan.PNG', grayscale=True)))
@@ -179,7 +204,6 @@ class NardaNavigator:
         for i in range(1, 17):
             fname = name + str(i) + ".txt"
             self.getMaxValue(fname)
-
 
 
 if __name__ == '__main__':
