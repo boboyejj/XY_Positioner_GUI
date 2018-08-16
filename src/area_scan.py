@@ -4,8 +4,6 @@ from src.motor_driver import MotorDriver
 from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
 from src.narda_navigator import NardaNavigator
-from matplotlib import pyplot as plt
-from pywinauto import application
 import os
 import threading
 import time
@@ -15,7 +13,7 @@ from scipy import interpolate
 
 class AreaScanThread(threading.Thread):
     def __init__(self, parent, x_distance, y_distance, grid_step_dist,
-                 dwell_time, save_dir, meas_type, meas_field, meas_side):
+                 dwell_time, save_dir, meas_type, meas_field, meas_side, meas_rbw):
         self.parent = parent
         self.callback = parent.update_values
         self.x_distance = x_distance
@@ -26,6 +24,7 @@ class AreaScanThread(threading.Thread):
         self.meas_type = meas_type
         self.meas_field = meas_field
         self.meas_side = meas_side
+        self.meas_rbw = meas_rbw
 
         self.num_steps = None  # Placeholder for number of motor steps needed to move one grid space
         self.values = None  # Placeholder for the array of values
@@ -37,7 +36,7 @@ class AreaScanThread(threading.Thread):
 
     def run(self):
         print("Measurement Parameters:")
-        print("Type: %s - Field: %s - Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
+        print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
 
         # Preparation
         x_points = int(np.ceil(np.around(self.x_distance / self.grid_step_dist, decimals=3))) + 1
@@ -52,10 +51,11 @@ class AreaScanThread(threading.Thread):
         narda = NardaNavigator()
         # Set measurement settings
         narda.selectTab('mode')
-        narda.selectInputType(self.meas_field)
+        narda.selectInputField(self.meas_field)
         narda.selectTab('span')
         narda.inputTextEntry('start', str(0.005))
         narda.inputTextEntry('stop', str(5))
+        narda.selectRBW(self.meas_rbw)
         narda.selectTab('data')
 
         # Calculate number of motor steps necessary to move one grid space
@@ -74,7 +74,7 @@ class AreaScanThread(threading.Thread):
 
 class ZoomScanThread(threading.Thread):
     def __init__(self, parent, dwell_time, save_dir, meas_type, meas_field,
-                 meas_side, num_steps, values, grid, curr_row, curr_col):
+                 meas_side, meas_rbw, num_steps, values, grid, curr_row, curr_col):
         self.parent = parent
         self.callback = parent.update_values
         self.num_steps = num_steps
@@ -83,6 +83,7 @@ class ZoomScanThread(threading.Thread):
         self.meas_type = meas_type
         self.meas_field = meas_field
         self.meas_side = meas_side
+        self.meas_rbw = meas_rbw
         self.curr_row = curr_row
         self.curr_col = curr_col
 
@@ -93,7 +94,7 @@ class ZoomScanThread(threading.Thread):
 
     def run(self):
         print("Measurement Parameters:")
-        print("Type: %s - Field: %s - Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
+        print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
 
         # Preparation
         x_points = 5
@@ -111,6 +112,7 @@ class ZoomScanThread(threading.Thread):
         narda.selectTab('span')
         narda.inputTextEntry('start', str(0.005))
         narda.inputTextEntry('stop', str(5))
+        narda.selectRBW(self.meas_rbw)
         narda.selectTab('data')
 
         # Calculate number of motor steps necessary to move one grid space
@@ -151,7 +153,7 @@ class ZoomScanThread(threading.Thread):
 
 class CorrectionThread(threading.Thread):
     def __init__(self, parent, target, num_steps, dwell_time, values, grid, curr_row, curr_col,
-                 save_dir, meas_type, meas_field, meas_side, max_fname):
+                 save_dir, meas_type, meas_field, meas_side, meas_rbw, max_fname):
         self.parent = parent
         self.callback = self.parent.update_values
         self.target = target
@@ -165,12 +167,13 @@ class CorrectionThread(threading.Thread):
         self.meas_type = meas_type
         self.meas_field = meas_field
         self.meas_side = meas_side
+        self.meas_rbw = meas_rbw
         self.max_fname = max_fname
         super(CorrectionThread, self).__init__()
 
     def run(self):
         print("Measurement Parameters:")
-        print("Type: %s - Field: %s - Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
+        print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
 
         # Prepare motors
         # Check ports and instantiate relevant objects
@@ -186,6 +189,7 @@ class CorrectionThread(threading.Thread):
         narda.selectTab('span')
         narda.inputTextEntry('start', str(0.005))
         narda.inputTextEntry('stop', str(5))
+        narda.selectRBW(self.meas_rbw)
         narda.selectTab('data')
 
         # Find the target location
@@ -278,43 +282,48 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
         print("---------")
         print(values)
     print("Renaming tmp.PNG to %s.PNG" % max_filename)
-    os.rename(savedir + '/tmp.PNG', savedir + '/' + max_filename + '.PNG')
+    try:
+        os.rename(savedir + '/tmp.PNG', savedir + '/' + max_filename + '.PNG')
+    except FileExistsError:
+        print("File " + max_filename + ".PNG already exists. Overwriting file with new image file.")
+        os.remove(savedir + '/' + max_filename + '.PNG')
+        os.rename(savedir + '/tmp.PNG', savedir + '/' + max_filename + '.PNG')
     return values, grid, curr_row, curr_col, max_filename
 
 
-def build_filename(type, field, side, number):
+def build_filename(meas_type, meas_field, meas_side, number):
     filename = ''
     # Adding type marker
-    if type == 'Limb':
+    if meas_type == 'Limb':
         filename += 'L'
     else:
         filename += 'B'
     filename += '_'
     # Adding field marker
-    if field == 'Electric':
+    if meas_field == 'Electric':
         filename += 'E'
     else:
         filename += 'H'
     # Adding side marker
-    if field == 'Back':
+    if meas_side == 'Back':
         filename += 'S'
     else:
-        filename += side.lower()
+        filename += meas_side.lower()
     filename += str(int(number))
     return filename
 
 
-def move_to_pos_one(moto, num_steps, x, y):
+def move_to_pos_one(moto, num_steps, rows, cols):
     """Move motor to first position in grid.
 
     :param moto: MotorDriver to control motion
     :param num_steps: Number of motor steps between grid points
-    :param x: Number of grid columns
-    :param y: Number of grid rows
+    :param rows: Number of grid rows
+    :param cols: Number of grid cols
     :return: None
     """
-    moto.reverse_motor_one(int(num_steps * x / 2.0))
-    moto.reverse_motor_two(int(num_steps * y / 2.0))
+    moto.reverse_motor_two(int(num_steps * rows / 2.0))
+    moto.reverse_motor_one(int(num_steps * cols / 2.0))
 
 
 def generate_grid(rows, columns):

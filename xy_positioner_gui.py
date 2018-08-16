@@ -16,10 +16,6 @@ import wx
 from wx.lib.agw import multidirdialog as mdd
 
 
-class AreaScanPanel(wx.Panel):
-    pass
-
-
 class MainFrame(wx.Frame):
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title, size=(800, 700))
@@ -91,6 +87,11 @@ class MainFrame(wx.Frame):
         self.side_rbox = wx.RadioBox(self, label="Side",
                                      choices=['Front', 'Back', 'Top', 'Bottom', 'Left', 'Right'],
                                      style=wx.RA_SPECIFY_COLS, majorDimension=1)
+        self.side_rbox.SetSelection(1)
+        self.rbw_rbox = wx.RadioBox(self, label="RBW",
+                                    choices=['300 kHz', '10 kHz', '100 kHz', '3 kHz', '30 kHz', '1 kHz'],
+                                    style=wx.RA_SPECIFY_COLS, majorDimension=2)
+        self.rbw_rbox.SetSelection(2)
 
         self.reset_btn = wx.Button(self, reset_id, "Reset Motors")
         self.Bind(wx.EVT_BUTTON, self.reset_motors, self.reset_btn)
@@ -135,6 +136,7 @@ class MainFrame(wx.Frame):
         self.radio_input_sizer.Add(self.type_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
         self.radio_input_sizer.Add(self.field_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
         self.radio_input_sizer.Add(self.side_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
+        self.radio_input_sizer.Add(self.rbw_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
 
         self.mainh_sizer.Add(self.text_input_sizer, proportion=2, border=5, flag=wx.ALL | wx.EXPAND)
         self.mainh_sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_VERTICAL), proportion=0, border=5,
@@ -190,13 +192,15 @@ class MainFrame(wx.Frame):
             return
         savedir = self.save_tctrl.GetValue()
         # Finding the measurement type
-        meas_type = self.type_rbox.GetString(self.type_rbox.GetSelection())
+        meas_type = self.type_rbox.GetStringSelection()
         # Finding the measurement field
-        meas_field = self.field_rbox.GetString(self.field_rbox.GetSelection())
+        meas_field = self.field_rbox.GetStringSelection()
         # Finding the measurement side
-        meas_side = self.side_rbox.GetString(self.side_rbox.GetSelection())
+        meas_side = self.side_rbox.GetStringSelection()
+        # Finding the RBW setting
+        meas_rbw = self.rbw_rbox.GetStringSelection()
         self.run_thread = AreaScanThread(self, x, y, step, dwell, savedir,
-                                         meas_type, meas_field, meas_side)
+                                         meas_type, meas_field, meas_side, meas_rbw)
         self.disablegui()
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
@@ -208,8 +212,12 @@ class MainFrame(wx.Frame):
 
     def run_post_scan(self):
         # Plot the scan
+        plotvals = np.copy(self.values)
+        plotvals = np.rot90(plotvals)
         plt.close()
-        plt.imshow(self.values, interpolation='bilinear')
+        #plt.axes([0, 0, self.values.shape[0], self.values.shape[1]])
+        plt.imshow(plotvals, interpolation='bilinear',
+                   extent=[0, plotvals.shape[1] - 1, 0, plotvals.shape[0] - 1])
         plt.title('Area Scan Heat Map')
         cbar = plt.colorbar()
         cbar.set_label('Signal Level')
@@ -233,12 +241,14 @@ class MainFrame(wx.Frame):
                 return
             savedir = self.save_tctrl.GetValue()
             # Finding the measurement type
-            meas_type = self.type_rbox.GetString(self.type_rbox.GetSelection())
+            meas_type = self.type_rbox.GetStringSelection()
             # Finding the measurement field
-            meas_field = self.field_rbox.GetString(self.field_rbox.GetSelection())
+            meas_field = self.field_rbox.GetStringSelection()
             # Finding the measurement side
-            meas_side = self.side_rbox.GetString(self.side_rbox.GetSelection())
-            self.zoom_thread = ZoomScanThread(self, zdwell, savedir, meas_type, meas_field, meas_side,
+            meas_side = self.side_rbox.GetStringSelection()
+            # Finding the RBW setting
+            meas_rbw = self.rbw_rbox.GetStringSelection()
+            self.zoom_thread = ZoomScanThread(self, zdwell, savedir, meas_type, meas_field, meas_side, meas_rbw,
                                               self.run_thread.num_steps, self.values, self.grid,
                                               self.curr_row, self.curr_col)
             if not self.console_frame:
@@ -272,14 +282,16 @@ class MainFrame(wx.Frame):
     def run_correction(self, val):
         savedir = self.save_tctrl.GetValue()
         # Finding the measurement type
-        meas_type = self.type_rbox.GetString(self.type_rbox.GetSelection())
+        meas_type = self.type_rbox.GetStringSelection()
         # Finding the measurement field
-        meas_field = self.field_rbox.GetString(self.field_rbox.GetSelection())
+        meas_field = self.field_rbox.GetStringSelection()
         # Finding the measurement side
-        meas_side = self.side_rbox.GetString(self.side_rbox.GetSelection())
+        meas_side = self.side_rbox.GetStringSelection()
+        # Finding the RBW setting
+        meas_rbw = self.rbw_rbox.GetStringSelection()
         self.corr_thread = CorrectionThread(self, val, self.run_thread.num_steps, float(self.dwell_tctrl.GetValue()),
                                             self.values, self.grid, self.curr_row, self.curr_col,
-                                            savedir, meas_type, meas_field, meas_side, self.max_fname)
+                                            savedir, meas_type, meas_field, meas_side, meas_rbw, self.max_fname)
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)

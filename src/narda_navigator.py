@@ -2,10 +2,10 @@ import pyautogui as pgui
 import pywinauto as pwin
 from win32com.client import GetObject
 from pywinauto import application
+import warnings
 import time
 import os
 import subprocess
-
 
 
 class NardaNavigator:
@@ -19,7 +19,9 @@ class NardaNavigator:
         self.ehp200_app = application.Application()
         self.snip_tool = application.Application()
         self.startSnip()
-        self.startNarda()
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=UserWarning)
+            self.startNarda()
 
     def startSnip(self):
         WMI = GetObject('winmgmts:')
@@ -31,8 +33,8 @@ class NardaNavigator:
             self.snip_tool.connect(path=self.snip_path)
             self.snip_tool.kill()
         print("Starting Snipping Tool - Connecting...")
-        print("NOTE: The program window, once open, must be ACTIVE (i.e. the front-most window) for the NS Scan"
-              "Program to connect to the program.")
+        print("NOTE: 'Snipping Tool', once open, must be ACTIVE (i.e. the front-most window) for the NS Scan"
+              "Program to connect to it.")
         self.snip_tool.start(self.snip_path)
         # Wait until the window has been opened
         while not pgui.locateOnScreen(self.refpics_path + '/snip_window_title.PNG'):
@@ -49,8 +51,8 @@ class NardaNavigator:
             self.ehp200_app.connect(path=self.ehp200_path)
             self.ehp200_app.kill()
         print("Starting EHP200 program - Connecting...")
-        print("NOTE: The program window, once open, must be ACTIVE (i.e. the front-most window) for the NS Scan"
-              "Program to connect to the program.")
+        print("NOTE: The 'EHP200' program, once open, must be ACTIVE (i.e. the front-most window) for the NS Scan"
+              "Program to connect to it.")
         self.ehp200_app.start(self.ehp200_path)
         # Wait until the window has been opened
         while not pgui.locateOnScreen(self.refpics_path + '/window_title.PNG'):
@@ -78,17 +80,27 @@ class NardaNavigator:
             print('Error: Reference images not found on screen...')
             exit(1)
 
-    def selectInputType(self, meas_type):
-        if meas_type == 'Electric':
+    def selectInputField(self, meas_field):
+        if meas_field == 'Electric':
             pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/electric.PNG'))
-        elif meas_type == 'Magnetic (Mode A)':
+        elif meas_field == 'Magnetic (Mode A)':
             pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/magnetic_modea.PNG'))
-        elif meas_type == 'Magnetic (Mode B)':
+        elif meas_field == 'Magnetic (Mode B)':
             pgui.click((pgui.locateCenterOnScreen(self.refpics_path + '/magnetic_modeb.PNG')))
         # TODO: Probably useless else statement here...
         else:
             print("Argument must be one of either 'elec', 'mag_a', or 'mag_b'")
             raise ValueError
+
+    def selectRBW(self, meas_rbw):
+        fname = meas_rbw.lower().replace(' ', '_')
+        pgui.click((pgui.locateCenterOnScreen((self.refpics_path + '/' + fname + '.PNG'))))
+        # if meas_rbw == '300 kHz':
+        #     pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/electric.PNG'))
+        # elif meas_rbw == '100 kHz':
+        #     pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/magnetic_modea.PNG'))
+        # elif meas_field == 'Magnetic (Mode B)':
+        #     pgui.click((pgui.locateCenterOnScreen(self.refpics_path + '/magnetic_modeb.PNG')))
 
     def inputTextEntry(self, ref_word, input, direction='right'):
         # TODO: Probably not gonna use 'direction' param, since always to the right...
