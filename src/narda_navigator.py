@@ -108,8 +108,9 @@ class NardaNavigator:
         x, y = pgui.locateCenterOnScreen(self.refpics_path + '/' + ref_word + '.PNG')
         counter = 0  # counts how many continuous white spaces we find to determine if text entry
         pgui.moveTo(x, y)
+        pgui.moveRel(85, 0)
         while pgui.position()[0] < pgui.size()[0]:
-            pgui.moveRel(15, 0)
+            pgui.moveRel(5, 0)
             im = pgui.screenshot()
             color = im.getpixel(pgui.position())
             if color == (255, 255, 255):

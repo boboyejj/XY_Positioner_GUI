@@ -59,10 +59,10 @@ class MainFrame(wx.Frame):
         self.grid_tctrl = wx.TextCtrl(self)
         self.grid_tctrl.SetValue(str(2.8))
 
-        self.dwell_time_text = wx.StaticText(self, label="Pre-Measurement Dwell Time (in sec)")
+        self.dwell_time_text = wx.StaticText(self, label="Pre-Measurement Dwell Time (Area scan, in sec)")
         self.dwell_tctrl = wx.TextCtrl(self)
         self.dwell_tctrl.SetValue(str(1))
-        self.zoom_scan_dwell_time_text = wx.StaticText(self, label="Pre-Measurement Dwell Time (in sec)")
+        self.zoom_scan_dwell_time_text = wx.StaticText(self, label="Pre-Measurement Dwell Time (Zoom scan, in sec)")
         self.zdwell_tctrl = wx.TextCtrl(self)
         self.zdwell_tctrl.SetValue(str(1.5))
 
