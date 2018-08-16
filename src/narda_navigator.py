@@ -1,11 +1,11 @@
+import os
+import subprocess
+import warnings
+import time
 import pyautogui as pgui
 import pywinauto as pwin
 from win32com.client import GetObject
 from pywinauto import application
-import warnings
-import time
-import os
-import subprocess
 
 
 class NardaNavigator:

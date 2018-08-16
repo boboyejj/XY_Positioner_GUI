@@ -1,14 +1,14 @@
-import numpy as np
-import serial
+import os
+import threading
+import time
 from src.motor_driver import MotorDriver
 from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
 from src.narda_navigator import NardaNavigator
-import os
-import threading
-import time
-import wx
+import numpy as np
 from scipy import interpolate
+import serial
+import wx
 
 
 class AreaScanThread(threading.Thread):

@@ -1,5 +1,5 @@
-import wx
 import numpy as np
+import wx
 
 
 class LocationSelectGUI(wx.Dialog):

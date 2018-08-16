@@ -1,8 +1,7 @@
-
-import wx
-import serial
 from src.narda_navigator import NardaNavigator
 from src.motor_driver import MotorDriver
+import serial
+import wx
 
 
 class ManualMoveGUI(wx.Frame):
