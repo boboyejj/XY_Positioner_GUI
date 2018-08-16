@@ -9,7 +9,7 @@ from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
 from src.manual_move import ManualMoveGUI
 from src.console_gui import TextRedirecter, ConsoleGUI
-from src.reset_motors import ResetThread
+from src.motor_driver import ResetThread
 import numpy as np
 import matplotlib.pyplot as plt
 import wx

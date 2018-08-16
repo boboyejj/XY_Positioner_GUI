@@ -6,3 +6,4 @@ results/*
 src/location_select_gui_COPY.py
 src/post_scan_gui_COPY.py
 src/dummy.py
+dummy.py
