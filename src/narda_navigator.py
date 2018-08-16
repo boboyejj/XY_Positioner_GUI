@@ -11,7 +11,7 @@ from pywinauto import application
 class NardaNavigator:
 
     def __init__(self):
-        pgui.PAUSE = 0.5
+        pgui.PAUSE = 0.5  # Set appropriate amount of pause time so that the controlled programs can keep up w/ auto
         pgui.FAILSAFE = True  # True - abort program mid-automation by moving mouse to upper left corner
         self.refpics_path = 'narda_navigator_referencepics'
         self.ehp200_path = "C:\\Program Files (x86)\\NardaSafety\\EHP-TS\\EHP200-TS\\EHP200.exe"
@@ -87,20 +87,10 @@ class NardaNavigator:
             pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/magnetic_modea.PNG'))
         elif meas_field == 'Magnetic (Mode B)':
             pgui.click((pgui.locateCenterOnScreen(self.refpics_path + '/magnetic_modeb.PNG')))
-        # TODO: Probably useless else statement here...
-        else:
-            print("Argument must be one of either 'elec', 'mag_a', or 'mag_b'")
-            raise ValueError
 
     def selectRBW(self, meas_rbw):
         fname = meas_rbw.lower().replace(' ', '_')
         pgui.click((pgui.locateCenterOnScreen((self.refpics_path + '/' + fname + '.PNG'))))
-        # if meas_rbw == '300 kHz':
-        #     pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/electric.PNG'))
-        # elif meas_rbw == '100 kHz':
-        #     pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/magnetic_modea.PNG'))
-        # elif meas_field == 'Magnetic (Mode B)':
-        #     pgui.click((pgui.locateCenterOnScreen(self.refpics_path + '/magnetic_modeb.PNG')))
 
     def inputTextEntry(self, ref_word, input, direction='right'):
         # TODO: Probably not gonna use 'direction' param, since always to the right...
