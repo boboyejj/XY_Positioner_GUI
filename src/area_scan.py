@@ -1,3 +1,12 @@
+"""
+Authors:
+Chang Hwan Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
+Ganesh Arvapalli, Software Engineering Intern (Jan. 2018) - ganesh.arvapalli@pctest.com
+
+
+
+"""
+
 import os
 import threading
 import time

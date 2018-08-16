@@ -1,6 +1,7 @@
 """
-    Created by Ganesh Arvapalli on 1/12/18
-    ganesh.arvapalli@pctest.com
+    Authors:
+    Ganesh Arvapalli, Software Engineering Intern (Jan. 2018) - ganesh.arvapalli@pctest.com
+
 """
 
 import serial

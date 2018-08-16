@@ -1,3 +1,10 @@
+"""
+    Authors:
+    Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
+
+
+"""
+
 from src.narda_navigator import NardaNavigator
 from src.motor_driver import MotorDriver
 import serial

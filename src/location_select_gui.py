@@ -1,3 +1,10 @@
+"""
+    Authors:
+    Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
+
+
+"""
+
 import numpy as np
 import wx
 

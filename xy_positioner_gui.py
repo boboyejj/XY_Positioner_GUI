@@ -1,6 +1,8 @@
 """
-    Created by Chang Hwan 'Oliver' Choi on 08/09/2018
-    changhwan.choi@pctest.com
+    Authors:
+    Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
+
+
 """
 import os
 import sys
