@@ -124,11 +124,6 @@ class NardaNavigator:
         # If the text entry location is not found, raise exception
         raise Exception
 
-    def enableMaxHold(self):
-        # If not on the data tab, switch to it
-        self.selectTab('data')
-        pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/max_hold_unchecked.PNG', grayscale=True))
-
     def takeMeasurement(self, dwell_time, filename, pathname):
         self.bringToFront()
         # If not on the data tab, switch to it

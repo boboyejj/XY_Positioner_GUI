@@ -57,7 +57,6 @@ class AreaScanThread(threading.Thread):
         narda.inputTextEntry('stop', str(5))
         narda.selectRBW(self.meas_rbw)
         narda.selectTab('data')
-        narda.enableMaxHold()
 
         # Calculate number of motor steps necessary to move one grid space
         self.num_steps = self.grid_step_dist / m.step_unit
@@ -109,7 +108,7 @@ class ZoomScanThread(threading.Thread):
         narda = NardaNavigator()
         # Set measurement settings
         narda.selectTab('mode')
-        narda.selectInputField(self.meas_field)
+        narda.selectInputType(self.meas_field)
         narda.selectTab('span')
         narda.inputTextEntry('start', str(0.005))
         narda.inputTextEntry('stop', str(5))
@@ -181,12 +180,12 @@ class CorrectionThread(threading.Thread):
         try:
             m = MotorDriver()
         except serial.SerialException:
-            print("Error: Connection to C4 controller was not found.")
+            print("Error: Connection to C4 controller was not found")
             return -1
         narda = NardaNavigator()
         # Set measurement settings
         narda.selectTab('mode')
-        narda.selectInputField(self.meas_field)
+        narda.selectInputType(self.meas_field)
         narda.selectTab('span')
         narda.inputTextEntry('start', str(0.005))
         narda.inputTextEntry('stop', str(5))
