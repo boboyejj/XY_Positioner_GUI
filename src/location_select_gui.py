@@ -17,8 +17,17 @@ import wx
 
 
 class LocationSelectGUI(wx.Dialog):
+    """
+    Location Selection GUI. Allows the user to select a position in the area scan grid for the 'Correct Previous
+    Value' function.
+    """
     def __init__(self, parent, title, grid):
-        wx.Frame.__init__(self, parent, title=title)
+        """
+        :param parent: Parent frame invoking the LocationSelectGUI.
+        :param title: Title for the GUI window.
+        :param grid: Numpy array of the traversal grid for the general area scan.
+        """
+        wx.Dialog.__init__(self, parent, title=title)
         self.parent = parent
         self.grid = grid
 
@@ -41,11 +50,25 @@ class LocationSelectGUI(wx.Dialog):
         self.coord_sizer.Fit(self)
         self.Show(True)
 
-    def selected(self, valid):
-        self.parent.run_correction(valid)
+    def selected(self, value):
+        """
+        Runs the parent Frame's 'run_currection()' function using the clicked button's number as the argument.
+        Destroys the GUI on button click.
+
+        :param value: Button value/position selected on the grid.
+        :return: Nothing.
+        """
+        self.parent.run_correction(value)
         self.Destroy()
 
     def OnQuit(self, e):
+        """
+        Exit script - when the GUI closes, wx calls the MainFrame's 'run_post_scan()' function.
+        Destroys the GUI button.
+
+        :param e:
+        :return:
+        """
         wx.CallAfter(self.parent.run_post_scan)
         self.Destroy()
 
