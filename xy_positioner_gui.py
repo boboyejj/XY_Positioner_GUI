@@ -191,6 +191,13 @@ class MainFrame(wx.Frame):
         self.Show(True)
 
     def select_save_dir(self, e):
+        """
+        Opens quick dialog to select the save directory for the output files (.txt, .png) from the automatic
+        measurements. Writes the directory name on the TextCtrl object on the GUI (self.save_tctrl).
+
+        :param e: Event handler.
+        :return: Nothing.
+        """
         # TODO: Currently, there is a problem with wx.DirDialog, so I have resorted to using multidirdialog
         # TODO: When the bugs are fixed on their end, revert back to the nicer looking wx.DirDialog
         with mdd.MultiDirDialog(None, "Select save directory for output files.",
@@ -210,6 +217,14 @@ class MainFrame(wx.Frame):
         #    if os.path.exists(parentpath):
 
     def run_area_scan(self, e):
+        """
+        Begins general area scan based on the measurement settings specified on the GUI.
+        Starts and runs an instance of AreaScanThread to perform automatic area scan.
+        Opens console GUI to help user track progress of the program.
+
+        :param e: Event handler.
+        :return: Nothing.
+        """
         if self.save_tctrl.GetValue() is None or self.save_tctrl.GetValue() is '':
             self.errormsg("Please select a save directory for the output files.")
             return
@@ -242,11 +257,17 @@ class MainFrame(wx.Frame):
         self.run_thread.start()
 
     def run_post_scan(self):
+        """
+        Plots the area scan results and prompts the user for a post-scan option ('Exit', 'Zoom Scan', 'Correct previous
+        value', 'Save data'). Called by the area scan threads (AreaScanThread, ZoomScanThread, CorrectionThread)
+        once threads are closed.
+
+        :return: Nothing.
+        """
         # Plot the scan
         plotvals = np.copy(self.values)
         plotvals = np.rot90(plotvals)
         plt.close()
-        #plt.axes([0, 0, self.values.shape[0], self.values.shape[1]])
         plt.imshow(plotvals, interpolation='bilinear',
                    extent=[0, plotvals.shape[1] - 1, 0, plotvals.shape[0] - 1])
         plt.title('Area Scan Heat Map')
@@ -299,6 +320,13 @@ class MainFrame(wx.Frame):
             self.enablegui()
 
     def update_values(self, call_thread):
+        """
+        Updates the variables stored in the MainFrame based on the measurement results returned from the scans.
+        Called by the area scan threads (AreaScanThread, ZoomScanThread, CorrectionThread).
+
+        :param call_thread: The thread calling the update method and updating the variables stored in the MainFrame.
+        :return: Nothing.
+        """
         self.curr_row = call_thread.curr_row
         self.curr_col = call_thread.curr_col
         if type(call_thread) is AreaScanThread:
@@ -310,7 +338,14 @@ class MainFrame(wx.Frame):
         elif type(call_thread) is ZoomScanThread:
             self.zoom_values = call_thread.zoom_values
 
-    def run_correction(self, val):
+    def run_correction(self, target_index):
+        """
+        Runs the 'Correct Previous Value' option from the Post Scan GUI. Starts and runs an instance of
+        CorrectionThread to retake a measurement in the specified coordinate.
+
+        :param target_index: the index in the grid that the user chooses to correct.
+        :return: Nothing.
+        """
         savedir = self.save_tctrl.GetValue()
         # Finding the measurement type
         meas_type = self.type_rbox.GetStringSelection()
@@ -320,9 +355,10 @@ class MainFrame(wx.Frame):
         meas_side = self.side_rbox.GetStringSelection()
         # Finding the RBW setting
         meas_rbw = self.rbw_rbox.GetStringSelection()
-        self.corr_thread = CorrectionThread(self, val, self.run_thread.num_steps, float(self.dwell_tctrl.GetValue()),
-                                            self.values, self.grid, self.curr_row, self.curr_col,
-                                            savedir, meas_type, meas_field, meas_side, meas_rbw, self.max_fname)
+        self.corr_thread = CorrectionThread(self, target_index, self.run_thread.num_steps,
+                                            float(self.dwell_tctrl.GetValue()), self.values, self.grid,
+                                            self.curr_row, self.curr_col, savedir, meas_type,
+                                            meas_field, meas_side, meas_rbw, self.max_fname)
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
@@ -331,6 +367,13 @@ class MainFrame(wx.Frame):
         self.corr_thread.start()
 
     def manual_move(self, e):
+        """
+        Allows user to manually move the position of the NS probe. Opens a terminal console if not open already.
+        Creates and shows instance of ManualMoveGUI to allow direct input from the user.
+
+        :param e: Event handler.
+        :return: Nothing.
+        """
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
@@ -345,6 +388,13 @@ class MainFrame(wx.Frame):
         manual.Show(True)
 
     def reset_motors(self, e):
+        """
+        Resets the motors back to their default position. Starts and runs instance of ResetThread to facilitate motor
+        resets. Opens terminal console if not open already.
+
+        :param e: Event handler.
+        :return: Nothing.
+        """
         self.disablegui()
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
@@ -354,6 +404,11 @@ class MainFrame(wx.Frame):
         ResetThread(self).start()
 
     def enablegui(self):
+        """
+        Re-enables all MainFrame GUI elements.
+
+        :return: Nothing.
+        """
         self.x_tctrl.Enable(True)
         self.y_tctrl.Enable(True)
         self.grid_tctrl.Enable(True)
@@ -371,6 +426,11 @@ class MainFrame(wx.Frame):
         self.run_btn.Enable(True)
 
     def disablegui(self):
+        """
+        Disables all MainFrame GUI elements.
+
+        :return: Nothing.
+        """
         self.x_tctrl.Enable(False)
         self.y_tctrl.Enable(False)
         self.grid_tctrl.Enable(False)
@@ -390,6 +450,7 @@ class MainFrame(wx.Frame):
     def showshortcuts(self, e):
         """
         Opens simple dialog listing the different shortcuts of the program.
+
         :param e: Event handler.
         :return: Nothing.
         """
@@ -399,13 +460,14 @@ class MainFrame(wx.Frame):
                            "Manual Movement: Ctrl + M\n" +\
                            "Run Analysis: Ctrl + E\n" +\
                            "Check Shortcut Keys: Ctrl + H"
-        dlg = wx.MessageDialog(self, shortcuts_string, 'Shortcut Keys',
-                               style=wx.OK | wx.ICON_QUESTION | wx.CENTER)
-        dlg.ShowModal()
+        with wx.MessageDialog(self, shortcuts_string, 'Shortcut Keys',
+                              style=wx.OK | wx.ICON_QUESTION | wx.CENTER) as dlg:
+            dlg.ShowModal()
 
     def errormsg(self, errmsg):
         """
         Shows an error message as a wx.Dialog.
+
         :param errmsg: String error message to show in the message dialog.
         :return: Nothing
         """
