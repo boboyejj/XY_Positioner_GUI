@@ -1,3 +1,18 @@
+"""
+Post-Scan GUI
+
+This is the GUI module for selecting a function after the general area scan (e.g. Correcting a previous measurement,
+performing a zoom scan, exiting the area scan module). This GUI is intended to be run in conjunction with the
+'xy_positioner_gui.py' only.
+
+This module contains a single class:
+    - PostScanGUI(wx.Dialog): basic GUI dialog to select between correcting a prev. measurement, perform a zoom scan,
+                              save data (NOTE: note yet implemented), or exiting the area scan module.
+
+Authors:
+Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
+"""
+
 import wx
 
 

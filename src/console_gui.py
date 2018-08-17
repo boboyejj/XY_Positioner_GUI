@@ -1,3 +1,17 @@
+"""
+Console GUI
+
+This is the GUI module for displaying a terminal console for the NS Testing program. This GUI is intended to be run
+in conjunction with the 'xy_positioner_gui.py' only.
+
+This module contains the following classes:
+    - TextRedirecter(object): redirects stdout and stderr to the terminal console.
+    - ConsoleGUI(wx.Frame): terminal console that displays all stdout and stderr from the main NS testing program.
+
+Authors:
+Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
+"""
+
 import wx
 
 

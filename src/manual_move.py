@@ -1,11 +1,17 @@
 """
-    Authors:
-    Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
+Manual Move GUI
 
+This is the GUI module for manual motor control.
 
+The GUI handles motor movements and step distance settings.
+
+This module contains a single class:
+    - ManualMoveGUI(wx.Frame): GUI interfaced with the MotorDriver class, provides manual control for users.
+
+Authors:
+Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
 """
 
-from src.narda_navigator import NardaNavigator
 from src.motor_driver import MotorDriver
 import serial
 import wx

@@ -1,6 +1,16 @@
 """
-    Authors:
-    Ganesh Arvapalli, Software Engineering Intern (Jan. 2018) - ganesh.arvapalli@pctest.com
+Motor Driver
+
+This module contains scripts for initializing, communicating with, and controlling the C4 motor controller from
+Arrick Robotics.
+
+The module contains the following classes:
+    - ResetThread(threading.Thread): performs motor resets.
+    - MotorDriver(): establishes connection with the C4 controller and contains all motor movement functions.
+
+Authors:
+Ganesh Arvapalli, Software Engineering Intern (Jan. 2018) - ganesh.arvapalli@pctest.com
+Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
 
 """
 

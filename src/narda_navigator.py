@@ -1,9 +1,20 @@
 """
-    Authors:
-    Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
+NARDA Software Navigator
 
+This module contains automation scripts for navigating through the NARDA software and taking measurements.
+The scripts use image-based automation and make use of the images in 'XY_Positioner_GUI/narda_navigator_referencepics'
+to guide the mouse and keyboard.
 
+The navigator takes control over the EHP200-TS program and the Snipping Tool program to take NS measurements and
+take plot screenshots.
+
+The module contains a single class:
+    - NardaNavigator(): driver class for the NARDA automation scripts.
+
+Authors:
+Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
 """
+
 import os
 import subprocess
 import warnings

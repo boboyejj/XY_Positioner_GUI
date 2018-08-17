@@ -1,21 +1,26 @@
 """
+Area Scan Scripts
+
+This module contains the threads and functions to perform general area scans and zoom scans.
+The threads in the module are intended to be run in conjunction with 'xy_positioner_gui.py' only, as the
+threads refer to specific callback functions from this file.
+
+The module has the following classes:
+    - AreaScanThread(threading.Thread): performs general area scans.
+    - ZoomScanThread(threading.Thread): performs zoom scans at the maximum value.
+                                        position found during the general area scan.
+    - CorrectionThread(threading.Thread): retakes a previous measurement from the general area scan.
+
 Authors:
-Chang Hwan Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
+Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
 Ganesh Arvapalli, Software Engineering Intern (Jan. 2018) - ganesh.arvapalli@pctest.com
-
-
-
 """
 
 import os
 import threading
-import time
 from src.motor_driver import MotorDriver
-from src.post_scan_gui import PostScanGUI
-from src.location_select_gui import LocationSelectGUI
 from src.narda_navigator import NardaNavigator
 import numpy as np
-from scipy import interpolate
 import serial
 import wx
 

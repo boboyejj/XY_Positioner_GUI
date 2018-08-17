@@ -1,9 +1,18 @@
 """
-    Authors:
-    Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
+NS Testing Program/XY Positioner GUI
 
+This is the main frame/driver script for NS testing. Built on the wxPython GUI framework, the MainFrame class
+handles all of the GUI elements of the entire testing program.
 
+MainFrame and all other GUI elements run on the main thread, starting threads for analysis and computation functions.
+
+The script contains a single class:
+    - MainFrame(wx.Frame): main GUI window/frame, starts children GUIs and children threads.
+
+Authors:
+Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
 """
+
 import os
 import sys
 from src.area_scan import AreaScanThread, ZoomScanThread, CorrectionThread

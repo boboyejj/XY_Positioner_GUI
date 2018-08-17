@@ -1,8 +1,15 @@
 """
-    Authors:
-    Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
+Location Selection GUI
 
+This is the GUI module for selecting a coordinate post area scan for correcting a previous measurement.
+This GUI is intended to be run in conjunction with the 'xy_positioner_gui.py' only. The GUI is currently only used
+for the post-scan function 'Correct Previous Value'.
 
+This module contains a single class:
+    - LocationSelectionGUI(wx.Dialog): provides a grid of buttons to allow user to select area scan coordinate.
+
+Authors:
+Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
 """
 
 import numpy as np
