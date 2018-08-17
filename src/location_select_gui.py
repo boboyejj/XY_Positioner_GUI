@@ -66,8 +66,8 @@ class LocationSelectGUI(wx.Dialog):
         Exit script - when the GUI closes, wx calls the MainFrame's 'run_post_scan()' function.
         Destroys the GUI button.
 
-        :param e:
-        :return:
+        :param e: Event handler.
+        :return: Nothing.
         """
         wx.CallAfter(self.parent.run_post_scan)
         self.Destroy()
