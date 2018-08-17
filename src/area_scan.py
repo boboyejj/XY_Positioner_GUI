@@ -26,8 +26,23 @@ import wx
 
 
 class AreaScanThread(threading.Thread):
+    """
+    Thread for handling general area scans.
+    """
     def __init__(self, parent, x_distance, y_distance, grid_step_dist,
                  dwell_time, save_dir, meas_type, meas_field, meas_side, meas_rbw):
+        """
+        :param parent: Parent object (i.e. the Frame/GUI calling the thread).
+        :param x_distance: Width of the scanning area.
+        :param y_distance: Length of the scanning area.
+        :param grid_step_dist: Step distance between each measurement point.
+        :param dwell_time: Wait time at each scan point before measurements are recorded.
+        :param save_dir: Directory for output files (.txt, .png).
+        :param meas_type: Measurement type (limb or body).
+        :param meas_field: Measurement field (Electric or magnetic (mode A or B)).
+        :param meas_side: Side of the phone being scanned.
+        :param meas_rbw: Resolution bandwidth for the FFT.
+        """
         self.parent = parent
         self.callback = parent.update_values
         self.x_distance = x_distance
@@ -49,6 +64,11 @@ class AreaScanThread(threading.Thread):
         super(AreaScanThread, self).__init__()
 
     def run(self):
+        """
+        Script run on thread start. Performs area scan on a separate thread.
+
+        :return: Nothing.
+        """
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
 
@@ -88,8 +108,25 @@ class AreaScanThread(threading.Thread):
 
 
 class ZoomScanThread(threading.Thread):
+    """
+    Thread for handling zoom scans.
+    """
     def __init__(self, parent, dwell_time, save_dir, meas_type, meas_field,
                  meas_side, meas_rbw, num_steps, values, grid, curr_row, curr_col):
+        """
+        :param parent: Parent object (i.e. the Frame/GUI calling the thread).
+        :param dwell_time: Wait time at each scan point before measurements are recorded.
+        :param save_dir: Directory for output files (.txt, .png).
+        :param meas_type: Measurement type (limb or body).
+        :param meas_field: Measurement field (Electric or magnetic (mode A or B)).
+        :param meas_side: Side of the phone being scanned.
+        :param meas_rbw: Resolution bandwidth for the FFT.
+        :param num_steps: Number of motor steps per grid step.
+        :param values: Numpy array of the recorded values.
+        :param grid: Numpy array of index values (1-index).
+        :param curr_row: The NS probe's current row position.
+        :param curr_col: The NS probe's current column position.
+        """
         self.parent = parent
         self.callback = parent.update_values
         self.num_steps = num_steps
@@ -108,6 +145,11 @@ class ZoomScanThread(threading.Thread):
         super(ZoomScanThread, self).__init__()
 
     def run(self):
+        """
+        Script run on thread start. Performs zoom scan on a separate thread.
+
+        :return: Nothing.
+        """
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
 
@@ -167,8 +209,27 @@ class ZoomScanThread(threading.Thread):
 
 
 class CorrectionThread(threading.Thread):
+    """
+    Thread for handling corrections of previous values from the general area scan.
+    """
     def __init__(self, parent, target, num_steps, dwell_time, values, grid, curr_row, curr_col,
                  save_dir, meas_type, meas_field, meas_side, meas_rbw, max_fname):
+        """
+        :param parent: Parent object (i.e. the Frame/GUI calling the thread).
+        :param target: index of the target position (index by the grid).
+        :param num_steps: Number of motor steps per grid step.
+        :param dwell_time: Wait time at each scan point before measurements are recorded.
+        :param values: Numpy array of the recorded values.
+        :param grid: Numpy array of index values (1-index).
+        :param curr_row: The NS probe's current row position.
+        :param curr_col: The NS probe's current column position.
+        :param save_dir: Directory for output files (.txt, .png).
+        :param meas_type: Measurement type (limb or body).
+        :param meas_field: Measurement field (Electric or magnetic (mode A or B)).
+        :param meas_side: Side of the phone being scanned.
+        :param meas_rbw: Resolution bandwidth for the FFT.
+        :param max_fname: Filename corresponding to highest measurement.
+        """
         self.parent = parent
         self.callback = self.parent.update_values
         self.target = target
@@ -187,6 +248,11 @@ class CorrectionThread(threading.Thread):
         super(CorrectionThread, self).__init__()
 
     def run(self):
+        """
+        Script run on thread start. Corrects a previous value from the general area scan results on a separate thread.
+
+        :return: Nothing.
+        """
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
 
@@ -245,6 +311,24 @@ class CorrectionThread(threading.Thread):
 
 
 def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_type, meas_field, meas_side):
+    """
+    Performs an area scan according to the specified parameters.
+    The scan consists of moving the NS probe to an intended coordinate, taking a measurement, saving the results,
+    and repeating this process until all coordinate points have been measured.
+
+    :param x_points: Number of x-coordinate points.
+    :param y_points: Number of y-coordinate points.
+    :param m: Motor driver object.
+    :param narda: NARDA navigator object.
+    :param num_steps: Number of motor steps per grid step.
+    :param dwell_time: Wait time at each scan point before measurements are recorded.
+    :param save_dir: Directory for output files (.txt, .png).
+    :param meas_type: Measurement type (limb or body).
+    :param meas_field: Measurement field (Electric or magnetic (mode A or B)).
+    :param meas_side: Side of the phone being scanned.
+    :return: Numpy array of all measurements, Numpy array of the measurement grid, current NS probe's coordinates (rows
+             and columns), and the filename corresponding to the highest measurement point.
+    """
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
 
@@ -307,6 +391,15 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
 
 
 def build_filename(meas_type, meas_field, meas_side, number):
+    """
+    Builds a filename based on the measurement parameters.
+
+    :param meas_type: Measurement type (limb or body).
+    :param meas_field: Measurement field (electric or magnetic (mode A or B)).
+    :param meas_side: Side of the phone being measured.
+    :param number: Point on the grid where the measurement was taken.
+    :return: String filename.
+    """
     filename = ''
     # Adding type marker
     if meas_type == 'Limb':
