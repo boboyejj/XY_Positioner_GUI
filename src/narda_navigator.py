@@ -25,7 +25,9 @@ from pywinauto import application
 
 
 class NardaNavigator:
-
+    """
+    Driver class for the NARDA automation scripts.
+    """
     def __init__(self):
         pgui.PAUSE = 0.5  # Set appropriate amount of pause time so that the controlled programs can keep up w/ auto
         pgui.FAILSAFE = True  # True - abort program mid-automation by moving mouse to upper left corner
@@ -40,6 +42,11 @@ class NardaNavigator:
             self.startNarda()
 
     def startSnip(self):
+        """
+        Opens the 'Snipping Tool' program.
+
+        :return: Nothing.
+        """
         WMI = GetObject('winmgmts:')
         processes = WMI.InstancesOf('Win32_Process')
         p_list = [p.Properties_('Name').Value for p in processes]
@@ -58,6 +65,11 @@ class NardaNavigator:
         print("Snipping Tool opened successfully.")
 
     def startNarda(self):
+        """
+        Opens the EHP200-TS NARDA program.
+
+        :return: Nothing.
+        """
         WMI = GetObject('winmgmts:')
         processes = WMI.InstancesOf('Win32_Process')
         p_list = [p.Properties_('Name').Value for p in processes]
@@ -75,28 +87,32 @@ class NardaNavigator:
             pass
         print("EHP200 opened successfully.")
 
-    def closeNarda(self):
-        self.ehp200_app.kill()
-
     def selectTab(self, tabName):
+        """
+        Selects specified tab in the NARDA program.
+
+        :param tabName: String name of the tab to select.
+        :return: Nothing.
+        """
         tabName = tabName.lower()
-        # print(tabName)
         selectedName = '/' + tabName + '_tab_selected.PNG'
         deselectedName = '/' + tabName + '_tab_deselected.PNG'
-        # print(selectedName, deselectedName)
         try:
             if not pgui.locateOnScreen(self.refpics_path + selectedName):
-                # print("Not located - clicking the position: " + self.refpics_path + deselectedName)
                 x, y, w, h = pgui.locateOnScreen(self.refpics_path + '/' + tabName + '_tab_deselected.PNG',
                                                  grayscale=True)
                 pgui.click(pgui.center((x, y, w, h)))
-            # else:
-            #     print("Already in the '" + tabName + "' tab")
         except TypeError:
             print('Error: Reference images not found on screen...')
             exit(1)
 
     def selectInputField(self, meas_field):
+        """
+        Selects the input field in the NARDA program.
+
+        :param meas_field: Measurement field (electric or magnetic (mode A or B)).
+        :return: Nothing.
+        """
         if meas_field == 'Electric':
             pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/electric.PNG'))
         elif meas_field == 'Magnetic (Mode A)':
@@ -105,11 +121,25 @@ class NardaNavigator:
             pgui.click((pgui.locateCenterOnScreen(self.refpics_path + '/magnetic_modeb.PNG')))
 
     def selectRBW(self, meas_rbw):
+        """
+        Selects the RBW setting in the NARDA program.
+
+        :param meas_rbw: Measurement RBW (in kHz).
+        :return: Nothing.
+        """
         fname = meas_rbw.lower().replace(' ', '_')
         pgui.click((pgui.locateCenterOnScreen((self.refpics_path + '/' + fname + '.PNG'))))
 
-    def inputTextEntry(self, ref_word, input, direction='right'):
-        # TODO: Probably not gonna use 'direction' param, since always to the right...
+    def inputTextEntry(self, ref_word, input_val, direction='right'):
+        """
+        Fills a given text entry with a specified value.
+
+        :param ref_word: Text entry name (Reference word/point).
+        :param input_val: Input value for the text entry.
+        :param direction: Direction of the text entry relative to the ref. word.
+        :return: Nothing.
+        """
+        # FIXME: Probably not gonna use 'direction' param, since always to the right...
         # Find coordinates of the reference word
         x, y = pgui.locateCenterOnScreen(self.refpics_path + '/' + ref_word + '.PNG')
         counter = 0  # counts how many continuous white spaces we find to determine if text entry
@@ -126,17 +156,30 @@ class NardaNavigator:
             # If whitespace identified (i.e. 3 contiguous white pixel measurements taken)
             if counter == 3:
                 pgui.dragTo(x, y, duration=0.4)  # Select the value
-                pgui.typewrite(input)
+                pgui.typewrite(input_val)
                 return
         # If the text entry location is not found, raise exception
         raise Exception
 
     def enableMaxHold(self):
+        """
+        Turns 'Max Hold' on (i.e. selects the check box).
+
+        :return: Nothing.
+        """
         # If not on the data tab, switch to it
         self.selectTab('data')
         pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/max_hold_unchecked.PNG', grayscale=True))
 
     def takeMeasurement(self, dwell_time, filename, pathname):
+        """
+        Takes a measurement using the NARDA program.
+
+        :param dwell_time: Time the NS probe stays in position before taking a measurement.
+        :param filename: Filename to save the measurement outputs as.
+        :param pathname: Save directory to hold output files.
+        :return: The max value in the current measurement point.
+        """
         self.bringToFront()
         # If not on the data tab, switch to it
         self.selectTab('data')
@@ -185,6 +228,13 @@ class NardaNavigator:
         return self.getMaxValue(filename, pathname)
 
     def saveBitmap(self, filename, pathname):
+        """
+        Saves a partial screenshot of the NARDA GUI, called when a new max value has been found.
+
+        :param filename: Filename to save the image file as.
+        :param pathname: Save directory to save the image file in.
+        :return: Nothing.
+        """
         # Stack Snipping Tool in front of the NARDA program
         self.bringToFront()
         # Open Data Tab

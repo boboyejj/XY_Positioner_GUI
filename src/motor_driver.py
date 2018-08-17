@@ -86,7 +86,6 @@ class MotorDriver:
                 # print e.message
         if not entered:
             raise serial.SerialException
-            exit(1)
 
     def forward_motor_one(self, steps):
         """
