@@ -20,12 +20,23 @@ import wx
 
 
 class ResetThread(threading.Thread):
+    """
+    Thread for handling resetting the motors. NS probe is moved back to its 'home' position.
+    """
     def __init__(self, parent):
+        """
+        :param parent: Parent frame invoking the LocationSelectGUI.
+        """
         self.parent = parent
         self.motor = None  # Placeholder variable for the motor
         super(ResetThread, self).__init__()
 
     def run(self):
+        """
+        Script run on thread start. Resets the NS probe position to its home coordinates on a separate thread.
+
+        :return: Nothing.
+        """
         # Variables
         try:
             self.motor = MotorDriver()
@@ -41,9 +52,9 @@ class ResetThread(threading.Thread):
 
 
 class MotorDriver:
-    """Attempts to open serial port to control two MD2 stepper motors.
-
-        Automatically flushes input and output
+    """
+    Attempts to open serial port to control two MD2 stepper motors.
+    Automatically flushes input and output.
 
         Attributes:
             port: Serial port through which motors are controlled
@@ -51,7 +62,10 @@ class MotorDriver:
     """
 
     def __init__(self, step_unit_=0.00508, home=(3788, 4300)):
-        """Init MotorDriver with step_unit and port = COM #, # = 1,2,3..."""
+        """
+        :param step_unit_: Size of individual motor step (consult C4 controller manual for more details).
+        :param home: Home/Reset coordinates for the motors. NS probe returns to these coordinates.
+        """
         self.home = home
         entered = False
         for i in range(256):
@@ -75,7 +89,13 @@ class MotorDriver:
             exit(1)
 
     def forward_motor_one(self, steps):
-        """Move motor 1 forward the specified number of steps."""
+        """
+        Move motor 1 forward the specified number of steps. Blocks thread until a 'Completed' acknowledgment signal
+        is received.
+
+        :param steps: Number of steps to move the stepper motor by.
+        :return: Nothing.
+        """
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
@@ -85,7 +105,13 @@ class MotorDriver:
         self.port.flush()
 
     def reverse_motor_one(self, steps):
-        """Move motor 1 backward the specified number of steps."""
+        """
+        Move motor 1 backward the specified number of steps. Blocks thread until a 'Completed' acknowledgment signal
+        is received.
+
+        :param steps: Number of steps to move the stepper motor by.
+        :return: Nothing.
+        """
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
@@ -95,7 +121,13 @@ class MotorDriver:
         self.port.flush()
 
     def forward_motor_two(self, steps):
-        """Move motor 2 forward the specified number of steps."""
+        """
+        Move motor 2 forward the specified number of steps. Blocks thread until a 'Complete' acknowledgment signal
+        is received.
+
+        :param steps: Number of steps to move the stepper motor by.
+        :return: Nothing.
+        """
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
@@ -105,7 +137,13 @@ class MotorDriver:
         self.port.flush()
 
     def reverse_motor_two(self, steps):
-        """Move motor 2 backward the specified number of steps."""
+        """
+        Move motor 2 backward the specified number of steps. Blocks thread until a 'Complete' acknowledgment signal
+        is received.
+
+        :param steps: Number of steps to move the stepper motor by.
+        :return: Nothing.
+        """
         self.port.flushInput()
         self.port.flushOutput()
         self.port.flush()
@@ -116,16 +154,15 @@ class MotorDriver:
 
     # Home both motors to preset positions
     def home_motors(self):
-        """Reset motors back to center of grid."""
+        """
+        Resets the NS probe position to its home coordinates. Blocks thread until the motors have fully reset.
+        :return: Nothing.
+        """
         # Set home of motor 1 to be 6000 steps away, home of motor 2 to be 13000 steps away
         self.port.write(str.encode('!1wh1,r,'+str(self.home[0])+'\r'))
         self.port.readline()
-        #while self.port.read().decode() != 'o':
-        #    pass
         self.port.write(str.encode('!1wh2,r,'+str(self.home[1])+'\r'))
         self.port.readline()
-        #while self.port.read().decode() != 'o':
-        #    pass
         # print 'Home settings written (a if yes), ', port.readline()
         self.port.flush()
 
@@ -139,7 +176,6 @@ class MotorDriver:
             pass
         print("Motor 2 reset.")
         self.port.flush()
-
         print("Motors reset successfully.")
 
     def destroy(self):
