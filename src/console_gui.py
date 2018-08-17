@@ -15,16 +15,34 @@ Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - c
 import wx
 
 
-class TextRedirecter(object):
+class TextRedirector(object):
+    """
+    Class for redirecting the print function output to the ConsoleGUI TextCtrl widget.
+    """
     def __init__(self, aWxTextCtrl):
+        """
+        :param aWxTextCtrl: reference to the TextCtrl widget in the ConsoleGUI.
+        """
         self.out = aWxTextCtrl
 
     def write(self, string):
+        """
+        Writes the console output to the ConsoleGUI TextCtrl widget.
+        :param string: String to be written on the TextCtrl widget.
+        :return: Nothing.
+        """
         self.out.AppendText(string)
 
 
 class ConsoleGUI(wx.Frame):
+    """
+    Custom Terminal Console GUI. Helps users keep track of the NS scan's progress.
+    """
     def __init__(self, parent, title):
+        """
+        :param parent: Parent frame invoking the ConsoleGUI.
+        :param title: Title for the GUI window.
+        """
         wx.Frame.__init__(self, parent, title=title, size=(800, 700), style=wx.CAPTION)
 
         # UI Elements

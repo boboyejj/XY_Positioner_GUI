@@ -18,7 +18,7 @@ from src.area_scan import AreaScanThread, ZoomScanThread, CorrectionThread
 from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
 from src.manual_move import ManualMoveGUI
-from src.console_gui import TextRedirecter, ConsoleGUI
+from src.console_gui import TextRedirector, ConsoleGUI
 from src.motor_driver import ResetThread
 import numpy as np
 import matplotlib.pyplot as plt
@@ -251,8 +251,8 @@ class MainFrame(wx.Frame):
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
-        sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
-        sys.stderr = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
+        sys.stdout = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        sys.stderr = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
         print("Running general scan...")
         self.run_thread.start()
 
@@ -306,8 +306,8 @@ class MainFrame(wx.Frame):
             if not self.console_frame:
                 self.console_frame = ConsoleGUI(self, "Console")
             self.console_frame.Show(True)
-            sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
-            sys.stderr = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
+            sys.stdout = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+            sys.stderr = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
             self.zoom_thread.start()
 
         elif choice == 'Correct Previous Value':
@@ -362,8 +362,8 @@ class MainFrame(wx.Frame):
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
-        sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
-        sys.stderr = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
+        sys.stdout = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        sys.stderr = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
         self.corr_thread.start()
 
     def manual_move(self, e):
@@ -377,8 +377,8 @@ class MainFrame(wx.Frame):
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
-        sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
-        sys.stderr = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
+        sys.stdout = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        sys.stderr = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
         try:
             step = float(self.grid_tctrl.GetValue())
         except ValueError:
@@ -399,8 +399,8 @@ class MainFrame(wx.Frame):
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
-        sys.stdout = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
-        sys.stderr = TextRedirecter(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
+        sys.stdout = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stdout to the console
+        sys.stderr = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
         ResetThread(self).start()
 
     def enablegui(self):
