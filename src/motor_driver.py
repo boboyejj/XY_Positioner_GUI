@@ -143,7 +143,11 @@ class MotorDriver:
         print("Motors reset successfully.")
 
     def destroy(self):
-        """Flush remaining data and close port."""
+        """
+        Flush remaining data and close port.
+
+        :return: Nothing.
+        """
         self.port.flush()
         self.port.flushInput()
         self.port.flushOutput()

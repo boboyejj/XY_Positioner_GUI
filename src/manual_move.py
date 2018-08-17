@@ -18,7 +18,15 @@ import wx
 
 
 class ManualMoveGUI(wx.Frame):
+    """
+    GUI interfaced with the MotorDriver class that allows manual control over the motors.
+    """
     def __init__(self, parent, title, grid_step):
+        """
+        :param parent: Parent frame invoking the LocationSelectGUI.
+        :param title: Title for the GUI window.
+        :param grid_step: The grid step size.
+        """
         wx.Frame.__init__(self, parent, title=title, size=(400, 400))
 
         # Variables
@@ -102,6 +110,12 @@ class ManualMoveGUI(wx.Frame):
         self.Show(True)
 
     def move_up(self, e):
+        """
+        Moves the NS probe forward (i.e. negative X direction of the phone).
+
+        :param e: Event handler.
+        :return: Nothing.
+        """
         self.curry -= self.disty
         self.erry -= self.fracy
         self.motor.reverse_motor_two(self.stepy + int(self.erry))
@@ -109,6 +123,12 @@ class ManualMoveGUI(wx.Frame):
         self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
 
     def move_down(self, e):
+        """
+        Moves the NS probe backward (i.e. positive X direction of the phone).
+
+        :param e: Event handler.
+        :return: Nothing.
+        """
         self.curry += self.disty
         self.erry += self.fracy
         self.motor.forward_motor_two(self.stepy + int(self.erry))
@@ -116,6 +136,12 @@ class ManualMoveGUI(wx.Frame):
         self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
 
     def move_left(self, e):
+        """
+        Moves the NS probe leftward (i.e. negative Y direction of the phone).
+
+        :param e: Event handler.
+        :return: Nothing.
+        """
         self.currx -= self.distx
         self.errx -= self.fracx
         self.motor.reverse_motor_one(self.stepx + int(self.errx))
@@ -123,6 +149,12 @@ class ManualMoveGUI(wx.Frame):
         self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
 
     def move_right(self, e):
+        """
+        Moves the NS probe rightward (i.e. positive Y direction of the phone).
+
+        :param e: Event handler.
+        :return: Nothing.
+        """
         self.currx += self.distx
         self.errx += self.fracx
         self.motor.forward_motor_one(self.stepx + int(self.errx))
@@ -130,6 +162,13 @@ class ManualMoveGUI(wx.Frame):
         self.coord_box.SetLabel("Coordinates:\n[%.3f, %.3f]" % (self.currx, self.curry))
 
     def OnKey(self, e):
+        """
+        Handles wx.EVT_KEY_UP events (releasing a pressed key) to allow keyboard controlled movement.
+        Registers arrow keys for movement.
+
+        :param e: Event handler.
+        :return: Nothing.
+        """
         if e.GetKeyCode() == wx.WXK_UP:
             self.move_up(None)
         elif e.GetKeyCode() == wx.WXK_DOWN:
@@ -142,6 +181,13 @@ class ManualMoveGUI(wx.Frame):
             e.Skip()
 
     def update_settings(self, e):
+        """
+        Handles automatic X and Y grid step distance edits. Called when [Enter] is pressed or when the user clicks
+        on any element/widget of the GUI.
+
+        :param e: Event handler.
+        :return: Nothing.
+        """
         try:
             xval = float(self.x_tctrl.GetValue())
             yval = float(self.y_tctrl.GetValue())
@@ -162,6 +208,13 @@ class ManualMoveGUI(wx.Frame):
         print("New step distances: X =", self.distx, "Y =", self.disty)
 
     def OnClose(self, e):
+        """
+        Exit script for the GUI, called when the window is closed. Notifies the user about exiting the manual movement
+        module, destorys the motor object, and destroys the GUI object.
+
+        :param e: Event handler.
+        :return: Nothing.
+        """
         print("Exiting Manual Movement module.")
         self.motor.destroy()
         self.Destroy()
