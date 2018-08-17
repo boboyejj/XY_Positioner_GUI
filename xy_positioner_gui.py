@@ -27,9 +27,16 @@ from wx.lib.agw import multidirdialog as mdd
 
 
 class MainFrame(wx.Frame):
+    """
+    Main GUI frame of the entire NS testing program. Handles all children GUI and children threads for automated
+    measurement-taking.
+    """
     def __init__(self, parent, title):
+        """
+        :param parent: Parent object calling the MainFrame.
+        :param title: Title for the MainFrame window.
+        """
         wx.Frame.__init__(self, parent, title=title, size=(800, 700))
-        #wx.Window.SetMinSize(self, self.GetSize())
 
         # Variables
         self.run_thread = None
@@ -49,6 +56,13 @@ class MainFrame(wx.Frame):
         run_id = 116
         manual_id = 117
         reset_id = 118
+        help_id = 119
+        self.accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('s'), save_id),
+                                              (wx.ACCEL_CTRL, ord('r'), run_id),
+                                              (wx.ACCEL_CTRL, ord('m'), manual_id),
+                                              (wx.ACCEL_CTRL, ord('t'), reset_id),
+                                              (wx.ACCEL_CTRL, ord('h'), help_id)])
+        self.SetAcceleratorTable(self.accel_tbl)
 
         # UI Elements
         self.x_distance_text = wx.StaticText(self, label="X Distance")
@@ -80,7 +94,7 @@ class MainFrame(wx.Frame):
         self.save_dir_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.savedesc_text = wx.StaticText(self, label="Directory to save measurement text and image files")
         self.save_tctrl = wx.TextCtrl(self)
-        self.save_tctrl.SetValue("C:\\Users\changhwan.choi\Desktop\henlo")  # TODO :Debugging
+        self.save_tctrl.SetValue("C:\\Users\changhwan.choi\Desktop\hello")  # TODO :Debugging
         self.save_btn = wx.Button(self, save_id, "Browse")
         self.Bind(wx.EVT_BUTTON, self.select_save_dir, self.save_btn)
 
@@ -111,6 +125,13 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.run_area_scan, self.run_btn)
 
         # Menu Bar
+        menubar = wx.MenuBar()
+        helpmenu = wx.Menu()
+        shortcuthelp_item = wx.MenuItem(helpmenu, help_id, text="Shortcuts", kind=wx.ITEM_NORMAL)
+        helpmenu.Append(shortcuthelp_item)
+        menubar.Append(helpmenu, 'Help')
+        self.Bind(wx.EVT_MENU, self.showshortcuts, id=help_id)
+        self.SetMenuBar(menubar)
 
         # Sizers/Layout, Static Lines, & Static Boxes
         self.saveline_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -180,13 +201,13 @@ class MainFrame(wx.Frame):
             path = dlg.GetPaths()[0]
             path = path.split(':')[0][-1] + ':' + path.split(':)')[1]
             self.save_tctrl.SetValue(path)
-        #with wx.DirDialog(self, "Select save directory for '.txt' and '.png' files.",
-        #                  style=wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST) as dlg:
+        # with wx.DirDialog(self, "Select save directory for '.txt' and '.png' files.",
+        #                   style=wx.DD_DEFAULT_STYLE | wx.DD_DIR_MUST_EXIST) as dlg:
         #    if dlg.ShowModal() == wx.ID_CANCEL:
         #        return
         #    self.save_dir = dlg.GetPath()
         #    self.save_tctrl.SetValue(self.save_dir)
-            #if os.path.exists(parentpath):
+        #    if os.path.exists(parentpath):
 
     def run_area_scan(self, e):
         if self.save_tctrl.GetValue() is None or self.save_tctrl.GetValue() is '':
@@ -365,6 +386,22 @@ class MainFrame(wx.Frame):
         self.reset_btn.Enable(False)
         self.manual_btn.Enable(False)
         self.run_btn.Enable(False)
+
+    def showshortcuts(self, e):
+        """
+        Opens simple dialog listing the different shortcuts of the program.
+        :param e: Event handler.
+        :return: Nothing.
+        """
+        shortcuts_string = "Shortcuts:\n" +\
+                           "Select Save Directory: Ctrl + S\n" +\
+                           "Reset Motors: Ctrl + T\n" +\
+                           "Manual Movement: Ctrl + M\n" +\
+                           "Run Analysis: Ctrl + E\n" +\
+                           "Check Shortcut Keys: Ctrl + H"
+        dlg = wx.MessageDialog(self, shortcuts_string, 'Shortcut Keys',
+                               style=wx.OK | wx.ICON_QUESTION | wx.CENTER)
+        dlg.ShowModal()
 
     def errormsg(self, errmsg):
         """
