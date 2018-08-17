@@ -15,7 +15,6 @@ Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - c
 """
 
 import serial
-import time
 import threading
 import wx
 

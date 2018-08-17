@@ -13,7 +13,6 @@ Authors:
 Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - changhwan.choi@pctest.com
 """
 
-import os
 import sys
 from src.area_scan import AreaScanThread, ZoomScanThread, CorrectionThread
 from src.post_scan_gui import PostScanGUI

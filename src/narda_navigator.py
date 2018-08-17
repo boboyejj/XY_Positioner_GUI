@@ -16,7 +16,6 @@ Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - c
 """
 
 import os
-import subprocess
 import warnings
 import time
 import pyautogui as pgui
