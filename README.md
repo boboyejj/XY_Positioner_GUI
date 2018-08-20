@@ -133,7 +133,7 @@ The settings for "up, down, left, and right" may be altered depending on your pe
 the buttons have been labelled "towards/away" depending on the motor they are associated with.
 
 The distance moved by pressing a button can be changed by using the text boxes in the top right section of the Manual Movement GUI.
-![Manual Move GUI](docs/manualGUI.png)
+![Manual Move GUI](docs/manualGUI.PNG)
 
 ## Built With
 
