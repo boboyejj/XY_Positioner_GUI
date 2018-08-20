@@ -274,6 +274,12 @@ class NardaNavigator:
         # self.minimizeSnip()
 
     def getMaxValue(self, filepath, pathname):
+        """
+        Extracts the 'Highest Peak (A/m)' value from a given text output file.
+        :param filepath: Name of text output file.
+        :param pathname: Directory/path to the text output file.
+        :return: Returns the float 'Highest Peak (A/m)' value.
+        """
         with open(pathname + '/' + filepath + '.txt', 'r') as f:
             maxValLine = f.readlines()[8]
             for string in maxValLine.split(' '):
@@ -285,15 +291,33 @@ class NardaNavigator:
         return maxVal
 
     def saveCurrentLocation(self):
+        """
+        TODO: Pretty sure this is not used
+        :return:
+        """
         return pgui.position()
 
     def loadSavedLocation(self, x, y):
+        """
+        TODO: Pretty sure this is not used
+        :param x:
+        :param y:
+        :return:
+        """
         pgui.moveTo(x, y)
 
     def bringToFront(self):
+        """
+        Sets the NARDA software window on focus (i.e. brought to the front/set as the active window).
+        :return: Nothing.
+        """
         self.ehp200_app.EHP200.set_focus()
 
     def bringSnipToFront(self):
+        """
+        Sets the Snipping Tool program window on focus (i.e. brought to the front/set as the active window).
+        :return: Nothing.
+        """
         try:
             self.snip_tool.Snipping.set_focus()
             return 'snipping'
@@ -302,20 +326,15 @@ class NardaNavigator:
             return 'edit'
 
     def minimizeSnip(self):
+        """
+        Minimizes the Snipping Tool program window.
+        :return: Nothing.
+        """
         try:
             self.snip_tool.Snipping.Minimize()
         except pwin.findbestmatch.MatchError:  # If the snipping tool has already taken a snip, window is renamed 'edit'
             self.snip_tool.Edit.set_focus()
 
-    def main(self):
-        #self.startNarda()
-        #self.bringToFront()
-        name = "C:\\Users\changhwan.choi\Desktop\L_Efront"
-        for i in range(1, 17):
-            fname = name + str(i) + ".txt"
-            self.getMaxValue(fname)
-
 
 if __name__ == '__main__':
     ehp200 = NardaNavigator()
-    ehp200.main()
