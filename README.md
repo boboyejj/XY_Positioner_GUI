@@ -1,100 +1,90 @@
-# Robotic Positioning Controller
+# NS Testing/Robotic Positioning Controller
 
 This project was designed to allow easier use of the Arrick C4 Motor
-controllers and generate contour plots based on measurement data. The
-code was written in Python 2.7.
+controllers and generate contour plots based on measurement data.
+The project has since been expanded to also incorporate automatic
+measurements for nerve stimulation (NS) testing by way of mouse and
+keyboard control libraries. The code was written in Python 3.6.
+*Note: this version of the program only supports Windows 10 at the moment.
 
 ## Getting Started
+### Overview
+#### Programs
+* [Anaconda3/Miniconda3]( https://www.anaconda.com/download/)
+   * Python projects often implement a variety of different third party libraries which, as projects scale up, can be hard to manage in an organized fashion. As a Python distribution, Anaconda provides the core Python language, hundreds of core packages, a variety of different development tools (e.g. IDEs), and **conda**, Anaconda’s package manager that facilitates the downloading and management of Python packages.
+* [Python 3.6]( https://www.python.org/downloads/) (included in Anaconda3/Miniconda3)
+   * Python is the main programming language for this project. It has an active open-source community and easily readable code syntax, making Python a great language of choice for projects like these.
+   * **Note: Python 3.6 is included in the Anaconda 3 installation - there is no need to download it separately.**
+* An Integrated Development Environment (IDE) supporting Python – [PyCharm]( https://www.jetbrains.com/pycharm/download/) is recommended.
+    * While PyCharm is not necessary to run this program, we highly recommend it for Python-based development. It is easy to integrate it with Anaconda and provides fantastic tools/shortcuts/hotkeys that make development faster and easier.
+* EHP200-TS (NARDA Software)
+    * This is the Program for electric and magnetic field analysis. All measurements are processed and saved through this program.
+* Snipping Tool
+    * Snipping Tool is used to take screenshots and is a default program in Windows 10.
 
-### Prerequisites
+#### Packages (to be installed using Anaconda)
+* [Python](https://www.python.org/)
+* [PySerial](https://github.com/pyserial/pyserial)
+* [Numpy](http://www.numpy.org/)
+* [Matplotlib](https://matplotlib.org/)
+* [SciPy](https://www.scipy.org/)
+* [wxPython (wx)](https://wxpython.org/)
+* [pyautogui](https://pyautogui.readthedocs.io/en/latest/)
+* [pywinauto](https://pywinauto.github.io/)
+* [pywin32](https://wiki.python.org/moin/PyWin32)
 
-What things you need to install the software and how to install them
-
-It is recommended that you install an **I**ntegrated **D**evelopment **E**nvironment (IDE) for viewing and running Python files. [PyCharm](https://www.jetbrains.com/pycharm/download/) is recommended as it does not require admin privileges. 
-
-Spyder should also work and it comes preinstalled with [Anaconda](https://github.com/BurntSushi/nfldb/wiki/Python-&-pip-Windows-installation).
-Future versions should include a Jupyter Notebook to make data management testing easier.
-
-It is also assumed that you already have a built XY Positioning system (either 18 or 30 inch model). This code will simply
-help make controlling the motors more intuitive.
+#### Hardware Prerequisites
+* [EHP-200A](https://www.narda-sts.com/en/selective-emf/ehp-200a/) - Electric and Magnetic Field Analyzer Probe (NARDA)
+* XY Positioning System (18 inch or 30 inch model)
+    * C4 Controller
+    * MD-2 Stepper Motor Driver
 
 ### Installing
 
-1. First, install the latest version of Python 2.7 from the following [link](https://www.python.org/downloads/). Make sure you
-are downloading **Python 2.7** and NOT Python 3. You may also choose to install [Anaconda or Miniconda](https://github.com/BurntSushi/nfldb/wiki/Python-&-pip-Windows-installation) to manage the packages
-we will be using.
+A core strength of Python is its vast open-source community and libraries. However, downloading and managing these separate packages is often a messy and tricky endeavor. As such, we used [Anaconda](https://www.anaconda.com/download/) to browse, install, and manage the libraries. While it is possible to follow the general steps in this section through a standard Python installation, we highly recommend using Anaconda/Miniconda.
 
-![Install Python 2.7.x](docs/pyversion.png)
+1. First, install the latest version of [Anaconda](https://www.anaconda.com/download/). Make sure you are downloading Anaconda for **Python 3.X** (Version 3.6 was the latest one at the time of writing this guide). 
 
-2. Install an IDE such as [PyCharm](https://www.jetbrains.com/pycharm/download/) or use Spyder (included in Anaconda). Open the folder
-containing the files you downloaded using this IDE.
+2. Install an IDE such as [PyCharm](https://www.jetbrains.com/pycharm/download/). Open the folder containing the files you downloaded using this IDE.
 
-3. Next we must set up our virtual environment to continue using python properly. This can be slightly complicated, so use this link
-for [reference for PyCharm](https://www.jetbrains.com/help/pycharm/configuring-python-interpreter.html#configuring-venv) and this link
-for [reference for Anaconda](https://conda.io/docs/user-guide/tasks/manage-environments.html). If you have configured the PATH variables
-for Windows, this shouldn't be necessary. I will go through the exact steps for PyCharm
-here:
-    - Go to Help > Find Action in the top bar or press Ctrl+Shift+A
-    - Search for "Project Interpreter" and click the first result
-    - The term "Project Interpreter" should be highlighted. It is next to a long dropdown bar. Next to that bar is a settings 
-    gear icon. Click on it and choose "Add Local"
-    
-    ![Add local virtual environment](docs/addlocal.png)
-    
-    - Specify a "Location" for the virtual environment. For the "Base Interpreter", navigate to the folder where you installed Python
-    (probably `C:/Python27` or `C:/ProgramFiles/Python27`). Choose the file "python.exe" to make sure PyCharm knows how to run your code.
-    
-    ![Create virtual environment](docs/createvenv.png)
-    
-    - Before you exit out of this window, on the left hand side, there should be an option that says "System Interpreter". For the "Interpreter"
-    choose the exact same location you specified for the "Base Interpreter" (the python.exe file from before).
-    
-    ![Instantiate virtual environment](docs/instantiatevenv.png)
-    
-    - Click "Ok" and exit the "Settings" window.
+3.	We will now install the different packages required to run the scripts.
+  * Open **Anaconda Navigator** and click on **Environments** tab on the left.
+  
+  ![anaconda](docs/anaconda.PNG) 
+  
+  * Select **Not installed** from the dropdown menu.
+  
+  ![anaconda1](docs/anaconda1.png)
+  
+  * From here, we can search for each of the different packages listed above (in the Packages subsection of the Overview). To download the packages, check the box next to the package and click **Apply** at the bottom. **Keep in mind that some of these packages may already have come with the full Anaconda installation.**
+  * Some packages may not be found using the Navigator. In this case, they must be downloaded using **Anaconda Prompt**. Open the prompt and type the following: `conda install -c anaconda <package_names_space-separated>`.
+ 
+  ![ananconda prompt](docs/anacondaprompt.png)
+  
+*Note: Alternatively, you can add the packages in the **Project Interpreter** section of the project settings in PyCharm. However, this must be done after the project has been opened and the project interpreter has been selected, which will be done in the next few steps.*
 
-4. You must then open up the "Terminal" inside the IDE you are using to run the following command to install relevant packages.
-The button to open it in PyCharm can be found in the very bottom left corner (it looks like a gray square). Hovering over it will allow the
-user the option to open the terminal.
+4.	Open PyCharm and open the project – select the **XY_Positioner_GUI** folder in the “Open File or Project” window.
 
-    ![Choose Terminal](docs/terminalchoose.png)
-
-5. Run the following command in the terminal (within your IDE) to install all packages at once. These packages take up about 1 GB of space:
-
-```bash
-pip install numpy matplotlib Gooey pyserial scipy
-```
-
-Alternatively, if you are using Anaconda, use the following command:
-
-```bash
-conda install numpy matplotlib Gooey pyserial scipy
-```
+  ![open project](docs/openproject.PNG)
+  
+5.	Select **File->Settings…** and select the **Project Interpreter** tab on the left. Click on the cog and select **Add…**.
+  
+  ![project interpreter](docs/projectinterpreter.PNG)
+  
+  * Click on the **System Interpreter** tab on the left and select the location of the python.exe file from your Anaconda/Miniconda installation (most probably found in `C:\Users\<user>\AppData\Local\Continuum\anaconda3\python.exe` in Windows machines).
 
 ## Deployment
-
-Open the file ["basic_xy_positioner_gui.py"](basic_xy_positioner_gui.py) in your favorite IDE and click run 
+Open the file ["xy_positioner_gui.py"](xy_positioner_gui.py) in your favorite IDE and click run 
 (the green play button at the top for PyCharm). If you have to enter run configurations, the only That should be it!
 
-Running from the command line on Linux/Mac systems can be done by simply typing:
-
-```bash
-python basic_xy_positioner_gui.py
-```
-
-Make sure that it is configured to be executable by using:
-
-```bash
-chmod +x basic_xy_positioner_gui.py
-```
-
-For Windows 10, you must first configure your PATH variables in order to run python from the command line. Follow the steps
+In order to run python from the command line, you must first configure your PATH variables. Follow the steps
 on this [site](https://superuser.com/questions/143119/how-to-add-python-to-the-windows-path) to learn how to add Python to the PATH.
 Note that this is completely optional and that the program can still be run through an IDE.
 
 The GUI should pop up with options that you may define. Additional parameters can be tweaked by modifying the source files.
 
 ![GUI in action](docs/GUI_img.png)
+# TODO: Change image
 
 It may be necessary to purchase a USB-to-Serial cable as the one currently in use is liable to
 breaking. Ensure that the stopper is in place for motor 1 on the 30 inch system to ensure homing
@@ -102,84 +92,55 @@ works correctly.
 
 ##### NOTE THAT BEFORE RUNNING ANY SCANS YOU MUST FIRST [RESET THE MOTORS](#resetting-Motors-reset_motors).
 
-### Running an Area Scan (area_scan)
-
+### Running an Area Scan
 ##### Required Arguments
-
 * Input the dimensions of the object (x goes across and is controlled by motor #1, y goes up and down by using motor #2) into *x_distance* and *y_distance*.
 * The *grid_step_dist* selects how far apart each measurement point should be.
-* The *dwell_time* is by default set to 1, but can be changed to 0 to allow for the user to wait an indefinite amount of time before inputting a value.
+* The *dwell_time* is the time the NS probe spends idle above a point before a measurement is taken.
 
-##### Optional Arguments
+The default settings create a 4x6 grid with spacing of 2.8 cm with a 3-second dwell time (for both area scan and zoom scan). Span settings are set to be between 0.005 - 5 MHz.
 
-* The *filename* is a prefix that will appear at the beginning of all resulting file output. All output can be found in the folder
-`results/` which will be automatically generated if not present.
-* The *measure* setting can be turned off to simply observe how the motors are stepping through the grid.
-* The *auto_zoom_scan* setting will automatically conduct a zoom scan over the point with the highest value after travelling
-to it. Zoom scan data is stored separately from area scan data.
+#### General Area Scan
+The main function of this program is the general area scan. This consists of moving the probe throughout a specified area, taking NS measurements automatically until all points in the area have been traversed.
 
-The default settings create a 4x6 grid with spacing of 2.8 cm with a 1 second dwell time. The default file prefix is "raw_values" and the automatic zoom scan is not conducted.
+Before the scan, make sure all text entries in the GUI are filled with valid inputs.
+To begin the scan, click on the **Run** button at the bottomo right of the GUI window.
+The scan will open up a custom terminal console window that displays any message or error from the program, containing information on the progress or particular crashes within the lifetime of the program.
+The program will then automatically call Snipping Tool and EHP200-TS and interface with the C4 controller in the XY positioner system.
+Once all preparations have been completed, the program starts the scan.
+**Do not touch the computer until the area scan has been completed - the program uses image recognition for its automated measurement process and will crash if certain key reference points/buttons/UI elements are not in sight. With this in mind, it may also be helpful to disable any notifications or programs that pop to the front (e.g. installers that get in front of all other windows once the installation has been completed.**
 
-Once the area scan is complete, you may select more options from the post-scan GUI that pops up afterward. You may choose to
-* correct a previous value
-* run a zoom scan
-* save your data into `results/`
-* ...or exit the program
- 
-Note that the plot will also be saved and you do not have to choose the save button on the graph pop up unless you would like 
-to save it in another folder.
+Once the general area scan has been completed, you may select one of four options: 1) Exit the area scan module, 2) Perform a zoom scan on the coordinate corresponding to the highest value measurement, 3) Correct a previous position's value, and 4) Save Data (not yet implemented - may delete in the future).
 
-### Moving to a Grid Position (pos_move)
+#### Zoom Scan
+The scan process begins by identifying the point in the grid with the highest measurement value and moving the probe to this position. Once here, the program begins a 5 by 5 grid point scan similar to the area scan.
 
-##### Required Arguments
-
-* Input the dimensions of the object (x goes across and is controlled by motor #1, y goes up and down by using motor #2) into *x_distance* and *y_distance*.
-* The *grid_step_dist* selects how far apart each measurement point should be.
-
-After the command is selected, a grid GUI will pop up with a series of buttons. Click on where you want to go within the grid
-and the motors will move there after moving to the first position in the grid.
-
-### Running a Zoom Scan
-
-To run a zoom scan over a single point, it is recommended that you first run [pos_move](#moving-to-a-grid-position-pos_move)
-and then conduct an area scan with smaller step size.
-
-Make sure to indicate in your filename that you are conducting a zoom scan!
-The program is built to assume that if you choose [area_scan](#running-an-area-scan-area_scan), you are expecting data outputted
-into a file called "_area".
-
-You can also choose to run a zoom scan after the area scan is complete or set it to be run automatically after an area scan.
+#### Correct Previous Value
+The program prompts the user to select a point to measure again. The program then simply moves the probe to the selected position and automatically takes a measurement, replacing the value at its corresponding coordinate in the value array.
 
 ### Resetting Motors (reset_motors)
 
-This command resets the motors to their start position at the center of the XY positioner. Please run this command every time you
-are finished using the positioner. It will take approximately a minute to complete the reset, but PLEASE DO NOT RUN ANY SCANS while
-the motors are moving. This will throw off position calculations. To that effect, check the "wait" box to say that you understand this. :+1:
-
-You may also select whether you would like to go to the center of the 18 inch system or the 30 inch system. ("scan_30")
+This command resets the motors to their start position approximately at the center of the XY positioner. Please run this command every time you are finished using the positioner. It will take approximately a minute to complete the reset.
 
 ### Manual Control (manual)
-
 The manual control option assumes that you know your exact positions for grid coordinates and allows for free movement of the motors.
 
 The settings for "up, down, left, and right" may be altered depending on your perspective relative to the positioner. For this reason,
 the buttons have been labelled "towards/away" depending on the motor they are associated with.
 
-The distance moved by pressing a button can be changed by using the text boxes in the top right section of the GUI.
-
-To generate a graph (scatter + contour) you require at least 4 data points. To add a data point, type a value into the textbox and click "Add
-to graph". Unfortunately, overwriting data points is **not** supported at this time, so be sure of your value before you click "Add to graph"!
-
-Note that this graph IS NOT SAVED unless you click the save button and choose a location/filename.
+The distance moved by pressing a button can be changed by using the text boxes in the top right section of the Manual Movement GUI.
 
 ## Built With
 
-* [Python](https://www.python.org/) - This code base was written in Python 2.7.14
-* [PySerial](https://github.com/pyserial/pyserial) - Dependency Management
+* [Python](https://www.python.org/) - This code base was written in Python 3.6
+* [PySerial](https://github.com/pyserial/pyserial) - Serial communication with the motor controller
 * [Numpy](http://www.numpy.org/) - Used for matrix manipulations and structuring data
 * [Matplotlib](https://matplotlib.org/) - Used for interpolation and contour plotting
 * [SciPy](https://www.scipy.org/) - Used for additional interpolation
-* [Gooey](https://github.com/chriskiehl/Gooey) - Used to construct initial menu selection
+* [wxPython (wx)](https://wxpython.org/) - Used to construct all GUI elements
+* [pyautogui](https://pyautogui.readthedocs.io/en/latest/) - Used to automate mouse and keyboard for automatic data measurements
+* [pywinauto](https://pywinauto.github.io/) - Used to automate processes
+* [pywin32](https://wiki.python.org/moin/PyWin32) - Set of extension modules that give access to many Windows API functions
 
 ## Contributing
 
@@ -188,6 +149,7 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 ## Authors
 
 * **Ganesh Arvapalli** - *Software Engineering Intern* - [garva-pctest](https://github.com/garva-pctest)
+* **Chang Hwan 'Oliver' Choi** - Biomedical/Software Engineering Intern* - [changhwan95](https://github.com/changhwan95)
 
 Originally written for the internal use of PCTEST Engineering Lab, Inc.
 
@@ -201,4 +163,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * Baron Chan
 * Kaitlin O'Keefe
 * Steve Liu
+* Thomas Rigolage
 * PCTEST Engineering Lab, Inc.
+* Billie Thompson ([PurpleBooth](https://gist.github.com/PurpleBooth)) for the README template
