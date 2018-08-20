@@ -283,6 +283,8 @@ class MainFrame(wx.Frame):
             y = float(self.y_tctrl.GetValue())
             step = float(self.grid_tctrl.GetValue())
             dwell = float(self.dwell_tctrl.GetValue())
+            span_start = float(self.span_start_tctrl.GetValue())
+            span_stop = float(self.span_stop_tctrl.GetValue())
         except ValueError:
             self.errormsg("Invalid scan parameters.\nPlease input numerical values only.")
             return
@@ -304,8 +306,8 @@ class MainFrame(wx.Frame):
         meas_side = self.side_rbox.GetStringSelection()
         # Finding the RBW setting
         meas_rbw = self.rbw_rbox.GetStringSelection()
-        self.run_thread = AreaScanThread(self, x, y, step, dwell, savedir, comment,
-                                         meas_type, meas_field, meas_side, meas_rbw)
+        self.run_thread = AreaScanThread(self, x, y, step, dwell, span_start, span_stop, savedir,
+                                         comment, meas_type, meas_field, meas_side, meas_rbw)
         self.disablegui()
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
@@ -359,9 +361,9 @@ class MainFrame(wx.Frame):
             meas_side = self.side_rbox.GetStringSelection()
             # Finding the RBW setting
             meas_rbw = self.rbw_rbox.GetStringSelection()
-            self.zoom_thread = ZoomScanThread(self, zdwell, savedir, self.run_thread.comment,
-                                              meas_type, meas_field, meas_side, meas_rbw,
-                                              self.run_thread.num_steps, self.values, self.grid,
+            self.zoom_thread = ZoomScanThread(self, zdwell, self.run_thread.span_start, self.run_thread.span_stop,
+                                              savedir, self.run_thread.comment, meas_type, meas_field, meas_side,
+                                              meas_rbw, self.run_thread.num_steps, self.values, self.grid,
                                               self.curr_row, self.curr_col)
             if not self.console_frame:
                 self.console_frame = ConsoleGUI(self, "Console")
@@ -416,7 +418,8 @@ class MainFrame(wx.Frame):
         # Finding the RBW setting
         meas_rbw = self.rbw_rbox.GetStringSelection()
         self.corr_thread = CorrectionThread(self, target_index, self.run_thread.num_steps,
-                                            float(self.dwell_tctrl.GetValue()), self.values, self.grid,
+                                            float(self.dwell_tctrl.GetValue()), self.run_thread.span_start,
+                                            self.run_thread.span_stop, self.values, self.grid,
                                             self.curr_row, self.curr_col, savedir, self.run_thread.comment,
                                             meas_type, meas_field, meas_side, meas_rbw, self.max_fname)
         if not self.console_frame:

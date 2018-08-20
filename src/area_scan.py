@@ -29,14 +29,16 @@ class AreaScanThread(threading.Thread):
     """
     Thread for handling general area scans.
     """
-    def __init__(self, parent, x_distance, y_distance, grid_step_dist, dwell_time,
-                 save_dir, comment, meas_type, meas_field, meas_side, meas_rbw):
+    def __init__(self, parent, x_distance, y_distance, grid_step_dist, dwell_time, span_start,
+                 span_stop, save_dir, comment, meas_type, meas_field, meas_side, meas_rbw):
         """
         :param parent: Parent object (i.e. the Frame/GUI calling the thread).
         :param x_distance: Width of the scanning area.
         :param y_distance: Length of the scanning area.
         :param grid_step_dist: Step distance between each measurement point.
         :param dwell_time: Wait time at each scan point before measurements are recorded.
+        :param span_start: Lower-limit frequency for FFT (MHz).
+        :param span_stop: Upper-limit frequency for FFT (MHz).
         :param save_dir: Directory for output files (.txt, .png).
         :param comment: Comment saved in the output file (.txt).
         :param meas_type: Measurement type (limb or body).
@@ -50,6 +52,8 @@ class AreaScanThread(threading.Thread):
         self.y_distance = y_distance
         self.grid_step_dist = grid_step_dist
         self.dwell_time = dwell_time
+        self.span_start = span_start
+        self.span_stop = span_stop
         self.save_dir = save_dir
         self.comment = comment
         self.meas_type = meas_type
@@ -89,8 +93,8 @@ class AreaScanThread(threading.Thread):
         narda.selectTab('mode')
         narda.selectInputField(self.meas_field)
         narda.selectTab('span')
-        narda.inputTextEntry('start', str(0.005))
-        narda.inputTextEntry('stop', str(5))
+        narda.inputTextEntry('start', str(self.span_start))
+        narda.inputTextEntry('stop', str(self.span_stop))
         narda.selectRBW(self.meas_rbw)
         narda.selectTab('data')
         narda.enableMaxHold()
@@ -113,11 +117,13 @@ class ZoomScanThread(threading.Thread):
     """
     Thread for handling zoom scans.
     """
-    def __init__(self, parent, dwell_time, save_dir, comment, meas_type, meas_field,
-                 meas_side, meas_rbw, num_steps, values, grid, curr_row, curr_col):
+    def __init__(self, parent, dwell_time, span_start, span_stop, save_dir, comment, meas_type,
+                 meas_field, meas_side, meas_rbw, num_steps, values, grid, curr_row, curr_col):
         """
         :param parent: Parent object (i.e. the Frame/GUI calling the thread).
         :param dwell_time: Wait time at each scan point before measurements are recorded.
+        :param span_start: Lower-limit frequency for FFT (MHz).
+        :param span_stop: Upper-limit frequency for FFT (MHz).
         :param save_dir: Directory for output files (.txt, .png).
         :param comment: Comment saved in the output file (.txt).
         :param meas_type: Measurement type (limb or body).
@@ -134,6 +140,8 @@ class ZoomScanThread(threading.Thread):
         self.callback = parent.update_values
         self.num_steps = num_steps
         self.dwell_time = dwell_time
+        self.span_start = span_start
+        self.span_stop = span_stop
         self.save_dir = save_dir
         self.comment = comment
         self.meas_type = meas_type
@@ -171,8 +179,8 @@ class ZoomScanThread(threading.Thread):
         narda.selectTab('mode')
         narda.selectInputField(self.meas_field)
         narda.selectTab('span')
-        narda.inputTextEntry('start', str(0.005))
-        narda.inputTextEntry('stop', str(5))
+        narda.inputTextEntry('start', str(self.span_start))
+        narda.inputTextEntry('stop', str(self.span_stop))
         narda.selectRBW(self.meas_rbw)
         narda.selectTab('data')
 
@@ -216,13 +224,15 @@ class CorrectionThread(threading.Thread):
     """
     Thread for handling corrections of previous values from the general area scan.
     """
-    def __init__(self, parent, target, num_steps, dwell_time, values, grid, curr_row, curr_col,
-                 save_dir, comment, meas_type, meas_field, meas_side, meas_rbw, max_fname):
+    def __init__(self, parent, target, num_steps, dwell_time, span_start, span_stop, values, grid, curr_row,
+                 curr_col, save_dir, comment, meas_type, meas_field, meas_side, meas_rbw, max_fname):
         """
         :param parent: Parent object (i.e. the Frame/GUI calling the thread).
         :param target: index of the target position (index by the grid).
         :param num_steps: Number of motor steps per grid step.
         :param dwell_time: Wait time at each scan point before measurements are recorded.
+        :param span_start: Lower-limit frequency for FFT (MHz).
+        :param span_stop: Upper-limit frequency for FFT (MHz).
         :param values: Numpy array of the recorded values.
         :param grid: Numpy array of index values (1-index).
         :param curr_row: The NS probe's current row position.
@@ -240,6 +250,8 @@ class CorrectionThread(threading.Thread):
         self.target = target
         self.num_steps = num_steps
         self.dwell_time = dwell_time
+        self.span_start = span_start
+        self.span_stop = span_stop
         self.values = values
         self.grid = grid
         self.curr_row = curr_row
@@ -273,8 +285,8 @@ class CorrectionThread(threading.Thread):
         narda.selectTab('mode')
         narda.selectInputField(self.meas_field)
         narda.selectTab('span')
-        narda.inputTextEntry('start', str(0.005))
-        narda.inputTextEntry('stop', str(5))
+        narda.inputTextEntry('start', str(self.span_start))
+        narda.inputTextEntry('stop', str(self.span_stop))
         narda.selectRBW(self.meas_rbw)
         narda.selectTab('data')
 
