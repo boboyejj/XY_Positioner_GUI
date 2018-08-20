@@ -332,8 +332,9 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
     # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
 
+    # Generate a 'traversal grid' with values starting from 1 showing the order of measurement taking
     grid = generate_grid(x_points, y_points)
-    values = np.zeros(grid.shape)
+    values = np.zeros(grid.shape)  # Placeholder for filling in with measurement values
 
     print("Scan path:")
     print(grid)
@@ -344,15 +345,17 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
     frac_step = num_steps - int(num_steps)
     num_steps = int(num_steps)
     x_error, y_error = 0, 0  # Accumulator for x and y directions
-    curr_row, curr_col = 0, 0
+    curr_row, curr_col = 0, 0  # Current coordinates of the NS testing probe
     curr_max = -1  # Current maximum value
     max_filename = ''  # Filename of the maximum measurement point
 
     # General Area Scan
     for i in range(1, grid.size + 1):
+        # Find the position of the next
         next_row, next_col = np.where(grid == i)
         next_row = next_row[0]
         next_col = next_col[0]
+        # Move the NS probe to the next position
         if next_row > curr_row:  # Move downwards
             y_error += frac_step
             m.forward_motor_two(num_steps + int(y_error))
@@ -368,9 +371,12 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
             m.reverse_motor_one(num_steps + int(x_error))
             x_error -= int(x_error)
             curr_col = next_col
+        # Build the filename for the measurements at this point
         fname = build_filename(meas_type, meas_field, meas_side, i)
+        # Take the measurement and save relevant files
         value = narda.takeMeasurement(dwell_time, fname, savedir)
         values[curr_row, curr_col] = value
+        # If new maximum value found, save take a screenshot of the GUI interface
         if value > curr_max:
             print("New max val: %f" % value)
             # Switch to Snipping Tool in front of the NARDA program
@@ -381,6 +387,7 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
         print("---------")
         print(values)
     print("Renaming tmp.PNG to %s.PNG" % max_filename)
+    # End of scan - rename screenshot file with the correct name
     try:
         os.rename(savedir + '/tmp.PNG', savedir + '/' + max_filename + '.PNG')
     except FileExistsError:
@@ -424,10 +431,10 @@ def build_filename(meas_type, meas_field, meas_side, number):
 def move_to_pos_one(moto, num_steps, rows, cols):
     """Move motor to first position in grid.
 
-    :param moto: MotorDriver to control motion
-    :param num_steps: Number of motor steps between grid points
-    :param rows: Number of grid rows
-    :param cols: Number of grid cols
+    :param moto: MotorDriver to control motion.
+    :param num_steps: Number of motor steps between grid points.
+    :param rows: Number of grid rows.
+    :param cols: Number of grid cols.
     :return: None
     """
     moto.reverse_motor_two(int(num_steps * rows / 2.0))
@@ -438,9 +445,9 @@ def generate_grid(rows, columns):
     """Create grid traversal visual in format of numpy matrix.
     Looks like a normal sequential matrix, but every other row is in reverse order.
 
-    :param rows: Number of rows in grid
-    :param columns: Number of columns in grid
-    :return: Numpy matrix of correct values
+    :param rows: Number of rows in grid.
+    :param columns: Number of columns in grid.
+    :return: Numpy matrix of correct values.
     """
     g = []
     for i in range(rows):
@@ -453,13 +460,15 @@ def generate_grid(rows, columns):
 
 
 def convert_to_pts(arr, dist, x_off=0, y_off=0):
-    """Convert matrix to set of points
+    """
+    Convert matrix to set of points.
+    #TODO: Probably not going to be using this one anymore.
 
-    :param arr: matrix to convert
-    :param dist: distance between points in matrix
-    :param x_off: offset to add in x direction (if not at (0,0))
-    :param y_off: offset to add in y direction (if not at (0,0))
-    :return: xpts, ypts, zpts: List of points on each axis
+    :param arr: matrix to convert.
+    :param dist: distance between points in matrix.
+    :param x_off: offset to add in x direction (if not at (0,0)).
+    :param y_off: offset to add in y direction (if not at (0,0)).
+    :return: xpts, ypts, zpts: List of points on each axis.
     """
     x_dim = arr.shape[1]
     y_dim = arr.shape[0]
@@ -481,4 +490,3 @@ def convert_to_pts(arr, dist, x_off=0, y_off=0):
             zpts.append(arr[i][j])
     print(xpts, ypts, zpts)
     return xpts, ypts, zpts
-
