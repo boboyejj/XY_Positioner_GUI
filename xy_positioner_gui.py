@@ -37,7 +37,8 @@ class MainFrame(wx.Frame):
         :param parent: Parent object calling the MainFrame.
         :param title: Title for the MainFrame window.
         """
-        wx.Frame.__init__(self, parent, title=title, size=(800, 700))
+        wx.Frame.__init__(self, parent, title=title, size=(600, 700))
+        self.scan_panel = wx.Panel(self)
 
         # Variables
         self.run_thread = None
@@ -66,87 +67,87 @@ class MainFrame(wx.Frame):
         self.SetAcceleratorTable(self.accel_tbl)
 
         # UI Elements
-        self.scan_settings_text = wx.StaticText(self, label="Area Scan Settings")
+        self.scan_settings_text = wx.StaticText(self.scan_panel, label="Area Scan Settings")
         self.scan_settings_text.SetFont(wx.Font(10, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.x_distance_text = wx.StaticText(self, label="X Distance")
+        self.x_distance_text = wx.StaticText(self.scan_panel, label="X Distance")
         self.x_distance_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.xdesc_text = wx.StaticText(self, label="Horizontal length of measurement region (in cm)")
-        self.x_tctrl = wx.TextCtrl(self)
+        self.xdesc_text = wx.StaticText(self.scan_panel, label="Horizontal length of measurement region (in cm)")
+        self.x_tctrl = wx.TextCtrl(self.scan_panel)
         self.x_tctrl.SetValue(str(1 * 2.8))
 
-        self.y_distance_text = wx.StaticText(self, label="Y Distance")
+        self.y_distance_text = wx.StaticText(self.scan_panel, label="Y Distance")
         self.y_distance_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.ydesc_text = wx.StaticText(self, label="Vertical length of measurement region (in cm)")
-        self.y_tctrl = wx.TextCtrl(self)
+        self.ydesc_text = wx.StaticText(self.scan_panel, label="Vertical length of measurement region (in cm)")
+        self.y_tctrl = wx.TextCtrl(self.scan_panel)
         self.y_tctrl.SetValue(str(1 * 2.8))
 
-        self.grid_step_dist_text = wx.StaticText(self, label="Grid Step Distance")
+        self.grid_step_dist_text = wx.StaticText(self.scan_panel, label="Grid Step Distance")
         self.grid_step_dist_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.griddesc_text = wx.StaticText(self, label="Distance between measurement points (in cm)")
-        self.grid_tctrl = wx.TextCtrl(self)
+        self.griddesc_text = wx.StaticText(self.scan_panel, label="Distance between measurement points (in cm)")
+        self.grid_tctrl = wx.TextCtrl(self.scan_panel)
         self.grid_tctrl.SetValue(str(2.8))
 
-        self.times_text = wx.StaticText(self, label="Dwell Time Settings")
+        self.times_text = wx.StaticText(self.scan_panel, label="Dwell Time Settings")
         self.times_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.dwell_time_text = wx.StaticText(self, label="Pre-Measurement Dwell Time (Area scan, in sec)")
-        self.dwell_tctrl = wx.TextCtrl(self)
+        self.dwell_time_text = wx.StaticText(self.scan_panel, label="Pre-Measurement Dwell Time (Area scan, in sec)")
+        self.dwell_tctrl = wx.TextCtrl(self.scan_panel)
         self.dwell_tctrl.SetValue(str(1))
-        self.zoom_scan_dwell_time_text = wx.StaticText(self, label="Pre-Measurement Dwell Time (Zoom scan, in sec)")
-        self.zdwell_tctrl = wx.TextCtrl(self)
+        self.zoom_scan_dwell_time_text = wx.StaticText(self.scan_panel, label="Pre-Measurement Dwell Time (Zoom scan, in sec)")
+        self.zdwell_tctrl = wx.TextCtrl(self.scan_panel)
         self.zdwell_tctrl.SetValue(str(1.5))
 
-        self.span_text = wx.StaticText(self, label="Span Settings")
+        self.span_text = wx.StaticText(self.scan_panel, label="Span Settings")
         self.span_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.span_start_text = wx.StaticText(self, label="Start (MHz):")
-        self.span_start_tctrl = wx.TextCtrl(self)
+        self.span_start_text = wx.StaticText(self.scan_panel, label="Start (MHz):")
+        self.span_start_tctrl = wx.TextCtrl(self.scan_panel)
         self.span_start_tctrl.SetValue(str(0.005))
-        self.span_stop_text = wx.StaticText(self, label="Stop (MHz):")
-        self.span_stop_tctrl = wx.TextCtrl(self)
+        self.span_stop_text = wx.StaticText(self.scan_panel, label="Stop (MHz):")
+        self.span_stop_tctrl = wx.TextCtrl(self.scan_panel)
         self.span_stop_tctrl.SetValue(str(5))
 
-        self.save_dir_text = wx.StaticText(self, label="Save Directory")
+        self.save_dir_text = wx.StaticText(self.scan_panel, label="Save Directory")
         self.save_dir_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.savedesc_text = wx.StaticText(self, label="Directory to save measurement text and image files")
-        self.save_tctrl = wx.TextCtrl(self)
+        self.savedesc_text = wx.StaticText(self.scan_panel, label="Directory to save measurement text and image files")
+        self.save_tctrl = wx.TextCtrl(self.scan_panel)
         self.save_tctrl.SetValue("C:\\Users\changhwan.choi\Desktop\hello")  # TODO :Debugging
-        self.save_btn = wx.Button(self, save_id, "Browse")
+        self.save_btn = wx.Button(self.scan_panel, save_id, "Browse")
         self.Bind(wx.EVT_BUTTON, self.select_save_dir, self.save_btn)
 
-        self.auto_checkbox = wx.CheckBox(self, label="Automatic Measurements")  # TODO: may not use
+        self.auto_checkbox = wx.CheckBox(self.scan_panel, label="Automatic Measurements")  # TODO: may not use
         self.auto_checkbox.SetValue(True)
 
-        self.test_info_text = wx.StaticText(self, label="Test Information")
+        self.test_info_text = wx.StaticText(self.scan_panel, label="Test Information")
         self.test_info_text.SetFont(wx.Font(10, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.eut_model_text = wx.StaticText(self, label="Model of EUT: ")
-        self.eut_model_tctrl = wx.TextCtrl(self)
-        self.eut_sn_text = wx.StaticText(self, label="S/N of EUT: ")
-        self.eut_sn_tctrl = wx.TextCtrl(self)
-        self.initials_text = wx.StaticText(self, label="Test Engineer Initials: ")
-        self.initials_tctrl = wx.TextCtrl(self)
-        self.test_num_text = wx.StaticText(self, label="Test Number: ")
-        self.test_num_tctrl = wx.TextCtrl(self)
+        self.eut_model_text = wx.StaticText(self.scan_panel, label="Model of EUT: ")
+        self.eut_model_tctrl = wx.TextCtrl(self.scan_panel)
+        self.eut_sn_text = wx.StaticText(self.scan_panel, label="S/N of EUT: ")
+        self.eut_sn_tctrl = wx.TextCtrl(self.scan_panel)
+        self.initials_text = wx.StaticText(self.scan_panel, label="Test Engineer Initials: ")
+        self.initials_tctrl = wx.TextCtrl(self.scan_panel)
+        self.test_num_text = wx.StaticText(self.scan_panel, label="Test Number: ")
+        self.test_num_tctrl = wx.TextCtrl(self.scan_panel)
 
-        self.measurement_specs_text = wx.StaticText(self, label="Measurement Specifications")
+        self.measurement_specs_text = wx.StaticText(self.scan_panel, label="Measurement Specifications")
         self.measurement_specs_text.SetFont(wx.Font(10, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.type_rbox = wx.RadioBox(self, label="Type", choices=['Limb', 'Body'],
+        self.type_rbox = wx.RadioBox(self.scan_panel, label="Type", choices=['Limb', 'Body'],
                                      style=wx.RA_SPECIFY_COLS, majorDimension=1)
-        self.field_rbox = wx.RadioBox(self, label="Field",
+        self.field_rbox = wx.RadioBox(self.scan_panel, label="Field",
                                       choices=['Electric', 'Magnetic (Mode A)', 'Magnetic (Mode B)'],
                                       style=wx.RA_SPECIFY_COLS, majorDimension=1)
-        self.side_rbox = wx.RadioBox(self, label="Side",
+        self.side_rbox = wx.RadioBox(self.scan_panel, label="Side",
                                      choices=['Front', 'Back', 'Top', 'Bottom', 'Left', 'Right'],
                                      style=wx.RA_SPECIFY_COLS, majorDimension=1)
         self.side_rbox.SetSelection(1)
-        self.rbw_rbox = wx.RadioBox(self, label="RBW",
+        self.rbw_rbox = wx.RadioBox(self.scan_panel, label="RBW",
                                     choices=['300 kHz', '10 kHz', '100 kHz', '3 kHz', '30 kHz', '1 kHz'],
                                     style=wx.RA_SPECIFY_COLS, majorDimension=2)
         self.rbw_rbox.SetSelection(2)
 
-        self.reset_btn = wx.Button(self, reset_id, "Reset Motors")
+        self.reset_btn = wx.Button(self.scan_panel, reset_id, "Reset Motors")
         self.Bind(wx.EVT_BUTTON, self.reset_motors, self.reset_btn)
-        self.manual_btn = wx.Button(self, manual_id, "Manual Movement")
+        self.manual_btn = wx.Button(self.scan_panel, manual_id, "Manual Movement")
         self.Bind(wx.EVT_BUTTON, self.manual_move, self.manual_btn)
-        self.run_btn = wx.Button(self, run_id, "Run")
+        self.run_btn = wx.Button(self.scan_panel, run_id, "Run")
         self.Bind(wx.EVT_BUTTON, self.run_area_scan, self.run_btn)
 
         # Menu Bar
@@ -197,8 +198,8 @@ class MainFrame(wx.Frame):
         self.checkbox_sizer.Add(self.auto_checkbox, proportion=0, flag=wx.ALIGN_LEFT | wx.ALL, border=5)
         self.text_input_sizer.Add(self.saveline_sizer, proportion=0, flag=wx.LEFT | wx.EXPAND)
         self.text_input_sizer.Add(self.checkbox_sizer, proportion=0, flag=wx.LEFT | wx.EXPAND)
-        self.text_input_sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), proportion=0, border=5,
-                                  flag=wx.TOP | wx.BOTTOM | wx.EXPAND)
+        self.text_input_sizer.Add(wx.StaticLine(self.scan_panel, wx.ID_ANY, style=wx.LI_HORIZONTAL),
+                                  proportion=0, border=5, flag=wx.TOP | wx.BOTTOM | wx.EXPAND)
         self.text_input_sizer.Add(self.test_info_text, proportion=0, flag=wx.BOTTOM, border=3)
         self.test_info_sizer.Add(self.eut_model_text, proportion=0)
         self.test_info_sizer.Add(self.eut_model_tctrl, proportion=0, flag=wx.EXPAND)
@@ -217,8 +218,8 @@ class MainFrame(wx.Frame):
         self.radio_input_sizer.Add(self.rbw_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
 
         self.mainh_sizer.Add(self.text_input_sizer, proportion=2, border=5, flag=wx.ALL | wx.EXPAND)
-        self.mainh_sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_VERTICAL), proportion=0, border=5,
-                             flag=wx.TOP | wx.BOTTOM | wx.EXPAND)
+        self.mainh_sizer.Add(wx.StaticLine(self.scan_panel, wx.ID_ANY, style=wx.LI_VERTICAL),
+                             proportion=0, border=5, flag=wx.TOP | wx.BOTTOM | wx.EXPAND)
         self.mainh_sizer.Add(self.radio_input_sizer, proportion=1, border=5, flag=wx.ALL | wx.EXPAND)
 
         self.btn_sizer.Add(self.reset_btn, proportion=1, border=5,
@@ -228,13 +229,20 @@ class MainFrame(wx.Frame):
         self.btn_sizer.Add(self.run_btn, proportion=1, border=5, flag=wx.ALIGN_RIGHT | wx.ALL)
 
         self.mainv_sizer.Add(self.mainh_sizer, proportion=1, border=0, flag=wx.ALL | wx.EXPAND)
-        self.mainv_sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), proportion=0, border=0,
-                             flag=wx.ALL | wx.EXPAND)
+        self.mainv_sizer.Add(wx.StaticLine(self.scan_panel, wx.ID_ANY, style=wx.LI_HORIZONTAL),
+                             proportion=0, border=0, flag=wx.ALL | wx.EXPAND)
         self.mainv_sizer.Add(self.btn_sizer, proportion=0, border=5, flag=wx.ALIGN_RIGHT)
 
-        self.SetSizer(self.mainv_sizer)
+        self.scan_panel.SetSizer(self.mainv_sizer)
+        pan_size = self.scan_panel.GetSize()
+        print(pan_size)
+        self.SetSize(pan_size)
+        self.SetMinSize(pan_size)
+        self.SetMaxSize(pan_size)
         self.SetAutoLayout(True)
-        self.mainv_sizer.Fit(self)
+        # self.scan_panel.Fit()
+        self.mainv_sizer.Fit(self.scan_panel)
+        self.Layout()
         self.Show(True)
 
     def select_save_dir(self, e):
