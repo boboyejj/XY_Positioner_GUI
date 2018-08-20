@@ -94,9 +94,13 @@ works correctly.
 
 ### Running an Area Scan
 ##### Required Arguments
-* Input the dimensions of the object (x goes across and is controlled by motor #1, y goes up and down by using motor #2) into *x_distance* and *y_distance*.
-* The *grid_step_dist* selects how far apart each measurement point should be.
-* The *dwell_time* is the time the NS probe spends idle above a point before a measurement is taken.
+* Input the dimensions of the object (x goes across and is controlled by motor #1, y goes up and down by using motor #2) into *X Distance* and *Y Distance*.
+* *Grid Step Distance* selects how far apart each measurement point should be.
+* *Dwell Time Settings* for the time the NS probe spends idle above a point before a measurement is taken.
+* The *Span Settings* for the FFT band limits.
+* *Save Directory* to save all the output files from the auto measurements.
+* *Test Information* to save current test run info (i.e. Test engineer initials, test number, EUT serial number).
+* *Measurement Specifications* to select the measurement field, type, side, and RBW.
 
 The default settings create a 4x6 grid with spacing of 2.8 cm with a 3-second dwell time (for both area scan and zoom scan). Span settings are set to be between 0.005 - 5 MHz.
 
