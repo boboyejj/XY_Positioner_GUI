@@ -29,7 +29,7 @@ class NardaNavigator:
     Driver class for the NARDA automation scripts.
     """
     def __init__(self):
-        pgui.PAUSE = 0.5  # Set appropriate amount of pause time so that the controlled programs can keep up w/ auto
+        pgui.PAUSE = 0.55  # Set appropriate amount of pause time so that the controlled programs can keep up w/ auto
         pgui.FAILSAFE = True  # True - abort program mid-automation by moving mouse to upper left corner
         self.refpics_path = 'narda_navigator_referencepics'
         self.ehp200_path = "C:\\Program Files (x86)\\NardaSafety\\EHP-TS\\EHP200-TS\\EHP200.exe"
@@ -171,7 +171,7 @@ class NardaNavigator:
         self.selectTab('data')
         pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/max_hold_unchecked.PNG', grayscale=True))
 
-    def takeMeasurement(self, dwell_time, filename, pathname):
+    def takeMeasurement(self, dwell_time, filename, pathname, comment):
         """
         Takes a measurement using the NARDA program.
 
@@ -199,7 +199,7 @@ class NardaNavigator:
         # Input comment
         pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/comment.PNG', grayscale=True)))
         #time.sleep(0.3)
-        pgui.typewrite("Hello world!")
+        pgui.typewrite(comment)
         pgui.click(pgui.center(pgui.locateOnScreen(self.refpics_path + '/ok.PNG', grayscale=True)))
 
         # Save file

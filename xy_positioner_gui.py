@@ -95,6 +95,15 @@ class MainFrame(wx.Frame):
         self.zdwell_tctrl = wx.TextCtrl(self)
         self.zdwell_tctrl.SetValue(str(1.5))
 
+        self.span_text = wx.StaticText(self, label="Span Settings")
+        self.span_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
+        self.span_start_text = wx.StaticText(self, label="Start (MHz):")
+        self.span_start_tctrl = wx.TextCtrl(self)
+        self.span_start_tctrl.SetValue(str(0.005))
+        self.span_stop_text = wx.StaticText(self, label="Stop (MHz):")
+        self.span_stop_tctrl = wx.TextCtrl(self)
+        self.span_stop_tctrl.SetValue(str(5))
+
         self.save_dir_text = wx.StaticText(self, label="Save Directory")
         self.save_dir_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.savedesc_text = wx.StaticText(self, label="Directory to save measurement text and image files")
@@ -152,8 +161,9 @@ class MainFrame(wx.Frame):
         # Sizers/Layout, Static Lines, & Static Boxes
         self.saveline_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.checkbox_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.text_input_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.span_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.test_info_sizer = wx.GridSizer(rows=4, cols=2, hgap=0, vgap=0)
+        self.text_input_sizer = wx.BoxSizer(wx.VERTICAL)
         self.radio_input_sizer = wx.BoxSizer(wx.VERTICAL)
         self.btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.mainh_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -174,6 +184,12 @@ class MainFrame(wx.Frame):
         self.text_input_sizer.Add(self.dwell_tctrl, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.zoom_scan_dwell_time_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.zdwell_tctrl, proportion=0, flag=wx.LEFT)
+        self.text_input_sizer.Add(self.span_text, proportion=0, flag=wx.LEFT)
+        self.span_sizer.Add(self.span_start_text, proportion=0, flag=wx.LEFT)
+        self.span_sizer.Add(self.span_start_tctrl, proportion=1, flag=wx.LEFT | wx.RIGHT | wx.EXPAND, border=5)
+        self.span_sizer.Add(self.span_stop_text, proportion=0, flag=wx.LEFT)
+        self.span_sizer.Add(self.span_stop_tctrl, proportion=1, flag=wx.LEFT | wx.EXPAND, border=5)
+        self.text_input_sizer.Add(self.span_sizer, proportion=0, flag=wx.EXPAND)
         self.text_input_sizer.Add(self.save_dir_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.savedesc_text, proportion=0, flag=wx.LEFT)
         self.saveline_sizer.Add(self.save_tctrl, proportion=1, flag=wx.LEFT | wx.EXPAND)
@@ -276,9 +292,9 @@ class MainFrame(wx.Frame):
             self.errormsg("Please fill out all entries in the 'Test Information' section.")
             return
         comment = "Model of EUT: " + self.eut_model_tctrl.GetValue() +\
-                  "\nS/N of EUT: " + self.eut_sn_tctrl.GetValue() +\
-                  "\nTest Engineer Initials: " + self.initials_tctrl.GetValue() +\
-                  "\nTest Number: " + self.test_num_tctrl.GetValue()
+                  " - \r\nS/N of EUT: " + self.eut_sn_tctrl.GetValue() +\
+                  " - \r\nTest Engineer Initials: " + self.initials_tctrl.GetValue() +\
+                  " - \r\nTest Number: " + self.test_num_tctrl.GetValue()
         savedir = self.save_tctrl.GetValue()
         # Finding the measurement type
         meas_type = self.type_rbox.GetStringSelection()
@@ -401,8 +417,8 @@ class MainFrame(wx.Frame):
         meas_rbw = self.rbw_rbox.GetStringSelection()
         self.corr_thread = CorrectionThread(self, target_index, self.run_thread.num_steps,
                                             float(self.dwell_tctrl.GetValue()), self.values, self.grid,
-                                            self.curr_row, self.curr_col, savedir, meas_type,
-                                            meas_field, meas_side, meas_rbw, self.max_fname)
+                                            self.curr_row, self.curr_col, savedir, self.run_thread.comment,
+                                            meas_type, meas_field, meas_side, meas_rbw, self.max_fname)
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
@@ -461,6 +477,10 @@ class MainFrame(wx.Frame):
         self.save_tctrl.Enable(True)
         self.auto_checkbox.Enable(True)
         self.save_btn.Enable(True)
+        self.eut_model_tctrl.Enable(True)
+        self.eut_sn_tctrl.Enable(True)
+        self.initials_tctrl.Enable(True)
+        self.test_num_tctrl.Enable(True)
         self.type_rbox.Enable(True)
         self.field_rbox.Enable(True)
         self.side_rbox.Enable(True)
@@ -483,6 +503,10 @@ class MainFrame(wx.Frame):
         self.save_tctrl.Enable(False)
         self.auto_checkbox.Enable(False)
         self.save_btn.Enable(False)
+        self.eut_model_tctrl.Enable(False)
+        self.eut_sn_tctrl.Enable(False)
+        self.initials_tctrl.Enable(False)
+        self.test_num_tctrl.Enable(False)
         self.type_rbox.Enable(False)
         self.field_rbox.Enable(False)
         self.side_rbox.Enable(False)

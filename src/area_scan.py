@@ -217,7 +217,7 @@ class CorrectionThread(threading.Thread):
     Thread for handling corrections of previous values from the general area scan.
     """
     def __init__(self, parent, target, num_steps, dwell_time, values, grid, curr_row, curr_col,
-                 save_dir, meas_type, meas_field, meas_side, meas_rbw, max_fname):
+                 save_dir, comment, meas_type, meas_field, meas_side, meas_rbw, max_fname):
         """
         :param parent: Parent object (i.e. the Frame/GUI calling the thread).
         :param target: index of the target position (index by the grid).
@@ -228,6 +228,7 @@ class CorrectionThread(threading.Thread):
         :param curr_row: The NS probe's current row position.
         :param curr_col: The NS probe's current column position.
         :param save_dir: Directory for output files (.txt, .png).
+        :param comment: Comment saved in the output file (.txt).
         :param meas_type: Measurement type (limb or body).
         :param meas_field: Measurement field (Electric or magnetic (mode A or B)).
         :param meas_side: Side of the phone being scanned.
@@ -244,6 +245,7 @@ class CorrectionThread(threading.Thread):
         self.curr_row = curr_row
         self.curr_col = curr_col
         self.save_dir = save_dir
+        self.comment = comment
         self.meas_type = meas_type
         self.meas_field = meas_field
         self.meas_side = meas_side
@@ -297,7 +299,7 @@ class CorrectionThread(threading.Thread):
         print("row:", self.curr_row, "col:", self.curr_col)
         fname = build_filename(self.meas_type, self.meas_field, self.meas_side, self.target)
         # Take measurement
-        value = narda.takeMeasurement(self.dwell_time, fname, self.save_dir)
+        value = narda.takeMeasurement(self.dwell_time, fname, self.save_dir, self.comment)
         self.values[self.curr_row, self.curr_col] = value
         print(self.values)
         # Check if max and take screenshot of plot/UI accordingly
