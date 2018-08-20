@@ -73,13 +73,13 @@ class MainFrame(wx.Frame):
         self.x_distance_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.xdesc_text = wx.StaticText(self.scan_panel, label="Horizontal length of measurement region (in cm)")
         self.x_tctrl = wx.TextCtrl(self.scan_panel)
-        self.x_tctrl.SetValue(str(1 * 2.8))
+        self.x_tctrl.SetValue(str(4 * 2.8))
 
         self.y_distance_text = wx.StaticText(self.scan_panel, label="Y Distance")
         self.y_distance_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.ydesc_text = wx.StaticText(self.scan_panel, label="Vertical length of measurement region (in cm)")
         self.y_tctrl = wx.TextCtrl(self.scan_panel)
-        self.y_tctrl.SetValue(str(1 * 2.8))
+        self.y_tctrl.SetValue(str(6 * 2.8))
 
         self.grid_step_dist_text = wx.StaticText(self.scan_panel, label="Grid Step Distance")
         self.grid_step_dist_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
@@ -91,10 +91,10 @@ class MainFrame(wx.Frame):
         self.times_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.dwell_time_text = wx.StaticText(self.scan_panel, label="Pre-Measurement Dwell Time (Area scan, in sec)")
         self.dwell_tctrl = wx.TextCtrl(self.scan_panel)
-        self.dwell_tctrl.SetValue(str(1))
+        self.dwell_tctrl.SetValue(str(3))
         self.zoom_scan_dwell_time_text = wx.StaticText(self.scan_panel, label="Pre-Measurement Dwell Time (Zoom scan, in sec)")
         self.zdwell_tctrl = wx.TextCtrl(self.scan_panel)
-        self.zdwell_tctrl.SetValue(str(1.5))
+        self.zdwell_tctrl.SetValue(str(3))
 
         self.span_text = wx.StaticText(self.scan_panel, label="Span Settings")
         self.span_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
@@ -109,7 +109,7 @@ class MainFrame(wx.Frame):
         self.save_dir_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.savedesc_text = wx.StaticText(self.scan_panel, label="Directory to save measurement text and image files")
         self.save_tctrl = wx.TextCtrl(self.scan_panel)
-        self.save_tctrl.SetValue("C:\\Users\changhwan.choi\Desktop\hello")  # TODO :Debugging
+        # self.save_tctrl.SetValue("C:\\Users\changhwan.choi\Desktop\hello")  # TODO :Debugging
         self.save_btn = wx.Button(self.scan_panel, save_id, "Browse")
         self.Bind(wx.EVT_BUTTON, self.select_save_dir, self.save_btn)
 
