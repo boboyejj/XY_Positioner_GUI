@@ -17,6 +17,9 @@ import wx
 
 
 class PostScanGUI(wx.Dialog):
+    """
+    GUI that provides user post-scan options (e.g. Exit, Zoom Scan, Correct Previous Value, Save Data).
+    """
     def __init__(self, *args, **kw):
         super(PostScanGUI, self).__init__(*args, **kw)
 
@@ -39,6 +42,11 @@ class PostScanGUI(wx.Dialog):
         self.mainv_sizer.Fit(self)
 
     def OnQuit(self, e):
+        """
+        Function called on quit.
+        :param e: Event handler.
+        :return: Nothing.
+        """
         self.Destroy()
 
 
