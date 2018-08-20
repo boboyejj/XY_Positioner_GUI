@@ -29,8 +29,8 @@ class AreaScanThread(threading.Thread):
     """
     Thread for handling general area scans.
     """
-    def __init__(self, parent, x_distance, y_distance, grid_step_dist,
-                 dwell_time, save_dir, meas_type, meas_field, meas_side, meas_rbw):
+    def __init__(self, parent, x_distance, y_distance, grid_step_dist, dwell_time,
+                 save_dir, comment, meas_type, meas_field, meas_side, meas_rbw):
         """
         :param parent: Parent object (i.e. the Frame/GUI calling the thread).
         :param x_distance: Width of the scanning area.
@@ -38,6 +38,7 @@ class AreaScanThread(threading.Thread):
         :param grid_step_dist: Step distance between each measurement point.
         :param dwell_time: Wait time at each scan point before measurements are recorded.
         :param save_dir: Directory for output files (.txt, .png).
+        :param comment: Comment saved in the output file (.txt).
         :param meas_type: Measurement type (limb or body).
         :param meas_field: Measurement field (Electric or magnetic (mode A or B)).
         :param meas_side: Side of the phone being scanned.
@@ -50,6 +51,7 @@ class AreaScanThread(threading.Thread):
         self.grid_step_dist = grid_step_dist
         self.dwell_time = dwell_time
         self.save_dir = save_dir
+        self.comment = comment
         self.meas_type = meas_type
         self.meas_field = meas_field
         self.meas_side = meas_side
@@ -99,8 +101,8 @@ class AreaScanThread(threading.Thread):
         # Run scan
         self.values, self.grid, self.curr_row,\
         self.curr_col, self.max_fname = run_scan(x_points, y_points, m, narda, self.num_steps,
-                                                 self.dwell_time, self.save_dir, self.meas_type,
-                                                 self.meas_field, self.meas_side)
+                                                 self.dwell_time, self.save_dir, self.comment,
+                                                 self.meas_type, self.meas_field, self.meas_side)
         print("General area scan complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
@@ -111,12 +113,13 @@ class ZoomScanThread(threading.Thread):
     """
     Thread for handling zoom scans.
     """
-    def __init__(self, parent, dwell_time, save_dir, meas_type, meas_field,
+    def __init__(self, parent, dwell_time, save_dir, comment, meas_type, meas_field,
                  meas_side, meas_rbw, num_steps, values, grid, curr_row, curr_col):
         """
         :param parent: Parent object (i.e. the Frame/GUI calling the thread).
         :param dwell_time: Wait time at each scan point before measurements are recorded.
         :param save_dir: Directory for output files (.txt, .png).
+        :param comment: Comment saved in the output file (.txt).
         :param meas_type: Measurement type (limb or body).
         :param meas_field: Measurement field (Electric or magnetic (mode A or B)).
         :param meas_side: Side of the phone being scanned.
@@ -132,6 +135,7 @@ class ZoomScanThread(threading.Thread):
         self.num_steps = num_steps
         self.dwell_time = dwell_time
         self.save_dir = save_dir
+        self.comment = comment
         self.meas_type = meas_type
         self.meas_field = meas_field
         self.meas_side = meas_side
@@ -196,8 +200,8 @@ class ZoomScanThread(threading.Thread):
 
         # Run scan
         self.zoom_values, _, _, _, _ = run_scan(x_points, y_points, m, narda, znum_steps,
-                                                self.dwell_time, self.save_dir, self.meas_type,
-                                                self.meas_field, 'z')
+                                                self.dwell_time, self.save_dir, self.comment,
+                                                self.meas_type, self.meas_field, 'z')
         # Move back to original position
         m.reverse_motor_one(int(2 * znum_steps))
         m.reverse_motor_two(int(2 * znum_steps))
@@ -309,7 +313,7 @@ class CorrectionThread(threading.Thread):
         m.destroy()
 
 
-def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_type, meas_field, meas_side):
+def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comment, meas_type, meas_field, meas_side):
     """
     Performs an area scan according to the specified parameters.
     The scan consists of moving the NS probe to an intended coordinate, taking a measurement, saving the results,
@@ -322,6 +326,7 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
     :param num_steps: Number of motor steps per grid step.
     :param dwell_time: Wait time at each scan point before measurements are recorded.
     :param save_dir: Directory for output files (.txt, .png).
+    :param comment: Comment saved in the output file (.txt).
     :param meas_type: Measurement type (limb or body).
     :param meas_field: Measurement field (Electric or magnetic (mode A or B)).
     :param meas_side: Side of the phone being scanned.
@@ -373,7 +378,7 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, meas_
         # Build the filename for the measurements at this point
         fname = build_filename(meas_type, meas_field, meas_side, i)
         # Take the measurement and save relevant files
-        value = narda.takeMeasurement(dwell_time, fname, savedir)
+        value = narda.takeMeasurement(dwell_time, fname, savedir, comment)
         values[curr_row, curr_col] = value
         # If new maximum value found, save take a screenshot of the GUI interface
         if value > curr_max:

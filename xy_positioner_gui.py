@@ -14,6 +14,7 @@ Chang Hwan 'Oliver' Choi, Biomedical/Software Engineering Intern (Aug. 2018) - c
 """
 
 import sys
+import os
 from src.area_scan import AreaScanThread, ZoomScanThread, CorrectionThread
 from src.post_scan_gui import PostScanGUI
 from src.location_select_gui import LocationSelectGUI
@@ -65,6 +66,8 @@ class MainFrame(wx.Frame):
         self.SetAcceleratorTable(self.accel_tbl)
 
         # UI Elements
+        self.scan_settings_text = wx.StaticText(self, label="Area Scan Settings")
+        self.scan_settings_text.SetFont(wx.Font(10, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.x_distance_text = wx.StaticText(self, label="X Distance")
         self.x_distance_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.xdesc_text = wx.StaticText(self, label="Horizontal length of measurement region (in cm)")
@@ -83,6 +86,8 @@ class MainFrame(wx.Frame):
         self.grid_tctrl = wx.TextCtrl(self)
         self.grid_tctrl.SetValue(str(2.8))
 
+        self.times_text = wx.StaticText(self, label="Dwell Time Settings")
+        self.times_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.dwell_time_text = wx.StaticText(self, label="Pre-Measurement Dwell Time (Area scan, in sec)")
         self.dwell_tctrl = wx.TextCtrl(self)
         self.dwell_tctrl.SetValue(str(1))
@@ -101,8 +106,19 @@ class MainFrame(wx.Frame):
         self.auto_checkbox = wx.CheckBox(self, label="Automatic Measurements")  # TODO: may not use
         self.auto_checkbox.SetValue(True)
 
+        self.test_info_text = wx.StaticText(self, label="Test Information")
+        self.test_info_text.SetFont(wx.Font(10, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
+        self.eut_model_text = wx.StaticText(self, label="Model of EUT: ")
+        self.eut_model_tctrl = wx.TextCtrl(self)
+        self.eut_sn_text = wx.StaticText(self, label="S/N of EUT: ")
+        self.eut_sn_tctrl = wx.TextCtrl(self)
+        self.initials_text = wx.StaticText(self, label="Test Engineer Initials: ")
+        self.initials_tctrl = wx.TextCtrl(self)
+        self.test_num_text = wx.StaticText(self, label="Test Number: ")
+        self.test_num_tctrl = wx.TextCtrl(self)
+
         self.measurement_specs_text = wx.StaticText(self, label="Measurement Specifications")
-        self.measurement_specs_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
+        self.measurement_specs_text.SetFont(wx.Font(10, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
         self.type_rbox = wx.RadioBox(self, label="Type", choices=['Limb', 'Body'],
                                      style=wx.RA_SPECIFY_COLS, majorDimension=1)
         self.field_rbox = wx.RadioBox(self, label="Field",
@@ -137,11 +153,13 @@ class MainFrame(wx.Frame):
         self.saveline_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.checkbox_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.text_input_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.test_info_sizer = wx.GridSizer(rows=4, cols=2, hgap=0, vgap=0)
         self.radio_input_sizer = wx.BoxSizer(wx.VERTICAL)
         self.btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.mainh_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.mainv_sizer = wx.BoxSizer(wx.VERTICAL)
 
+        self.text_input_sizer.Add(self.scan_settings_text, proportion=0, border=3, flag=wx.BOTTOM)
         self.text_input_sizer.Add(self.x_distance_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.xdesc_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.x_tctrl, proportion=0, flag=wx.LEFT | wx.EXPAND)
@@ -151,6 +169,7 @@ class MainFrame(wx.Frame):
         self.text_input_sizer.Add(self.grid_step_dist_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.griddesc_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.grid_tctrl, proportion=0, flag=wx.LEFT | wx.EXPAND)
+        self.text_input_sizer.Add(self.times_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.dwell_time_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.dwell_tctrl, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.zoom_scan_dwell_time_text, proportion=0, flag=wx.LEFT)
@@ -162,8 +181,20 @@ class MainFrame(wx.Frame):
         self.checkbox_sizer.Add(self.auto_checkbox, proportion=0, flag=wx.ALIGN_LEFT | wx.ALL, border=5)
         self.text_input_sizer.Add(self.saveline_sizer, proportion=0, flag=wx.LEFT | wx.EXPAND)
         self.text_input_sizer.Add(self.checkbox_sizer, proportion=0, flag=wx.LEFT | wx.EXPAND)
+        self.text_input_sizer.Add(wx.StaticLine(self, wx.ID_ANY, style=wx.LI_HORIZONTAL), proportion=0, border=5,
+                                  flag=wx.TOP | wx.BOTTOM | wx.EXPAND)
+        self.text_input_sizer.Add(self.test_info_text, proportion=0, flag=wx.BOTTOM, border=3)
+        self.test_info_sizer.Add(self.eut_model_text, proportion=0)
+        self.test_info_sizer.Add(self.eut_model_tctrl, proportion=0, flag=wx.EXPAND)
+        self.test_info_sizer.Add(self.eut_sn_text, proportion=0)
+        self.test_info_sizer.Add(self.eut_sn_tctrl, proportion=0, flag=wx.EXPAND)
+        self.test_info_sizer.Add(self.initials_text, proportion=0)
+        self.test_info_sizer.Add(self.initials_tctrl, proportion=0, flag=wx.EXPAND)
+        self.test_info_sizer.Add(self.test_num_text, proportion=0)
+        self.test_info_sizer.Add(self.test_num_tctrl, proportion=0, flag=wx.EXPAND)
+        self.text_input_sizer.Add(self.test_info_sizer, proportion=0, flag=wx.EXPAND)
 
-        self.radio_input_sizer.Add(self.measurement_specs_text, proportion=0, flag=wx.LEFT)
+        self.radio_input_sizer.Add(self.measurement_specs_text, proportion=0, border=3, flag=wx.BOTTOM)
         self.radio_input_sizer.Add(self.type_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
         self.radio_input_sizer.Add(self.field_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
         self.radio_input_sizer.Add(self.side_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
@@ -225,8 +256,11 @@ class MainFrame(wx.Frame):
         :param e: Event handler.
         :return: Nothing.
         """
-        if self.save_tctrl.GetValue() is None or self.save_tctrl.GetValue() is '':
-            self.errormsg("Please select a save directory for the output files.")
+        # Make sure entries are valid
+        if self.save_tctrl.GetValue() is None or \
+                self.save_tctrl.GetValue() is '' or \
+                not os.path.exists(self.save_tctrl.GetValue()):
+            self.errormsg("Please select a valid save directory for the output files.")
             return
         try:
             x = float(self.x_tctrl.GetValue())
@@ -236,6 +270,15 @@ class MainFrame(wx.Frame):
         except ValueError:
             self.errormsg("Invalid scan parameters.\nPlease input numerical values only.")
             return
+        # Build comment for savefiles
+        if self.eut_model_tctrl.GetValue() is '' or self.eut_sn_tctrl.GetValue() is '' or \
+                self.initials_tctrl.GetValue() is '' or self.test_num_tctrl.GetValue() is '':
+            self.errormsg("Please fill out all entries in the 'Test Information' section.")
+            return
+        comment = "Model of EUT: " + self.eut_model_tctrl.GetValue() +\
+                  "\nS/N of EUT: " + self.eut_sn_tctrl.GetValue() +\
+                  "\nTest Engineer Initials: " + self.initials_tctrl.GetValue() +\
+                  "\nTest Number: " + self.test_num_tctrl.GetValue()
         savedir = self.save_tctrl.GetValue()
         # Finding the measurement type
         meas_type = self.type_rbox.GetStringSelection()
@@ -245,7 +288,7 @@ class MainFrame(wx.Frame):
         meas_side = self.side_rbox.GetStringSelection()
         # Finding the RBW setting
         meas_rbw = self.rbw_rbox.GetStringSelection()
-        self.run_thread = AreaScanThread(self, x, y, step, dwell, savedir,
+        self.run_thread = AreaScanThread(self, x, y, step, dwell, savedir, comment,
                                          meas_type, meas_field, meas_side, meas_rbw)
         self.disablegui()
         if not self.console_frame:
@@ -300,7 +343,8 @@ class MainFrame(wx.Frame):
             meas_side = self.side_rbox.GetStringSelection()
             # Finding the RBW setting
             meas_rbw = self.rbw_rbox.GetStringSelection()
-            self.zoom_thread = ZoomScanThread(self, zdwell, savedir, meas_type, meas_field, meas_side, meas_rbw,
+            self.zoom_thread = ZoomScanThread(self, zdwell, savedir, self.run_thread.comment,
+                                              meas_type, meas_field, meas_side, meas_rbw,
                                               self.run_thread.num_steps, self.values, self.grid,
                                               self.curr_row, self.curr_col)
             if not self.console_frame:
