@@ -75,7 +75,7 @@ class AreaScanThread(threading.Thread):
         # Preparation
         x_points = int(np.ceil(np.around(self.x_distance / self.grid_step_dist, decimals=3))) + 1
         y_points = int(np.ceil(np.around(self.y_distance / self.grid_step_dist, decimals=3))) + 1
-        # Check ports and instantiate relevant objects
+        # Check ports and instantiate relevant objects (motors, NARDA driver)
         try:
             m = MotorDriver()
         except serial.SerialException:
@@ -156,7 +156,7 @@ class ZoomScanThread(threading.Thread):
         # Preparation
         x_points = 5
         y_points = 5
-        # Check ports and instantiate relevant objects
+        # Check ports and instantiate relevant objects (motors, NARDA driver)
         try:
             m = MotorDriver()
         except serial.SerialException:
@@ -256,8 +256,7 @@ class CorrectionThread(threading.Thread):
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
 
-        # Prepare motors
-        # Check ports and instantiate relevant objects
+        # Check ports and instantiate relevant objects (motors, NARDA driver)
         try:
             m = MotorDriver()
         except serial.SerialException:
