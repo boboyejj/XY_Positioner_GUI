@@ -155,7 +155,7 @@ Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c6
 ## Authors
 
 * **Ganesh Arvapalli** - *Software Engineering Intern* - [garva-pctest](https://github.com/garva-pctest)
-* **Chang Hwan 'Oliver' Choi** - Biomedical/Software Engineering Intern* - [changhwan95](https://github.com/changhwan95)
+* **Chang Hwan 'Oliver' Choi** - Biomedical/Software Engineering Intern* - [cchoi-oliver](https://github.com/cchoi-oliver)
 
 Originally written for the internal use of PCTEST Engineering Lab, Inc.
 
