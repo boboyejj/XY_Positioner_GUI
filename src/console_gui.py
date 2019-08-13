@@ -43,7 +43,7 @@ class ConsoleGUI(wx.Frame):
         :param parent: Parent frame invoking the ConsoleGUI.
         :param title: Title for the GUI window.
         """
-        wx.Frame.__init__(self, parent, title=title, size=(800, 700), style=wx.CAPTION)
+        wx.Frame.__init__(self, parent, title=title, size=(800, 700))
 
         # UI Elements
         self.console_text = wx.StaticText(self, label="Console Output")
@@ -61,7 +61,6 @@ class ConsoleGUI(wx.Frame):
         self.SetSizer(self.mainsizer)
         self.SetAutoLayout(True)
         self.mainsizer.Fit(self)
-
 
 if __name__ == '__main__':
     consolegui = wx.App()

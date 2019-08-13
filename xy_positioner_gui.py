@@ -25,6 +25,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import wx
 from wx.lib.agw import multidirdialog as mdd
+import json
+import time
 
 
 class MainFrame(wx.Frame):
@@ -37,7 +39,7 @@ class MainFrame(wx.Frame):
         :param parent: Parent object calling the MainFrame.
         :param title: Title for the MainFrame window.
         """
-        wx.Frame.__init__(self, parent, title=title, size=(600, 700))
+        wx.Frame.__init__(self, parent, title=title, size=(600, 750))
         self.scan_panel = wx.Panel(self)
 
         # Variables
@@ -86,6 +88,16 @@ class MainFrame(wx.Frame):
         self.griddesc_text = wx.StaticText(self.scan_panel, label="Distance between measurement points (in cm)")
         self.grid_tctrl = wx.TextCtrl(self.scan_panel)
         self.grid_tctrl.SetValue(str(2.8))
+
+        self.start_point_text = wx.StaticText(self.scan_panel, label="Starting Point")
+        self.start_point_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
+        self.posdesc_text = wx.StaticText(self.scan_panel, label="To use default starting point, set X and Y position to 0")
+        self.x_pos_text = wx.StaticText(self.scan_panel, label="X (cm):")
+        self.x_pos_tctrl = wx.TextCtrl(self.scan_panel)
+        self.x_pos_tctrl.SetValue(str(25))
+        self.y_pos_text = wx.StaticText(self.scan_panel, label="Y (cm):")
+        self.y_pos_tctrl = wx.TextCtrl(self.scan_panel)
+        self.y_pos_tctrl.SetValue(str(40))
 
         self.times_text = wx.StaticText(self.scan_panel, label="Dwell Time Settings")
         self.times_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
@@ -142,6 +154,8 @@ class MainFrame(wx.Frame):
                                     choices=['300 kHz', '10 kHz', '100 kHz', '3 kHz', '30 kHz', '1 kHz'],
                                     style=wx.RA_SPECIFY_COLS, majorDimension=2)
         self.rbw_rbox.SetSelection(2)
+        self.meas_rbox = wx.RadioBox(self.scan_panel, label="Measurement", choices=['Highest Peak', 'Wideband'],
+                                     style=wx.RA_SPECIFY_COLS, majorDimension=1)
 
         self.reset_btn = wx.Button(self.scan_panel, reset_id, "Reset Motors")
         self.Bind(wx.EVT_BUTTON, self.reset_motors, self.reset_btn)
@@ -162,6 +176,7 @@ class MainFrame(wx.Frame):
         # Sizers/Layout, Static Lines, & Static Boxes
         self.saveline_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.checkbox_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.pos_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.span_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.test_info_sizer = wx.GridSizer(rows=4, cols=2, hgap=0, vgap=0)
         self.text_input_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -180,6 +195,15 @@ class MainFrame(wx.Frame):
         self.text_input_sizer.Add(self.grid_step_dist_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.griddesc_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.grid_tctrl, proportion=0, flag=wx.LEFT | wx.EXPAND)
+
+        self.text_input_sizer.Add(self.start_point_text, proportion=0, flag=wx.LEFT)
+        self.text_input_sizer.Add(self.posdesc_text, proportion=0, flag=wx.LEFT)
+        self.pos_sizer.Add(self.x_pos_text, proportion=0, flag=wx.LEFT)
+        self.pos_sizer.Add(self.x_pos_tctrl, proportion=1, flag=wx.LEFT | wx.RIGHT | wx.EXPAND, border=5)
+        self.pos_sizer.Add(self.y_pos_text, proportion=0, flag=wx.LEFT)
+        self.pos_sizer.Add(self.y_pos_tctrl, proportion=1, flag=wx.LEFT | wx.EXPAND, border=5)
+        self.text_input_sizer.Add(self.pos_sizer, proportion=0, flag=wx.EXPAND)
+
         self.text_input_sizer.Add(self.times_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.dwell_time_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.dwell_tctrl, proportion=0, flag=wx.LEFT)
@@ -216,6 +240,7 @@ class MainFrame(wx.Frame):
         self.radio_input_sizer.Add(self.field_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
         self.radio_input_sizer.Add(self.side_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
         self.radio_input_sizer.Add(self.rbw_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
+        self.radio_input_sizer.Add(self.meas_rbox, proportion=0, flag=wx.ALL | wx.EXPAND)
 
         self.mainh_sizer.Add(self.text_input_sizer, proportion=2, border=5, flag=wx.ALL | wx.EXPAND)
         self.mainh_sizer.Add(wx.StaticLine(self.scan_panel, wx.ID_ANY, style=wx.LI_VERTICAL),
@@ -232,6 +257,9 @@ class MainFrame(wx.Frame):
         self.mainv_sizer.Add(wx.StaticLine(self.scan_panel, wx.ID_ANY, style=wx.LI_HORIZONTAL),
                              proportion=0, border=0, flag=wx.ALL | wx.EXPAND)
         self.mainv_sizer.Add(self.btn_sizer, proportion=0, border=5, flag=wx.ALIGN_RIGHT)
+
+        # load previous configuration when initialize the panel
+        self.load_configuration()
 
         self.scan_panel.SetSizer(self.mainv_sizer)
         pan_size = self.scan_panel.GetSize()
@@ -271,6 +299,62 @@ class MainFrame(wx.Frame):
         #    self.save_tctrl.SetValue(self.save_dir)
         #    if os.path.exists(parentpath):
 
+    def save_configuration(self, filename='prev_config.txt'):
+        """
+        Save current configuration to a txt file
+
+        """
+        try:
+            config = {}
+            config['x'] = self.x_tctrl.GetValue()
+            config['y'] = self.y_tctrl.GetValue()
+            config['step'] = self.grid_tctrl.GetValue()
+            config['start_pos'] = (self.x_pos_tctrl.GetValue(), self.y_pos_tctrl.GetValue())
+            config['dwell'] = self.dwell_tctrl.GetValue()
+            config['zdwell'] = self.zdwell_tctrl.GetValue()
+            config['start'] = self.span_start_tctrl.GetValue()
+            config['stop'] = self.span_stop_tctrl.GetValue()
+            config['checkbox'] = self.auto_checkbox.GetValue()
+            config['type'] = self.type_rbox.GetSelection()
+            config['field'] = self.field_rbox.GetSelection()
+            config['side'] = self.side_rbox.GetSelection()
+            config['rbw'] = self.rbw_rbox.GetSelection()
+            config['measurement'] = self.meas_rbox.GetSelection()
+            config['dir'] = self.save_tctrl.GetValue()
+
+            json.dump(config,open(filename,'w'))
+
+        except ValueError:
+            self.errormsg("Invalid scan parameters.\nCannot save current configuration.")
+            return
+
+        return
+
+    def load_configuration(self, filename='prev_config.txt'):
+        """
+        Load the saved configuration
+
+        """
+        # TODO: Add error exception
+        if os.path.exists(filename):
+            config = json.load(open(filename))
+            self.x_tctrl.SetValue(config['x'])
+            self.y_tctrl.SetValue(config['y'])
+            self.grid_tctrl.SetValue(config['step'])
+            self.x_pos_tctrl.SetValue(config['start_pos'][0])
+            self.y_pos_tctrl.SetValue(config['start_pos'][1])
+            self.dwell_tctrl.SetValue(config['dwell'])
+            self.zdwell_tctrl.SetValue(config['zdwell'])
+            self.span_start_tctrl.SetValue(config['start'])
+            self.span_stop_tctrl.SetValue(config['stop'])
+            self.auto_checkbox.SetValue(config['checkbox'])
+            self.type_rbox.SetSelection(int(config['type']))
+            self.field_rbox.SetSelection(int(config['field']))
+            self.side_rbox.SetSelection(int(config['side']))
+            self.rbw_rbox.SetSelection(int(config['rbw']))
+            self.meas_rbox.SetSelection(int(config['measurement']))
+            self.save_tctrl.SetValue(config['dir'])
+
     def run_area_scan(self, e):
         """
         Begins general area scan based on the measurement settings specified on the GUI.
@@ -287,12 +371,14 @@ class MainFrame(wx.Frame):
             self.errormsg("Please select a valid save directory for the output files.")
             return
         try:
+            self.save_configuration()
             x = float(self.x_tctrl.GetValue())
             y = float(self.y_tctrl.GetValue())
             step = float(self.grid_tctrl.GetValue())
             dwell = float(self.dwell_tctrl.GetValue())
             span_start = float(self.span_start_tctrl.GetValue())
             span_stop = float(self.span_stop_tctrl.GetValue())
+            start_pos = (float(self.x_pos_tctrl.GetValue()),float(self.y_pos_tctrl.GetValue()))
         except ValueError:
             self.errormsg("Invalid scan parameters.\nPlease input numerical values only.")
             return
@@ -314,8 +400,10 @@ class MainFrame(wx.Frame):
         meas_side = self.side_rbox.GetStringSelection()
         # Finding the RBW setting
         meas_rbw = self.rbw_rbox.GetStringSelection()
+        # Finding the measurement
+        meas = self.meas_rbox.GetStringSelection()
         self.run_thread = AreaScanThread(self, x, y, step, dwell, span_start, span_stop, savedir,
-                                         comment, meas_type, meas_field, meas_side, meas_rbw)
+                                         comment, meas_type, meas_field, meas_side, meas_rbw, meas, start_pos)
         self.disablegui()
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
@@ -324,6 +412,12 @@ class MainFrame(wx.Frame):
         sys.stderr = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
         print("Running general scan...")
         self.run_thread.start()
+
+        if self.run_thread.is_alive():
+            self.run_thread.stop()
+        #print(self.run_thread.stopped())
+        #self.run_thread.join()
+
 
     def run_post_scan(self):
         """
@@ -369,9 +463,11 @@ class MainFrame(wx.Frame):
             meas_side = self.side_rbox.GetStringSelection()
             # Finding the RBW setting
             meas_rbw = self.rbw_rbox.GetStringSelection()
+            # Finding the measurement
+            meas = self.meas_rbox.GetStringSelection()
             self.zoom_thread = ZoomScanThread(self, zdwell, self.run_thread.span_start, self.run_thread.span_stop,
                                               savedir, self.run_thread.comment, meas_type, meas_field, meas_side,
-                                              meas_rbw, self.run_thread.num_steps, self.values, self.grid,
+                                              meas_rbw, meas, self.run_thread.num_steps, self.values, self.grid,
                                               self.curr_row, self.curr_col)
             if not self.console_frame:
                 self.console_frame = ConsoleGUI(self, "Console")
@@ -501,6 +597,7 @@ class MainFrame(wx.Frame):
         self.reset_btn.Enable(True)
         self.manual_btn.Enable(True)
         self.run_btn.Enable(True)
+        self.meas_rbox.Enable(True)
 
     def disablegui(self):
         """
@@ -529,6 +626,7 @@ class MainFrame(wx.Frame):
         self.reset_btn.Enable(False)
         self.manual_btn.Enable(False)
         self.run_btn.Enable(False)
+        self.meas_rbox.Enable(False)
 
     def showshortcuts(self, e):
         """
