@@ -26,7 +26,8 @@ import matplotlib.pyplot as plt
 import wx
 from wx.lib.agw import multidirdialog as mdd
 import json
-import time
+from src.logger import logger
+from datetime import datetime
 
 
 class MainFrame(wx.Frame):
@@ -61,10 +62,14 @@ class MainFrame(wx.Frame):
         manual_id = 117
         reset_id = 118
         help_id = 119
+        pause_id = 120
+        resume_id = 121
         self.accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('s'), save_id),
                                               (wx.ACCEL_CTRL, ord('r'), run_id),
                                               (wx.ACCEL_CTRL, ord('m'), manual_id),
                                               (wx.ACCEL_CTRL, ord('t'), reset_id),
+                                              (wx.ACCEL_CTRL, ord('p'), pause_id),
+                                              (wx.ACCEL_CTRL, ord('e'), resume_id),
                                               (wx.ACCEL_CTRL, ord('h'), help_id)])
         self.SetAcceleratorTable(self.accel_tbl)
 
@@ -91,11 +96,11 @@ class MainFrame(wx.Frame):
 
         self.start_point_text = wx.StaticText(self.scan_panel, label="Starting Point")
         self.start_point_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.posdesc_text = wx.StaticText(self.scan_panel, label="To use default starting point, set X and Y position to 0")
-        self.x_pos_text = wx.StaticText(self.scan_panel, label="X (cm):")
+        self.posdesc_text = wx.StaticText(self.scan_panel, label="To use default starting point, set both row and col to 0")
+        self.x_pos_text = wx.StaticText(self.scan_panel, label="row :")
         self.x_pos_tctrl = wx.TextCtrl(self.scan_panel)
         self.x_pos_tctrl.SetValue(str(25))
-        self.y_pos_text = wx.StaticText(self.scan_panel, label="Y (cm):")
+        self.y_pos_text = wx.StaticText(self.scan_panel, label="col :")
         self.y_pos_tctrl = wx.TextCtrl(self.scan_panel)
         self.y_pos_tctrl.SetValue(str(40))
 
@@ -154,7 +159,7 @@ class MainFrame(wx.Frame):
                                     choices=['300 kHz', '10 kHz', '100 kHz', '3 kHz', '30 kHz', '1 kHz'],
                                     style=wx.RA_SPECIFY_COLS, majorDimension=2)
         self.rbw_rbox.SetSelection(2)
-        self.meas_rbox = wx.RadioBox(self.scan_panel, label="Measurement", choices=['Highest Peak', 'Wideband'],
+        self.meas_rbox = wx.RadioBox(self.scan_panel, label="Measurement", choices=['Highest Peak', 'WideBand'],
                                      style=wx.RA_SPECIFY_COLS, majorDimension=1)
 
         self.reset_btn = wx.Button(self.scan_panel, reset_id, "Reset Motors")
@@ -405,6 +410,8 @@ class MainFrame(wx.Frame):
         self.run_thread = AreaScanThread(self, x, y, step, dwell, span_start, span_stop, savedir,
                                          comment, meas_type, meas_field, meas_side, meas_rbw, meas, start_pos)
         self.disablegui()
+        logger.info("")
+        logger.info(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
         if not self.console_frame:
             self.console_frame = ConsoleGUI(self, "Console")
         self.console_frame.Show(True)
@@ -639,7 +646,7 @@ class MainFrame(wx.Frame):
                            "Select Save Directory: Ctrl + S\n" +\
                            "Reset Motors: Ctrl + T\n" +\
                            "Manual Movement: Ctrl + M\n" +\
-                           "Run Analysis: Ctrl + E\n" +\
+                           "Run Analysis: Ctrl + R\n" +\
                            "Check Shortcut Keys: Ctrl + H"
         with wx.MessageDialog(self, shortcuts_string, 'Shortcut Keys',
                               style=wx.OK | wx.ICON_QUESTION | wx.CENTER) as dlg:

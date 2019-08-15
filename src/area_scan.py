@@ -24,7 +24,8 @@ import numpy as np
 import serial
 import wx
 import sys
-import multiprocessing
+from src.logger import logger
+
 
 class AreaScanThread(threading.Thread):
     """
@@ -46,7 +47,7 @@ class AreaScanThread(threading.Thread):
         :param meas_field: Measurement field (Electric or magnetic (mode A or B)).
         :param meas_side: Side of the phone being scanned.
         :param meas_rbw: Resolution bandwidth for the FFT.
-        :param start_pos: User defined starting point if not 0.
+        :param start_pos: User defined starting point if not 0 (tupple(row, col)).
         """
         self.parent = parent
         self.callback = parent.update_values
@@ -84,6 +85,10 @@ class AreaScanThread(threading.Thread):
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
         print("Measurement: ", self.meas)
+        logger.info("Area Scan")
+        logger.info("Measurement Parameters:")
+        logger.info("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
+        logger.info("Measurement: %s", self.meas)
 
         # Preparation
         x_points = int(np.ceil(np.around(self.x_distance / self.grid_step_dist, decimals=3))) + 1
@@ -93,6 +98,7 @@ class AreaScanThread(threading.Thread):
             m = MotorDriver()
         except serial.SerialException:
             print("Error: Connection to C4 controller was not found")
+            logger.info("Error: Connection to C4 controller was not found")
             wx.CallAfter(self.parent.enablegui)
             self.exc = sys.exc_info()
             print("Thread '%s' threw an exception: %s" % (self.getName(), self.exc[0]))
@@ -119,6 +125,7 @@ class AreaScanThread(threading.Thread):
                                                      self.meas_type, self.meas_field, self.meas_side,
                                                      self.meas, self.start_pos)
         print("General area scan complete.")
+        logger.info("General area scan complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
         m.destroy()
@@ -189,6 +196,10 @@ class ZoomScanThread(threading.Thread):
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
         print("Measurement: ", self.meas)
+        logger.info("Zoom Scan")
+        logger.info("Measurement Parameters:")
+        logger.info("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
+        logger.info("Measurement: %s", self.meas)
 
         # Preparation
         x_points = 5
@@ -300,6 +311,10 @@ class CorrectionThread(threading.Thread):
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
         print("Measurement: ", self.meas)
+        logger.info("Correction")
+        logger.info("Measurement Parameters:")
+        logger.info("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
+        logger.info("Measurement: %s", self.meas)
 
         # Check ports and instantiate relevant objects (motors, NARDA driver)
         try:
@@ -313,6 +328,7 @@ class CorrectionThread(threading.Thread):
         narda.selectInputField(self.meas_field)
         narda.selectTab('span')
         narda.inputTextEntry('start', str(self.span_start))
+        narda.inputTextEntry('start', str(self.span_start)) # Fixed improper frequency range
         narda.inputTextEntry('stop', str(self.span_stop))
         narda.selectRBW(self.meas_rbw)
         narda.selectTab('data')
@@ -377,16 +393,23 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
     :return: Numpy array of all measurements, Numpy array of the measurement grid, current NS probe's coordinates (rows
              and columns), and the filename corresponding to the highest measurement point.
     """
-    if start_pos[0] or start_pos[1]:
-        # user defined initial position
-        print('Hi')
-    else:
-        # Move to the initial position (top left) of grid scan and measure once
-        move_to_pos_one(m, int(num_steps), x_points, y_points)
+
+    # Move to the initial position (top left) of grid scan and measure once
+    move_to_pos_one(m, int(num_steps), x_points, y_points)
+    start_grid = 1
+    row = start_pos[0]
+    col = start_pos[1]
 
     # Generate a 'traversal grid' with values starting from 1 showing the order of measurement taking
     grid = generate_grid(x_points, y_points)
     values = np.zeros(grid.shape)  # Placeholder for filling in with measurement values
+
+    # Move to the user defined postion
+    if row or col:
+        # user defined initial position (row, col)
+        m.forward_motor_two(int(num_steps * row))  # TODO: double check if need -1
+        m.forward_motor_one(int(num_steps * col))
+        start_grid = grid[row][col]
 
     print("Scan path:")
     print(grid)
@@ -402,11 +425,14 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
     max_filename = ''  # Filename of the maximum measurement point
 
     # General Area Scan
-    for i in range(1, grid.size + 1):
+    for i in range(start_grid, grid.size + 1):
         # Find the position of the next
         next_row, next_col = np.where(grid == i)
         next_row = next_row[0]
         next_col = next_col[0]
+        if i == start_grid: # scan the starting position
+            curr_row = next_row
+            curr_col = next_col
         # Move the NS probe to the next position
         if next_row > curr_row:  # Move downwards
             y_error += frac_step
@@ -438,6 +464,8 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
             max_filename = fname
         print("---------")
         print(values)
+        logger.info("---------")
+        logger.info(str(values))
     print("Renaming tmp.PNG to %s.PNG" % max_filename)
     # End of scan - rename screenshot file with the correct name
     try:
