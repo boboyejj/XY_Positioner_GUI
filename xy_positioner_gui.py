@@ -29,7 +29,6 @@ import json
 from src.logger import logger
 from datetime import datetime
 
-
 class MainFrame(wx.Frame):
     """
     Main GUI frame of the entire NS testing program. Handles all children GUI and children threads for automated
@@ -383,7 +382,7 @@ class MainFrame(wx.Frame):
             dwell = float(self.dwell_tctrl.GetValue())
             span_start = float(self.span_start_tctrl.GetValue())
             span_stop = float(self.span_stop_tctrl.GetValue())
-            start_pos = (float(self.x_pos_tctrl.GetValue()),float(self.y_pos_tctrl.GetValue()))
+            start_pos = (float(self.x_pos_tctrl.GetValue()), float(self.y_pos_tctrl.GetValue()))
         except ValueError:
             self.errormsg("Invalid scan parameters.\nPlease input numerical values only.")
             return
@@ -392,9 +391,9 @@ class MainFrame(wx.Frame):
                 self.initials_tctrl.GetValue() is '' or self.test_num_tctrl.GetValue() is '':
             self.errormsg("Please fill out all entries in the 'Test Information' section.")
             return
-        comment = "Model of EUT: " + self.eut_model_tctrl.GetValue() +\
-                  " - \r\nS/N of EUT: " + self.eut_sn_tctrl.GetValue() +\
-                  " - \r\nTest Engineer Initials: " + self.initials_tctrl.GetValue() +\
+        comment = "Model of EUT: " + self.eut_model_tctrl.GetValue() + \
+                  " - \r\nS/N of EUT: " + self.eut_sn_tctrl.GetValue() + \
+                  " - \r\nTest Engineer Initials: " + self.initials_tctrl.GetValue() + \
                   " - \r\nTest Number: " + self.test_num_tctrl.GetValue()
         savedir = self.save_tctrl.GetValue()
         # Finding the measurement type
@@ -409,7 +408,7 @@ class MainFrame(wx.Frame):
         meas = self.meas_rbox.GetStringSelection()
         self.run_thread = AreaScanThread(self, x, y, step, dwell, span_start, span_stop, savedir,
                                          comment, meas_type, meas_field, meas_side, meas_rbw, meas, start_pos)
-        self.disablegui()
+        # self.disablegui()
         logger.info("")
         logger.info(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
         if not self.console_frame:
@@ -419,12 +418,6 @@ class MainFrame(wx.Frame):
         sys.stderr = TextRedirector(self.console_frame.console_tctrl)  # Redirect text from stderr to the console
         print("Running general scan...")
         self.run_thread.start()
-
-        if self.run_thread.is_alive():
-            self.run_thread.stop()
-        #print(self.run_thread.stopped())
-        #self.run_thread.join()
-
 
     def run_post_scan(self):
         """
@@ -604,7 +597,6 @@ class MainFrame(wx.Frame):
         self.reset_btn.Enable(True)
         self.manual_btn.Enable(True)
         self.run_btn.Enable(True)
-        self.meas_rbox.Enable(True)
 
     def disablegui(self):
         """
@@ -633,7 +625,6 @@ class MainFrame(wx.Frame):
         self.reset_btn.Enable(False)
         self.manual_btn.Enable(False)
         self.run_btn.Enable(False)
-        self.meas_rbox.Enable(False)
 
     def showshortcuts(self, e):
         """
@@ -646,7 +637,7 @@ class MainFrame(wx.Frame):
                            "Select Save Directory: Ctrl + S\n" +\
                            "Reset Motors: Ctrl + T\n" +\
                            "Manual Movement: Ctrl + M\n" +\
-                           "Run Analysis: Ctrl + R\n" +\
+                           "Run Analysis: Ctrl + E\n" +\
                            "Check Shortcut Keys: Ctrl + H"
         with wx.MessageDialog(self, shortcuts_string, 'Shortcut Keys',
                               style=wx.OK | wx.ICON_QUESTION | wx.CENTER) as dlg:
