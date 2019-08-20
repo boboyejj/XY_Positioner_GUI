@@ -28,6 +28,8 @@ from wx.lib.agw import multidirdialog as mdd
 import json
 from src.logger import logger
 from datetime import datetime
+import time
+import keyboard
 
 class MainFrame(wx.Frame):
     """
@@ -95,13 +97,10 @@ class MainFrame(wx.Frame):
 
         self.start_point_text = wx.StaticText(self.scan_panel, label="Starting Point")
         self.start_point_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
-        self.posdesc_text = wx.StaticText(self.scan_panel, label="To use default starting point, set both row and col to 0")
-        self.x_pos_text = wx.StaticText(self.scan_panel, label="row :")
-        self.x_pos_tctrl = wx.TextCtrl(self.scan_panel)
-        self.x_pos_tctrl.SetValue(str(25))
-        self.y_pos_text = wx.StaticText(self.scan_panel, label="col :")
-        self.y_pos_tctrl = wx.TextCtrl(self.scan_panel)
-        self.y_pos_tctrl.SetValue(str(40))
+        self.posdesc_text = wx.StaticText(self.scan_panel, label="To use default starting point, set grid number to 0")
+        self.pos_text = wx.StaticText(self.scan_panel, label="grid number :")
+        self.pos_tctrl = wx.TextCtrl(self.scan_panel)
+        self.pos_tctrl.SetValue(str(0))
 
         self.times_text = wx.StaticText(self.scan_panel, label="Dwell Time Settings")
         self.times_text.SetFont(wx.Font(9, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
@@ -131,6 +130,9 @@ class MainFrame(wx.Frame):
 
         self.auto_checkbox = wx.CheckBox(self.scan_panel, label="Automatic Measurements")  # TODO: may not use
         self.auto_checkbox.SetValue(True)
+
+        self.zoom_checkbox = wx.CheckBox(self.scan_panel, label="Zoom Scan")
+        self.zoom_checkbox.SetValue(False)
 
         self.test_info_text = wx.StaticText(self.scan_panel, label="Test Information")
         self.test_info_text.SetFont(wx.Font(10, wx.DECORATIVE, wx.NORMAL, wx.BOLD))
@@ -172,9 +174,12 @@ class MainFrame(wx.Frame):
         menubar = wx.MenuBar()
         helpmenu = wx.Menu()
         shortcuthelp_item = wx.MenuItem(helpmenu, help_id, text="Shortcuts", kind=wx.ITEM_NORMAL)
+        pause_item = wx.MenuItem(helpmenu, pause_id, text="Pause", kind=wx.ITEM_NORMAL)
         helpmenu.Append(shortcuthelp_item)
+        helpmenu.Append(pause_item)
         menubar.Append(helpmenu, 'Help')
         self.Bind(wx.EVT_MENU, self.showshortcuts, id=help_id)
+        self.Bind(wx.EVT_MENU, self.pauseProg, id=pause_id)
         self.SetMenuBar(menubar)
 
         # Sizers/Layout, Static Lines, & Static Boxes
@@ -202,10 +207,8 @@ class MainFrame(wx.Frame):
 
         self.text_input_sizer.Add(self.start_point_text, proportion=0, flag=wx.LEFT)
         self.text_input_sizer.Add(self.posdesc_text, proportion=0, flag=wx.LEFT)
-        self.pos_sizer.Add(self.x_pos_text, proportion=0, flag=wx.LEFT)
-        self.pos_sizer.Add(self.x_pos_tctrl, proportion=1, flag=wx.LEFT | wx.RIGHT | wx.EXPAND, border=5)
-        self.pos_sizer.Add(self.y_pos_text, proportion=0, flag=wx.LEFT)
-        self.pos_sizer.Add(self.y_pos_tctrl, proportion=1, flag=wx.LEFT | wx.EXPAND, border=5)
+        self.pos_sizer.Add(self.pos_text, proportion=0, flag=wx.LEFT)
+        self.pos_sizer.Add(self.pos_tctrl, proportion=1, flag=wx.LEFT | wx.RIGHT | wx.EXPAND, border=5)
         self.text_input_sizer.Add(self.pos_sizer, proportion=0, flag=wx.EXPAND)
 
         self.text_input_sizer.Add(self.times_text, proportion=0, flag=wx.LEFT)
@@ -224,6 +227,7 @@ class MainFrame(wx.Frame):
         self.saveline_sizer.Add(self.save_tctrl, proportion=1, flag=wx.LEFT | wx.EXPAND)
         self.saveline_sizer.Add(self.save_btn, proportion=0, flag=wx.ALIGN_RIGHT | wx.LEFT, border=5)
         self.checkbox_sizer.Add(self.auto_checkbox, proportion=0, flag=wx.ALIGN_LEFT | wx.ALL, border=5)
+        self.checkbox_sizer.Add(self.zoom_checkbox, proportion=0, flag=wx.ALIGN_LEFT | wx.ALL, border=5)
         self.text_input_sizer.Add(self.saveline_sizer, proportion=0, flag=wx.LEFT | wx.EXPAND)
         self.text_input_sizer.Add(self.checkbox_sizer, proportion=0, flag=wx.LEFT | wx.EXPAND)
         self.text_input_sizer.Add(wx.StaticLine(self.scan_panel, wx.ID_ANY, style=wx.LI_HORIZONTAL),
@@ -313,7 +317,7 @@ class MainFrame(wx.Frame):
             config['x'] = self.x_tctrl.GetValue()
             config['y'] = self.y_tctrl.GetValue()
             config['step'] = self.grid_tctrl.GetValue()
-            config['start_pos'] = (self.x_pos_tctrl.GetValue(), self.y_pos_tctrl.GetValue())
+            config['start_pos'] = self.pos_tctrl.GetValue()
             config['dwell'] = self.dwell_tctrl.GetValue()
             config['zdwell'] = self.zdwell_tctrl.GetValue()
             config['start'] = self.span_start_tctrl.GetValue()
@@ -345,8 +349,7 @@ class MainFrame(wx.Frame):
             self.x_tctrl.SetValue(config['x'])
             self.y_tctrl.SetValue(config['y'])
             self.grid_tctrl.SetValue(config['step'])
-            self.x_pos_tctrl.SetValue(config['start_pos'][0])
-            self.y_pos_tctrl.SetValue(config['start_pos'][1])
+            self.pos_tctrl.SetValue(config['start_pos'])
             self.dwell_tctrl.SetValue(config['dwell'])
             self.zdwell_tctrl.SetValue(config['zdwell'])
             self.span_start_tctrl.SetValue(config['start'])
@@ -382,7 +385,8 @@ class MainFrame(wx.Frame):
             dwell = float(self.dwell_tctrl.GetValue())
             span_start = float(self.span_start_tctrl.GetValue())
             span_stop = float(self.span_stop_tctrl.GetValue())
-            start_pos = (float(self.x_pos_tctrl.GetValue()), float(self.y_pos_tctrl.GetValue()))
+            start_pos = float(self.pos_tctrl.GetValue())
+            zoom_scan = self.zoom_checkbox.GetValue()
         except ValueError:
             self.errormsg("Invalid scan parameters.\nPlease input numerical values only.")
             return
@@ -406,8 +410,15 @@ class MainFrame(wx.Frame):
         meas_rbw = self.rbw_rbox.GetStringSelection()
         # Finding the measurement
         meas = self.meas_rbox.GetStringSelection()
-        self.run_thread = AreaScanThread(self, x, y, step, dwell, span_start, span_stop, savedir,
+
+        if zoom_scan == "False":
+            self.run_thread = AreaScanThread(self, x, y, step, dwell, span_start, span_stop, savedir,
                                          comment, meas_type, meas_field, meas_side, meas_rbw, meas, start_pos)
+        else:
+            self.run_thread = ZoomScanThread(self, x, y, step, dwell, span_start, span_stop, savedir,
+                                             comment, meas_type, meas_field, meas_side, meas_rbw, meas,
+                                             self.curr_row, self.curr_col)
+
         # self.disablegui()
         logger.info("")
         logger.info(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
@@ -585,6 +596,7 @@ class MainFrame(wx.Frame):
         self.span_stop_tctrl.Enable(True)
         self.save_tctrl.Enable(True)
         self.auto_checkbox.Enable(True)
+        self.zoom_checkbox.Enable(True)
         self.save_btn.Enable(True)
         self.eut_model_tctrl.Enable(True)
         self.eut_sn_tctrl.Enable(True)
@@ -613,6 +625,7 @@ class MainFrame(wx.Frame):
         self.span_stop_tctrl.Enable(False)
         self.save_tctrl.Enable(False)
         self.auto_checkbox.Enable(False)
+        self.zoom_checkbox.Enable(False)
         self.save_btn.Enable(False)
         self.eut_model_tctrl.Enable(False)
         self.eut_sn_tctrl.Enable(False)
@@ -642,6 +655,22 @@ class MainFrame(wx.Frame):
         with wx.MessageDialog(self, shortcuts_string, 'Shortcut Keys',
                               style=wx.OK | wx.ICON_QUESTION | wx.CENTER) as dlg:
             dlg.ShowModal()
+
+    def pauseProg(self,e):
+        """
+        pause the program
+        """
+        print("press Enter to continue")
+
+        while True:
+            key = keyboard.read_key()
+
+            if key == "enter":
+                print("Program is resumed")
+                # exit(0)
+                break
+
+            time.sleep(0.5)
 
     def errormsg(self, errmsg):
         """

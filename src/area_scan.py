@@ -25,6 +25,7 @@ import serial
 import wx
 import sys
 from src.logger import logger
+import time
 
 
 class AreaScanThread(threading.Thread):
@@ -32,7 +33,7 @@ class AreaScanThread(threading.Thread):
     Thread for handling general area scans.
     """
     def __init__(self, parent, x_distance, y_distance, grid_step_dist, dwell_time, span_start,
-                 span_stop, save_dir, comment, meas_type, meas_field, meas_side, meas_rbw, meas, start_pos):
+                 span_stop, save_dir, comment, meas_type, meas_field, meas_side, meas_rbw, meas,start_pos):
         """
         :param parent: Parent object (i.e. the Frame/GUI calling the thread).
         :param x_distance: Width of the scanning area.
@@ -47,7 +48,7 @@ class AreaScanThread(threading.Thread):
         :param meas_field: Measurement field (Electric or magnetic (mode A or B)).
         :param meas_side: Side of the phone being scanned.
         :param meas_rbw: Resolution bandwidth for the FFT.
-        :param start_pos: User defined starting point if not 0 (tupple(row, col)).
+        :param start_pos: User defined starting point (grid number) if not 0.
         """
         self.parent = parent
         self.callback = parent.update_values
@@ -72,8 +73,6 @@ class AreaScanThread(threading.Thread):
         self.curr_row = None  # Current position row
         self.curr_col = None  # Current position col
         self.max_fname = None  # The filename of the screenshot for the maximum measurement
-        self.exc = None
-        self._stop_event = threading.Event()
         super(AreaScanThread, self).__init__()
 
     def run(self):
@@ -85,10 +84,6 @@ class AreaScanThread(threading.Thread):
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
         print("Measurement: ", self.meas)
-        logger.info("Area Scan")
-        logger.info("Measurement Parameters:")
-        logger.info("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
-        logger.info("Measurement: %s", self.meas)
 
         # Preparation
         x_points = int(np.ceil(np.around(self.x_distance / self.grid_step_dist, decimals=3))) + 1
@@ -98,12 +93,15 @@ class AreaScanThread(threading.Thread):
             m = MotorDriver()
         except serial.SerialException:
             print("Error: Connection to C4 controller was not found")
-            logger.info("Error: Connection to C4 controller was not found")
             wx.CallAfter(self.parent.enablegui)
             self.exc = sys.exc_info()
+            i = 10
+            while i:
+                print(i)
+                time.sleep(1)
+                i -= 1
             print("Thread '%s' threw an exception: %s" % (self.getName(), self.exc[0]))
             return
-
         narda = NardaNavigator()
         # Set measurement settings
         narda.selectTab('mode')
@@ -121,24 +119,13 @@ class AreaScanThread(threading.Thread):
         # Run scan
         self.values, self.grid, self.curr_row,\
         self.curr_col, self.max_fname = run_scan(x_points, y_points, m, narda, self.num_steps,
-                                                     self.dwell_time, self.save_dir, self.comment,
-                                                     self.meas_type, self.meas_field, self.meas_side,
-                                                     self.meas, self.start_pos)
+                                                 self.dwell_time, self.save_dir, self.comment,
+                                                 self.meas_type, self.meas_field, self.meas_side,
+                                                 self.meas, self.start_pos)
         print("General area scan complete.")
-        logger.info("General area scan complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
         m.destroy()
-
-        self.callback(self)
-        wx.CallAfter(self.parent.run_post_scan)
-        m.destroy()
-
-    def stop(self):
-        self._stop_event.set()
-
-    def stopped(self):
-        return self._stop_event.is_set()
 
 
 class ZoomScanThread(threading.Thread):
@@ -147,6 +134,7 @@ class ZoomScanThread(threading.Thread):
     """
     def __init__(self, parent, dwell_time, span_start, span_stop, save_dir, comment, meas_type,
                  meas_field, meas_side, meas_rbw, meas, num_steps, values, grid, curr_row, curr_col):
+
         """
         :param parent: Parent object (i.e. the Frame/GUI calling the thread).
         :param dwell_time: Wait time at each scan point before measurements are recorded.
@@ -184,7 +172,6 @@ class ZoomScanThread(threading.Thread):
         self.values = values  # original array of values
         self.zoom_values = None  # Placeholder for zoom coordinates
         self.grid = grid  # Placeholder for the coordinate grid array
-
         super(ZoomScanThread, self).__init__()
 
     def run(self):
@@ -196,10 +183,6 @@ class ZoomScanThread(threading.Thread):
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
         print("Measurement: ", self.meas)
-        logger.info("Zoom Scan")
-        logger.info("Measurement Parameters:")
-        logger.info("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
-        logger.info("Measurement: %s", self.meas)
 
         # Preparation
         x_points = 5
@@ -311,10 +294,6 @@ class CorrectionThread(threading.Thread):
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
         print("Measurement: ", self.meas)
-        logger.info("Correction")
-        logger.info("Measurement Parameters:")
-        logger.info("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
-        logger.info("Measurement: %s", self.meas)
 
         # Check ports and instantiate relevant objects (motors, NARDA driver)
         try:
@@ -328,7 +307,6 @@ class CorrectionThread(threading.Thread):
         narda.selectInputField(self.meas_field)
         narda.selectTab('span')
         narda.inputTextEntry('start', str(self.span_start))
-        narda.inputTextEntry('start', str(self.span_start)) # Fixed improper frequency range
         narda.inputTextEntry('stop', str(self.span_stop))
         narda.selectRBW(self.meas_rbw)
         narda.selectTab('data')
@@ -371,7 +349,7 @@ class CorrectionThread(threading.Thread):
 
 
 def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comment, meas_type, meas_field, meas_side,
-             meas, start_pos):
+             meas,start_pos):
     """
     Performs an area scan according to the specified parameters.
     The scan consists of moving the NS probe to an intended coordinate, taking a measurement, saving the results,
@@ -394,23 +372,22 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
              and columns), and the filename corresponding to the highest measurement point.
     """
 
-    # Move to the initial position (top left) of grid scan and measure once
     move_to_pos_one(m, int(num_steps), x_points, y_points)
-    start_grid = 1
-    row = start_pos[0]
-    col = start_pos[1]
 
     # Generate a 'traversal grid' with values starting from 1 showing the order of measurement taking
+    # x_points ~ row, y_points ~ col
     grid = generate_grid(x_points, y_points)
     values = np.zeros(grid.shape)  # Placeholder for filling in with measurement values
 
     # Move to the user defined postion
-    if row or col:
-        # user defined initial position (row, col)
+    time.sleep(2)
+    if start_pos > 0:
+        # move to user defined position
+        row, col = np.where(grid == start_pos)
         m.forward_motor_two(int(num_steps * row))  # TODO: double check if need -1
         m.forward_motor_one(int(num_steps * col))
-        start_grid = grid[row][col]
-
+        print("start position: (", row, ", ", col, ")")
+    time.sleep(2)
     print("Scan path:")
     print(grid)
     print("Values:")
@@ -425,14 +402,13 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
     max_filename = ''  # Filename of the maximum measurement point
 
     # General Area Scan
-    for i in range(start_grid, grid.size + 1):
+    for i in range(start_pos, grid.size + 1):
         # Find the position of the next
         next_row, next_col = np.where(grid == i)
         next_row = next_row[0]
         next_col = next_col[0]
-        if i == start_grid: # scan the starting position
-            curr_row = next_row
-            curr_col = next_col
+        if i == start_pos:
+            curr_row, curr_col = next_row, next_col
         # Move the NS probe to the next position
         if next_row > curr_row:  # Move downwards
             y_error += frac_step
@@ -464,8 +440,6 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
             max_filename = fname
         print("---------")
         print(values)
-        logger.info("---------")
-        logger.info(str(values))
     print("Renaming tmp.PNG to %s.PNG" % max_filename)
     # End of scan - rename screenshot file with the correct name
     try:
