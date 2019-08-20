@@ -387,6 +387,8 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
         m.forward_motor_two(int(num_steps * row))  # TODO: double check if need -1
         m.forward_motor_one(int(num_steps * col))
         print("start position: (", row, ", ", col, ")")
+    else:
+        start_pos = 1
     time.sleep(2)
     print("Scan path:")
     print(grid)
@@ -405,6 +407,7 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
     for i in range(start_pos, grid.size + 1):
         # Find the position of the next
         next_row, next_col = np.where(grid == i)
+        print("position: ", i)
         next_row = next_row[0]
         next_col = next_col[0]
         if i == start_pos:
