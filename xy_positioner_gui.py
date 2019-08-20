@@ -31,6 +31,7 @@ from datetime import datetime
 import time
 import keyboard
 
+
 class MainFrame(wx.Frame):
     """
     Main GUI frame of the entire NS testing program. Handles all children GUI and children threads for automated
@@ -329,6 +330,7 @@ class MainFrame(wx.Frame):
             config['rbw'] = self.rbw_rbox.GetSelection()
             config['measurement'] = self.meas_rbox.GetSelection()
             config['dir'] = self.save_tctrl.GetValue()
+            config['zoom'] = self.zoom_checkbox.GetValue()
 
             json.dump(config,open(filename,'w'))
 
@@ -361,6 +363,7 @@ class MainFrame(wx.Frame):
             self.rbw_rbox.SetSelection(int(config['rbw']))
             self.meas_rbox.SetSelection(int(config['measurement']))
             self.save_tctrl.SetValue(config['dir'])
+            self.zoom_checkbox.SetValue(config['zoom'])
 
     def run_area_scan(self, e):
         """
@@ -385,7 +388,7 @@ class MainFrame(wx.Frame):
             dwell = float(self.dwell_tctrl.GetValue())
             span_start = float(self.span_start_tctrl.GetValue())
             span_stop = float(self.span_stop_tctrl.GetValue())
-            start_pos = float(self.pos_tctrl.GetValue())
+            start_pos = int(self.pos_tctrl.GetValue())
             zoom_scan = self.zoom_checkbox.GetValue()
         except ValueError:
             self.errormsg("Invalid scan parameters.\nPlease input numerical values only.")
@@ -410,14 +413,17 @@ class MainFrame(wx.Frame):
         meas_rbw = self.rbw_rbox.GetStringSelection()
         # Finding the measurement
         meas = self.meas_rbox.GetStringSelection()
+        start_pos = int(self.pos_tctrl.GetValue())
 
-        if zoom_scan == "False":
-            self.run_thread = AreaScanThread(self, x, y, step, dwell, span_start, span_stop, savedir,
-                                         comment, meas_type, meas_field, meas_side, meas_rbw, meas, start_pos)
-        else:
+        if zoom_scan:
+            # convert grid number to row and col
+
             self.run_thread = ZoomScanThread(self, x, y, step, dwell, span_start, span_stop, savedir,
                                              comment, meas_type, meas_field, meas_side, meas_rbw, meas,
                                              self.curr_row, self.curr_col)
+        else:
+            self.run_thread = AreaScanThread(self, x, y, step, dwell, span_start, span_stop, savedir,
+                                             comment, meas_type, meas_field, meas_side, meas_rbw, meas, start_pos)
 
         # self.disablegui()
         logger.info("")
