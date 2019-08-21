@@ -169,11 +169,15 @@ class NardaNavigator:
         """
         # If not on the data tab, switch to it
         self.selectTab('data')
-        pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/max_hold_unchecked.PNG', grayscale=True))
 
-    def takeMeasurement(self, dwell_time, filename, pathname, comment):
+        try:
+            pgui.click(pgui.locateCenterOnScreen(self.refpics_path + '/max_hold_unchecked.PNG', grayscale=True))
+        except:
+            return
+
+    def takeMeasurement(self, dwell_time, measurement, filename, pathname, comment):
         """
-        Takes a measurement using the NARDA program.
+        Takes a measurement (highest_peak or WideBand) using the NARDA program.
 
         :param dwell_time: Time the NS probe stays in position before taking a measurement.
         :param filename: Filename to save the measurement outputs as.
@@ -225,7 +229,7 @@ class NardaNavigator:
             pass
 
         # Return max recorded value
-        return self.getMaxValue(filename, pathname)
+        return self.getMaxValue(filename, pathname, measurement)
 
     def saveBitmap(self, filename, pathname):
         """
@@ -273,7 +277,7 @@ class NardaNavigator:
             # print("New file '" + filename + ".PNG'" + " has been saved.")
         # self.minimizeSnip()
 
-    def getMaxValue(self, filepath, pathname):
+    def getMaxValue(self, filepath, pathname, measurement):
         """
         Extracts the 'Highest Peak (A/m)' value from a given text output file.
         :param filepath: Name of text output file.
@@ -281,7 +285,10 @@ class NardaNavigator:
         :return: Returns the float 'Highest Peak (A/m)' value.
         """
         with open(pathname + '/' + filepath + '.txt', 'r') as f:
-            maxValLine = f.readlines()[8]
+            index = 7 if measurement == "WideBand" else 8
+            print("measurement is ", measurement)
+            #print("index: ", str(index))
+            maxValLine = f.readlines()[index]
             for string in maxValLine.split(' '):
                 try:
                     maxVal = float(string)

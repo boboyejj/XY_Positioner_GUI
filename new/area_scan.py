@@ -24,6 +24,7 @@ import numpy as np
 import serial
 import wx
 import sys
+from src.logger import logger
 import time
 
 
@@ -72,7 +73,6 @@ class AreaScanThread(threading.Thread):
         self.curr_row = None  # Current position row
         self.curr_col = None  # Current position col
         self.max_fname = None  # The filename of the screenshot for the maximum measurement
-
         super(AreaScanThread, self).__init__()
 
     def run(self):
@@ -84,9 +84,6 @@ class AreaScanThread(threading.Thread):
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
         print("Measurement: ", self.meas)
-        self.parent.logger.info("Measurement Parameters:")
-        self.parent.logger.info("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
-        self.parent.logger.info("Measurement: %s" % (self.meas))
 
         # Preparation
         x_points = int(np.ceil(np.around(self.x_distance / self.grid_step_dist, decimals=3))) + 1
@@ -96,20 +93,20 @@ class AreaScanThread(threading.Thread):
             m = MotorDriver()
         except serial.SerialException:
             print("Error: Connection to C4 controller was not found")
-            self.parent.logger.info("Error: Connection to C4 controller was not found")
             wx.CallAfter(self.parent.enablegui)
             self.exc = sys.exc_info()
+            i = 10
+            while i:
+                print(i)
+                time.sleep(1)
+                i -= 1
             print("Thread '%s' threw an exception: %s" % (self.getName(), self.exc[0]))
-            self.parent.logger.info("Thread '%s' threw an exception: %s" % (self.getName(), self.exc[0]))
-            #raise Exception("Threw an exception")
-            #exit()
             return
         narda = NardaNavigator()
         # Set measurement settings
         narda.selectTab('mode')
         narda.selectInputField(self.meas_field)
         narda.selectTab('span')
-        narda.inputTextEntry('start', str(self.span_start))
         narda.inputTextEntry('start', str(self.span_start))
         narda.inputTextEntry('stop', str(self.span_stop))
         narda.selectRBW(self.meas_rbw)
@@ -124,12 +121,10 @@ class AreaScanThread(threading.Thread):
         self.curr_col, self.max_fname = run_scan(x_points, y_points, m, narda, self.num_steps,
                                                  self.dwell_time, self.save_dir, self.comment,
                                                  self.meas_type, self.meas_field, self.meas_side,
-                                                 self.meas, self.start_pos, self.parent.logger)
+                                                 self.meas, self.start_pos)
         print("General area scan complete.")
-        self.parent.logger.info("General area scan complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
-        self.parent.updateLogFileName()
         m.destroy()
 
 
@@ -138,8 +133,7 @@ class ZoomScanThread(threading.Thread):
     Thread for handling zoom scans.
     """
     def __init__(self, parent, dwell_time, span_start, span_stop, save_dir, comment, meas_type,
-                 meas_field, meas_side, meas_rbw, meas, num_steps, values, grid, curr_row, curr_col,
-                 zoom_checkbox, start_pos, grid_x, grid_y):
+                 meas_field, meas_side, meas_rbw, meas, num_steps, values, grid, curr_row, curr_col):
 
         """
         :param parent: Parent object (i.e. the Frame/GUI calling the thread).
@@ -178,12 +172,6 @@ class ZoomScanThread(threading.Thread):
         self.values = values  # original array of values
         self.zoom_values = None  # Placeholder for zoom coordinates
         self.grid = grid  # Placeholder for the coordinate grid array
-
-        # variables for zoom_checkbox
-        self.zoom_checkbox = zoom_checkbox
-        self.start_pos = start_pos
-        self.grid_x = grid_x
-        self.grid_y = grid_y
         super(ZoomScanThread, self).__init__()
 
     def run(self):
@@ -195,9 +183,6 @@ class ZoomScanThread(threading.Thread):
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
         print("Measurement: ", self.meas)
-        self.parent.logger.info("Measurement Parameters:")
-        self.parent.logger.info("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
-        self.parent.logger.info("Measurement: %s" % self.meas)
 
         # Preparation
         x_points = 5
@@ -207,14 +192,12 @@ class ZoomScanThread(threading.Thread):
             m = MotorDriver()
         except serial.SerialException:
             print("Error: Connection to C4 controller was not found")
-            self.parent.logger.info("Error: Connection to C4 controller was not found")
             return -1
         narda = NardaNavigator()
         # Set measurement settings
         narda.selectTab('mode')
         narda.selectInputField(self.meas_field)
         narda.selectTab('span')
-        narda.inputTextEntry('start', str(self.span_start))
         narda.inputTextEntry('start', str(self.span_start))
         narda.inputTextEntry('stop', str(self.span_stop))
         narda.selectRBW(self.meas_rbw)
@@ -223,52 +206,34 @@ class ZoomScanThread(threading.Thread):
         # Calculate number of motor steps necessary to move one grid space
         znum_steps = self.num_steps / 4.0  # Zoom scan steps are scaled down
 
-        if self.zoom_checkbox:
-            # Move to the input starting position
-            # Generate the original grid ==> need import more values
-            print("Start self defined zoom scan")
-            grid = generate_grid(self.grid_x, self.grid_y)
-
-            move_to_pos_one(m, int(self.num_steps), self.grid_x, self.grid_y)
-            print("move to pos one")
-            time.sleep(3)
-            move_to_user_defined(m, int(self.num_steps), grid, self.start_pos)
-            print("move to defined starting point")
-            time.sleep(5)
-            print("start zoom scan")
+        # Move to coordinate with maximum value
+        max_val = self.values.max()
+        max_row, max_col = np.where(self.values == float(max_val))
+        print("Max value: %f" % max_val)
+        print(max_row, max_col)
+        print("Max value coordinates: Row - %d / Col - %d" % (max_row, max_col))
+        row_steps = max_row - self.curr_row
+        col_steps = max_col - self.curr_col
+        self.curr_row = max_row
+        self.curr_col = max_col
+        if row_steps > 0:
+            m.forward_motor_two(int(self.num_steps * row_steps))
         else:
-            # Move to coordinate with maximum value
-            max_val = self.values.max()
-            max_row, max_col = np.where(self.values == float(max_val))
-            print("Max value: %f" % max_val)
-            print(max_row, max_col)
-            print("Max value coordinates: Row - %d / Col - %d" % (max_row, max_col))
-            self.parent.logger.info("Max value: %f" % max_val)
-            self.parent.logger.info(max_row, max_col)
-            self.parent.logger.info("Max value coordinates: Row - %d / Col - %d" % (max_row, max_col))
-            row_steps = max_row - self.curr_row
-            col_steps = max_col - self.curr_col
-            self.curr_row = max_row
-            self.curr_col = max_col
-            if row_steps > 0:
-                m.forward_motor_two(int(self.num_steps * row_steps))
-            else:
-                m.reverse_motor_two(int(-1 * self.num_steps * row_steps))
-            if col_steps > 0:
-                m.forward_motor_one(int(self.num_steps * col_steps))
-            else:
-                m.reverse_motor_one(int(-1 * self.num_steps * col_steps))
+            m.reverse_motor_two(int(-1 * self.num_steps * row_steps))
+        if col_steps > 0:
+            m.forward_motor_one(int(self.num_steps * col_steps))
+        else:
+            m.reverse_motor_one(int(-1 * self.num_steps * col_steps))
 
         # Run scan
         self.zoom_values, _, _, _, _ = run_scan(x_points, y_points, m, narda, znum_steps,
                                                 self.dwell_time, self.save_dir, self.comment,
-                                                self.meas_type, self.meas_field, 'z', self.meas, 0, self.parent.logger)
+                                                self.meas_type, self.meas_field, 'z', self.meas)
         # Move back to original position
         m.reverse_motor_one(int(2 * znum_steps))
         m.reverse_motor_two(int(2 * znum_steps))
 
         print("Zoom scan complete.")
-        self.parent.logger.info("Zoom scan complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
         m.destroy()
@@ -329,23 +294,18 @@ class CorrectionThread(threading.Thread):
         print("Measurement Parameters:")
         print("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
         print("Measurement: ", self.meas)
-        self.parent.logger.info("Measurement Parameters:")
-        self.parent.logger.info("Type: %s | Field: %s | Side: %s" % (self.meas_type, self.meas_field, self.meas_side))
-        self.parent.logger.info("Measurement: %s" % self.meas)
 
         # Check ports and instantiate relevant objects (motors, NARDA driver)
         try:
             m = MotorDriver()
         except serial.SerialException:
             print("Error: Connection to C4 controller was not found.")
-            self.parent.logger.info("Error: Connection to C4 controller was not found.")
             return -1
         narda = NardaNavigator()
         # Set measurement settings
         narda.selectTab('mode')
         narda.selectInputField(self.meas_field)
         narda.selectTab('span')
-        narda.inputTextEntry('start', str(self.span_start))
         narda.inputTextEntry('start', str(self.span_start))
         narda.inputTextEntry('stop', str(self.span_stop))
         narda.selectRBW(self.meas_rbw)
@@ -358,7 +318,6 @@ class CorrectionThread(threading.Thread):
 
         # Move to target location
         print("R steps: %d   -   C steps %d" % (row_steps, col_steps))
-        self.parent.logger.info("R steps: %d   -   C steps %d" % (row_steps, col_steps))
         if row_steps > 0:
             m.forward_motor_two(int(self.num_steps * row_steps))
         else:
@@ -371,31 +330,26 @@ class CorrectionThread(threading.Thread):
         self.curr_col = target_col
         print(self.values)
         print("row:", self.curr_row, "col:", self.curr_col)
-        self.parent.logger.info(self.values)
-        self.parent.logger.info("row: %s col: %s" % (self.curr_row, self.curr_col))
         fname = build_filename(self.meas_type, self.meas_field, self.meas_side, self.target)
         # Take measurement
         value = narda.takeMeasurement(self.dwell_time, self.meas, fname, self.save_dir, self.comment)
         self.values[self.curr_row, self.curr_col] = value
         print(self.values)
-        self.parent.logger.info(self.values)
         # Check if max and take screenshot of plot/UI accordingly
         if value > self.values.max():
             print("New max val: %f" % value)
-            self.parent.logger.info("New max val: %f" % value)
             # Switch to Snipping Tool in front of the NARDA program
             narda.saveBitmap(fname, self.save_dir)
             narda.bringToFront()  # Once bitmap is saved, return focus to NARDA
             os.rename(self.save_dir + '/' + self.max_fname + '.PNG', self.save_dir + '/' + fname + '.PNG')
         print("Correction of previous value complete.")
-        self.parent.logger.info("Correction of previous value complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
         m.destroy()
 
 
 def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comment, meas_type, meas_field, meas_side,
-             meas,start_pos, logger):
+             meas,start_pos):
     """
     Performs an area scan according to the specified parameters.
     The scan consists of moving the NS probe to an intended coordinate, taking a measurement, saving the results,
@@ -429,17 +383,15 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
     time.sleep(2)
     if start_pos > 0:
         # move to user defined position
-        move_to_user_defined(m,int(num_steps), grid, start_pos)
-    else:
-        start_pos = 1
+        row, col = np.where(grid == start_pos)
+        m.forward_motor_two(int(num_steps * row))  # TODO: double check if need -1
+        m.forward_motor_one(int(num_steps * col))
+        print("start position: (", row, ", ", col, ")")
     time.sleep(2)
     print("Scan path:")
     print(grid)
     print("Values:")
     print(values)
-
-    logger.info("Scan path:\n %s" % grid)
-    logger.info("Values:\n %s" % values)
 
     # Create an accumulator for the fraction of a step lost each time a grid space is moved
     frac_step = num_steps - int(num_steps)
@@ -453,8 +405,6 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
     for i in range(start_pos, grid.size + 1):
         # Find the position of the next
         next_row, next_col = np.where(grid == i)
-        print("position: ", i)
-        logger.info("position: %s" % i)
         next_row = next_row[0]
         next_col = next_col[0]
         if i == start_pos:
@@ -483,7 +433,6 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
         # If new maximum value found, save take a screenshot of the GUI interface
         if value > curr_max:
             print("New max val: %f" % value)
-            logger.info("New max val: %f" % value)
             # Switch to Snipping Tool in front of the NARDA program
             narda.saveBitmap(fname, savedir)
             narda.bringToFront()  # Once bitmap is saved, return focus to NARDA
@@ -491,10 +440,7 @@ def run_scan(x_points, y_points, m, narda, num_steps, dwell_time, savedir, comme
             max_filename = fname
         print("---------")
         print(values)
-        logger.info("------------------")
-        logger.info(values)
     print("Renaming tmp.PNG to %s.PNG" % max_filename)
-    logger.info("Renaming tmp.PNG to %s.PNG" % max_filename)
     # End of scan - rename screenshot file with the correct name
     try:
         os.rename(savedir + '/tmp.PNG', savedir + '/' + max_filename + '.PNG')
@@ -547,22 +493,6 @@ def move_to_pos_one(moto, num_steps, rows, cols):
     """
     moto.reverse_motor_two(int(num_steps * rows / 2.0))
     moto.reverse_motor_one(int(num_steps * cols / 2.0))
-
-
-def move_to_user_defined(moto, num_steps, grid, start_pos):
-    """Move motor to first position in grid.
-
-        :param moto: MotorDriver to control motion.
-        :param num_steps: Number of motor steps between grid points.
-        :param rows: Number of grid rows.
-        :param cols: Number of grid cols.
-        :return: None
-    """
-    # move to user defined position
-    row, col = np.where(grid == start_pos)
-    moto.forward_motor_two(int(num_steps * row))
-    moto.forward_motor_one(int(num_steps * col))
-    print("start position: (", row, ", ", col, ")")
 
 
 def generate_grid(rows, columns):

@@ -177,6 +177,32 @@ class MotorDriver:
         self.port.flush()
         print("Motors reset successfully.")
 
+    def set_start_point(self, offset=(3788, 4300)):
+        """
+        Set the NS probe position to a starting point.
+
+        :param offset: number of steps from the home coordinates.
+        :return: Nothing
+        """
+        self.port.write(str.encode('!1wh1,r,' + str(offset[0]) + '\r'))
+        self.port.readline()
+        self.port.write(str.encode('!1wh2,r,' + str(offset[1]) + '\r'))
+        self.port.readline()
+        # print 'Home settings written (a if yes), ', port.readline()
+        self.port.flush()
+
+        # Home both motors
+        motor_start = str.encode('!1h12\r')
+        self.port.write(motor_start)
+        while self.port.read().decode() != 'o':
+            pass
+        print("Motor 1 reset.")
+        while self.port.read().decode() != 'o':
+            pass
+        print("Motor 2 reset.")
+        self.port.flush()
+        print("Motors set to the start point successfully.")
+
     def destroy(self):
         """
         Flush remaining data and close port.

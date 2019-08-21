@@ -1,1 +1,1 @@
-{"x": "11.2", "y": "16.799999999999997", "step": "2.8", "start_pos": ["0", "0"], "dwell": "3", "zdwell": "3", "start": "0.005", "stop": "5", "checkbox": true, "type": 0, "field": 0, "side": 1, "rbw": 2, "measurement": 0, "dir": "C:\\Users\\bobo.ye\\Documents\\GitHub\\XY_Positioner_GUI"}
+{"x": "8", "y": "4", "step": "2", "start_pos": "2", "dwell": "3", "zdwell": "3", "start": "0.005", "stop": "5", "checkbox": true, "type": 0, "field": 0, "side": 1, "rbw": 0, "measurement": 1, "dir": "C:\\Users\\bobo.ye\\Desktop\\Bobo_NS update", "zoom": false}

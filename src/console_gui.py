@@ -46,7 +46,7 @@ class ConsoleGUI(wx.Frame):
         :param title: Title for the GUI window.
         """
         wx.Frame.__init__(self, parent, title=title, size=(800, 700))
-        self.SetWindowStyle(wx.CAPTION | wx.CLOSE_BOX | wx.STAY_ON_TOP)
+        #self.SetWindowStyle(wx.CAPTION | wx.CLOSE_BOX | wx.STAY_ON_TOP)
 
         # UI Elements
         self.console_text = wx.StaticText(self, label="Console Output")
