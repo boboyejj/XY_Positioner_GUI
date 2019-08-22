@@ -1,7 +1,0 @@
-18:33:07:2019/08/21
-18:33:07:Running general scan...
-18:33:07:Measurement Parameters:
-18:33:07:Type: Limb | Field: Electric | Side: Back
-18:33:07:Measurement: Highest Peak
-18:33:07:Error: Connection to C4 controller was not found
-18:33:07:Thread 'Thread-4' threw an exception: <class 'serial.serialutil.SerialException'>

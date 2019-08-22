@@ -129,7 +129,6 @@ class AreaScanThread(threading.Thread):
         self.parent.logger.info("General area scan complete.")
         self.callback(self)
         wx.CallAfter(self.parent.run_post_scan)
-        self.parent.updateLogFileName()
         m.destroy()
 
 

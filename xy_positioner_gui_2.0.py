@@ -709,7 +709,7 @@ class MainFrame(wx.Frame):
 
     def getLogFileName(self):
         """
-        Update the default log name "NS Testing.log" to Model + Test Number + Time
+        Create log filename as Datetime + Model + Test Number
 
         :return: None
         """
@@ -722,7 +722,7 @@ class MainFrame(wx.Frame):
             self.errormsg("Invalid scan parameters.\nPlease input numerical values only.")
             return
 
-        filename += str(datetime.now().strftime("%Y%m%d_%H%M"))
+        filename += str(datetime.now().strftime("%Y%m%d_%H%M%S"))
         filename += "_" + model + "_" + testNum
         filename = "log/"+filename
         filename += ".log"
